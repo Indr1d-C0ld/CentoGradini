@@ -127,13 +127,26 @@ return [
         // --- Le case ------------------------------------------------------------------
         [
             'lkey' => 'casa_kasuga', 'dove' => 'dai Kasuga', 'nome' => 'La palazzina dei Kasuga',
-            'sottotitolo' => 'Secondo piano, la porta in fondo',
-            'descrizione' => 'Un appartamento piccolo per quattro persone, con la camera oscura del '
-                . 'padre ricavata in uno sgabuzzino e un gatto che tenta la fuga ogni volta che si '
-                . 'apre la porta. Ci si entra solo se invitati, e chi ci entra si accorge presto che '
-                . 'in questa casa ci sono delle regole che nessuno spiega.',
+            'sottotitolo' => 'La «Green Castle», in cima alla collina',
+            'descrizione' => 'Cinque piani tirati su nel 1982, in cima alla collina, e dalla porta '
+                . 'principale si esce dritti verso la scalinata. Dentro, un appartamento piccolo per '
+                . 'quattro persone, con la camera oscura del padre ricavata in uno sgabuzzino e un '
+                . 'gatto che tenta la fuga ogni volta che si apre la porta. Ci si entra solo se '
+                . 'invitati, e chi ci entra si accorge presto che in questa casa ci sono delle '
+                . 'regole che nessuno spiega.',
             'tipo' => 'casa', 'x' => 520, 'y' => 434, 'privato' => 1, 'ordine' => 100,
         ],
+        [
+            'lkey' => 'casa_hiyama', 'dove' => 'da Hikaru', 'nome' => 'Casa Hiyama',
+            'sottotitolo' => 'Rumorosa, e la porta non è mai chiusa',
+            'descrizione' => 'Una casa bassa in fondo alla discesa, con la bicicletta appoggiata al '
+                . 'muro e sempre qualcuno che entra o esce. Ci si festeggia tutto: la festa delle '
+                . 'bambole a marzo, il capodanno, i compleanni, e qualunque altra scusa. Chi ci è '
+                . 'stato una volta ci torna, perché nessuno gli ha mai chiesto di annunciarsi.',
+            'tipo' => 'casa', 'x' => 766, 'y' => 296,
+            'apre' => null, 'chiude' => null, 'ordine' => 115,
+        ],
+
         [
             'lkey' => 'casa_ayukawa', 'dove' => 'da Ayukawa', 'nome' => 'Casa Ayukawa',
             'sottotitolo' => 'Grande, ordinata e quasi sempre vuota',

@@ -43,8 +43,10 @@ prova('da ogni luogo si torna alla scalinata', function () {
 });
 
 prova('i collegamenti a piedi sono reciproci', function () {
-    // Le uniche asimmetrie ammesse sono volute e documentate: la scalinata.
-    $attese = [['gradini', 'liceo']];
+    // Le uniche asimmetrie ammesse sono volute e documentate: la scalinata,
+    // che collega la cima della collina a tutto il quartiere che sta sotto.
+    $attese = [['gradini', 'liceo'], ['gradini', 'abcb'], ['gradini', 'viale'],
+               ['gradini', 'casa_ayukawa'], ['gradini', 'casa_hiyama']];
     foreach (Luoghi::archi() as $da => $lista) {
         foreach ($lista as $arco) {
             $ritorno = Luoghi::minuti($arco['a'], $da);
@@ -61,11 +63,28 @@ prova('i collegamenti a piedi sono reciproci', function () {
     }
 });
 
-prova('la scalinata costa di più in salita', function () {
-    $su  = Luoghi::minuti('gradini', 'liceo');
-    $giu = Luoghi::minuti('liceo', 'gradini');
-    vero($su !== null && $giu !== null);
-    vero($su > $giu, 'cento gradini in salita non sono cento in discesa');
+prova('LA SCALINATA VA NEL VERSO GIUSTO', function () {
+    // Questa prova, fino al 19/09/2026, codificava la geografia sbagliata:
+    // dava il liceo in cima e la casa dei Kasuga in fondo. È l'opposto del
+    // canone. La ricostruzione del grande escalier (Réflexion 16, ricavata
+    // dall'episodio 32 e confermata dal 6) dice che la residenza dei Kasuga
+    // sta in cima alla collina e che «nei quartieri in fondo ai gradini si
+    // trovano le case di Madoka, di Hikaru, l'ABCB e la scuola». Kyosuke
+    // scende per andare a lezione.
+    //
+    // `gradini` è il pianerottolo in alto: quello dove ha raccolto il
+    // cappello. Da lì si scende verso tutto il resto.
+    foreach (['liceo', 'abcb', 'viale', 'casa_ayukawa', 'casa_hiyama'] as $sotto) {
+        $giu = Luoghi::minuti('gradini', $sotto);
+        $su  = Luoghi::minuti($sotto, 'gradini');
+        vero($giu !== null && $su !== null, "manca il collegamento con {$sotto}");
+        vero($su > $giu, "verso {$sotto}: salire deve costare più che scendere ({$su} contro {$giu})");
+    }
+
+    // E la casa dei Kasuga è in cima, accanto alla scalinata: si arriva e si
+    // torna nello stesso tempo, perché non c'è dislivello.
+    uguale(Luoghi::minuti('casa_kasuga', 'gradini'), Luoghi::minuti('gradini', 'casa_kasuga'),
+        'la palazzina dei Kasuga sta sul pianerottolo in alto: nessun dislivello');
 });
 
 prova('i tempi sono plausibili', function () {

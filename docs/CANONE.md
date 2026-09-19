@@ -429,6 +429,62 @@ a nessuno, complicano la vita a tutti.
 
 ---
 
+## 7-ter. La collina, e dove abita Hikaru
+
+Restava una domanda sola dalla rilettura: **dove abitano Hikaru e Yusaku**. I riassunti non
+lo dicono, ma la risposta c'era in un posto che non avevamo ancora spremuto — la
+*Réflexion 16* del sito francese, dieci capitoli di studio sul grande escalier ricavati
+fotogramma per fotogramma dalla serie.
+
+### La risposta
+
+> «C'est en effet dans les quartiers situés **au bas des marches** que se trouvent les
+> domiciles de **Madoka, Hikaru**, l'Abcb, ainsi que **l'école** où ils se rendent.»
+
+È ricavata dall'episodio 32, in cui Kyosuke insegue Hikaru dalla residenza fino alla
+scalinata e la raggiunge mentre lei comincia a scendere, ed è confermata dall'episodio 6, in
+cui lo si vede in fondo ai gradini mentre va a scuola.
+
+Quindi: **casa di Hikaru sta in fondo alla scalinata**, nello stesso quartiere di casa
+Ayukawa, dell'ABCB e del liceo. È entrata nella mappa come `casa_hiyama`, e nell'opera è un
+posto molto frequentato: ci si festeggia l'Hinamatsuri (cap. 49), il capodanno (cap. 92), si
+va a mangiare la torta (cap. 78).
+
+Su **Yusaku** non c'è ancora niente. L'unico indizio è un paio di inquadrature in cui lo si
+vede uscire dalla palazzina dei Kasuga a due episodi di distanza, che molto più
+probabilmente vuol dire che era in visita. Resta in via commerciale per scelta nostra, e la
+scelta è dichiarata tale nel seme.
+
+### E una correzione seria alla mappa
+
+La stessa fonte ha fatto emergere che **avevamo la collina al contrario**.
+
+La residenza dei Kasuga si chiama **«Green Castle»** (poi «Green House»), ha cinque piani, è
+stata costruita nel 1982 e sta **in cima alla collina**; la scalinata comincia proprio di
+fronte all'uscita principale, a un centinaio di metri. Tutto il resto del quartiere — la
+scuola compresa — sta **sotto**. Kyosuke *scende* per andare a lezione.
+
+La nostra mappa faceva l'opposto: il liceo in cima e la palazzina in fondo. C'era persino una
+prova che lo affermava (`la scalinata costa di più in salita`, che confrontava `gradini` con
+`liceo` nel verso sbagliato) — cioè avevamo scritto una verifica che difendeva l'errore.
+
+Adesso `gradini` è il pianerottolo **in alto**, quello dove Kyosuke ha raccolto il cappello, e
+scendere verso liceo, ABCB, viale, casa Ayukawa e casa Hiyama costa meno che risalire. La
+palazzina dei Kasuga è l'unica cosa che sta sullo stesso piano della scalinata, e infatti è
+l'unico collegamento simmetrico.
+
+### Altre cose che la Réflexion 16 dà, e che non abbiamo ancora usato
+
+- Un **secondo scalinata** dietro la residenza, che scende a destra invece che a sinistra.
+- L'**area giochi** per bambini (altalena e scivolo) subito a destra arrivando in cima, e i
+  **giardini pensili** a terrazze sul versante — è lì che al cap. 45 Madoka dice a Kyosuke
+  che se ne va in America.
+- L'orientamento: la scalinata è **nord-sud**, e guardando giù si è rivolti a sud.
+- Il conto dei gradini per settori: nell'episodio 1, settori da quindici più un ultimo da
+  venti.
+
+---
+
 ## 8. Cosa resta da fare
 
 1. **I 156 capitoli ci sono, i loro contenuti no.** `fonti/capitoli_manga.tsv` ha numero, anno,

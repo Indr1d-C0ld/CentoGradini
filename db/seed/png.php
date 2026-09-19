@@ -23,11 +23,17 @@ declare(strict_types=1);
  * che è il modo in cui le voci attraversano la mappa.
  *
  * **La prima tappa è dove si dorme**, e la notte ci si torna: la usa
- * `Abitanti::dove()`. I Kasuga e Akane stanno alla palazzina, Madoka a casa
- * sua; per Hikaru, Yusaku, Komatsu e Hatta la casa non è sulla nostra mappa,
- * e li abbiamo messi in via commerciale, che nel Giappone del 1987 è fatta di
- * negozi con l'appartamento sopra. Quella è una scelta nostra, non canone. Il
- * Master dorme sopra il bar, e infatti il suo giro è di un posto solo.
+ * `Abitanti::dove()`. I Kasuga e Akane stanno alla palazzina in cima alla
+ * collina, Madoka a casa sua in fondo ai gradini, e **Hikaru pure**: la
+ * ricostruzione del grande escalier (CANONE §7-ter) dice che le case di
+ * Madoka e di Hikaru, l'ABCB e la scuola stanno tutte nel quartiere sotto la
+ * scalinata, e dal 19/09/2026 `casa_hiyama` è sulla mappa.
+ *
+ * Per **Yusaku, Komatsu e Hatta** la casa resta ignota: li abbiamo messi in
+ * via commerciale, che nel Giappone del 1987 è fatta di negozi con
+ * l'appartamento sopra. Quella è una scelta nostra, non canone, e si vede
+ * che lo è. Il Master dorme sopra il bar, e infatti il suo giro è di un
+ * posto solo.
  *
  * Confidenza: `canone` per date e fatti attestati, `ricostruita` per i
  * compleanni che il canone non dà e per la taratura numerica, che è nostra.
@@ -98,7 +104,7 @@ return [
         // alto del quartiere: si attacca alle persone, ed è il suo modo di
         // stare al mondo, non un difetto.
         $p('hikaru', 'Hikaru', 'Hiyama', 'f', 'superiori', 1, 11, 15, 1971, false,
-           'liceo', 'commerciale,liceo,abcb,sala_giochi,parco,gradini',
+           'liceo', 'casa_hiyama,liceo,abcb,sala_giochi,parco,gradini',
            [5, 7, 13, 12], [5, 8, 3, 7, 6, 6, 5, 8], 8, 0,
            'Una del primo anno che ti chiama «darling» in mezzo al corridoio.',
            'Capelli corti scuri, fermaglio rosso, non sta ferma un attimo.'),

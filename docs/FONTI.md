@@ -293,9 +293,17 @@ Elenco aperto, da chiudere prima di scrivere i seed definitivi (fase F2).
    tornare la coorte scolastica, e non c'è un dato vero da metterci al posto. In compenso il
    cap. 36 conferma che **Kyosuke e Hikaru compiono gli anni lo stesso giorno, il 15
    novembre**, e il cap. 111 che Madoka compie diciassette anni durante la serie.
-9. **Dove abitano Hikaru e Yusaku** — resta aperta. Casa di Hikaru esiste e ci si va spesso
-   (Hinamatsuri al cap. 49, capodanno al cap. 92, la torta al cap. 78), ma il quartiere non la
-   colloca mai. Servirebbero le tavole, non i riassunti.
+9. ~~Dove abita Hikaru~~ — **chiusa il 19/09/2026**, e non dai riassunti: dalla *Réflexion 16*
+   del sito francese, uno studio in dieci parti sul grande escalier ricavato fotogramma per
+   fotogramma. «Nei quartieri situati **in fondo ai gradini** si trovano le case di Madoka e
+   di Hikaru, l'ABCB e la scuola dove vanno» — dall'episodio 32, confermato dal 6. Casa
+   Hiyama è entrata nella mappa (`casa_hiyama`). **Su Yusaku resta aperta**: l'unico indizio
+   è che lo si vede uscire dalla palazzina dei Kasuga, che vuol dire quasi certamente che era
+   in visita. Vedi `CANONE.md` §7-ter.
+9-bis. **La stessa fonte ha corretto la nostra collina.** Avevamo il liceo in cima alla
+   scalinata e la palazzina dei Kasuga in fondo; è l'opposto. La residenza — la «Green
+   Castle», cinque piani, 1982 — sta **in cima**, e tutto il resto sta sotto. Corretto, e la
+   prova che difendeva l'errore è stata riscritta.
 10. **Il potere di Kazuya di bloccare i poteri altrui** non compare in nessuno dei 156
     riassunti. È implementato (`poteri.blocco`, migrazione 0012) sulla base della scheda
     giapponese e della FAQ: confidenza `documentato`, **non** `canone`. Se una tavola lo
