@@ -1,0 +1,502 @@
+/* ============================================================================
+   Cento Gradini — foglio di stile unico.
+
+   La tavolozza viene dai fondali di Akemi Takada: arancioni caldi di tramonto,
+   azzurri lavati, rosa polvere, crema. Niente nero puro e niente bianco puro —
+   in quei fondali non ci sono mai. Il tratto e' sottile, gli spazi sono larghi.
+
+   Due temi: "giorno" (crema e tramonto) e "sera" (indaco e luce di lampadina).
+   Si scelgono con data-tema sul tag <html>; senza attributo si segue il
+   sistema, cosi' chi ha il telefono in modalita' scura non viene accecato.
+   ========================================================================= */
+
+:root {
+  /* L'arancione di Takada e' brillante, ma il brillante non regge il contrasto
+     quando ci scrivi sopra o dentro. Quindi due arancioni: uno per il testo e i
+     comandi (verificato >= 4.5 su crema e col bianco sopra) e uno decorativo,
+     che non porta mai testo. Il terzo e' per il passaggio del mouse: si scurisce,
+     non si schiarisce, se no il contrasto crolla proprio quando serve. */
+  --arancio:        #b64f1c;
+  --arancio-vivo:   #e0762e;
+  --arancio-cupo:   #97400f;
+  --su-arancio:     #ffffff;
+  --arancio-pallido:#f7d9bd;
+  --azzurro:        #6d9db8;
+  --azzurro-pallido:#cfe3ec;
+  --rosa:           #e2a2a0;
+  --verde:          #7d9b72;
+
+  --fondo:          #fdf6ee;
+  --fondo-carta:    #fffdf9;
+  --fondo-cavo:     #f5e9dc;
+  --inchiostro:     #4a3f38;
+  --inchiostro-tenue:#756557;
+  --bordo:          #e4d3c0;
+  --ombra:          0 1px 2px rgba(74,63,56,.06), 0 6px 20px rgba(74,63,56,.07);
+
+  --cielo-1: #f9d9a8;
+  --cielo-2: #f0a878;
+  --cielo-3: #d98a86;
+  --cielo-4: #9d8bab;
+
+  --raggio: 10px;
+  --misura: 42rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tema="giorno"]) {
+    --arancio:        #f0904a;
+    --arancio-vivo:   #f5a968;
+    --arancio-cupo:   #f8bd88;
+    --su-arancio:     #1d2033;
+    --arancio-pallido:#4a3524;
+    --azzurro:        #8fb9d1;
+    --azzurro-pallido:#2a3a46;
+    --rosa:           #e0a8a6;
+    --verde:          #93b088;
+
+    --fondo:          #1d2033;
+    --fondo-carta:    #252a40;
+    --fondo-cavo:     #2e3450;
+    --inchiostro:     #e5ddd4;
+    --inchiostro-tenue:#a59dba;
+    --bordo:          #3a4160;
+    --ombra:          0 1px 2px rgba(0,0,0,.25), 0 6px 20px rgba(0,0,0,.28);
+
+    --cielo-1: #3b3550;
+    --cielo-2: #4e3f58;
+    --cielo-3: #5c4457;
+    --cielo-4: #23263b;
+  }
+}
+
+:root[data-tema="sera"] {
+  --arancio:        #f0904a;
+  --arancio-vivo:   #f5a968;
+  --arancio-cupo:   #f8bd88;
+  --su-arancio:     #1d2033;
+  --arancio-pallido:#4a3524;
+  --azzurro:        #8fb9d1;
+  --azzurro-pallido:#2a3a46;
+  --rosa:           #e0a8a6;
+  --verde:          #93b088;
+  --fondo:          #1d2033;
+  --fondo-carta:    #252a40;
+  --fondo-cavo:     #2e3450;
+  --inchiostro:     #e5ddd4;
+  --inchiostro-tenue:#a59dba;
+  --bordo:          #3a4160;
+  --ombra:          0 1px 2px rgba(0,0,0,.25), 0 6px 20px rgba(0,0,0,.28);
+  --cielo-1: #3b3550; --cielo-2: #4e3f58; --cielo-3: #5c4457; --cielo-4: #23263b;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  /* Dietro al body c'e' sempre il fondo giusto, mai il bianco del browser. */
+  background: var(--fondo);
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--fondo);
+  color: var(--inchiostro);
+  font: 16px/1.68 -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans",
+        "Helvetica Neue", Arial, sans-serif;
+  font-feature-settings: "kern" 1;
+}
+
+/* --- Il cielo sopra la scalinata -----------------------------------------
+   Sfondo delle pagine di soglia. E' un gradiente, non un'immagine: pesa zero,
+   si adatta a ogni schermo e cambia da solo con il tema. */
+body[data-ambiente="scalinata"] {
+  /* Il colore esplicito non e' ridondante: la forma breve `background` azzera
+     background-color, e con attachment fixed il gradiente copre solo la
+     finestra. Su una pagina lunga, scorrendo oltre, comparirebbe il bianco
+     del browser. */
+  background-color: var(--fondo);
+  background-image: linear-gradient(180deg,
+      var(--cielo-4) 0%, var(--cielo-3) 26%, var(--cielo-2) 52%, var(--cielo-1) 74%,
+      var(--fondo) 96%);
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+body[data-ambiente="scalinata"] .contenuto { padding-top: clamp(2rem, 9vh, 5rem); }
+
+/* --- Testata --------------------------------------------------------------- */
+.testata {
+  display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+  padding: .85rem clamp(1rem, 4vw, 2rem);
+  border-bottom: 1px solid var(--bordo);
+  background: color-mix(in srgb, var(--fondo-carta) 88%, transparent);
+  backdrop-filter: blur(6px);
+}
+.marchio {
+  display: inline-flex; align-items: baseline; gap: .5rem;
+  font-weight: 600; letter-spacing: .01em; text-decoration: none;
+  color: var(--inchiostro); font-size: 1.06rem;
+}
+.marchio .gradini { color: var(--arancio); letter-spacing: -.12em; font-weight: 700; }
+.marchio small { font-weight: 400; color: var(--inchiostro-tenue); font-size: .8rem; }
+.testata nav { margin-left: auto; display: flex; align-items: center; gap: .35rem 1rem; flex-wrap: wrap; }
+.testata nav a { color: var(--inchiostro-tenue); text-decoration: none; font-size: .92rem; }
+.testata nav a:hover { color: var(--arancio); }
+/* Il richiamo nella testata e' un bottone, non un collegamento di servizio:
+   senza questa riga `.testata nav a` vince per specificita' e gli mette il
+   testo marrone su fondo arancione — contrasto 1,1 e praticamente illeggibile. */
+.testata nav a.bottone { color: var(--su-arancio); }
+.testata nav a.bottone:hover { color: var(--su-arancio); }
+
+/* --- Impaginazione --------------------------------------------------------- */
+.contenuto {
+  flex: 1;
+  width: 100%;
+  max-width: var(--misura);
+  margin: 0 auto;
+  padding: clamp(1.5rem, 5vw, 3rem) clamp(1rem, 4vw, 2rem) 4rem;
+}
+.largo { max-width: 62rem; }
+
+h1, h2, h3 { line-height: 1.25; font-weight: 600; margin: 2rem 0 .6rem; letter-spacing: -.01em; }
+h1 { font-size: clamp(1.6rem, 4.5vw, 2.1rem); margin-top: 0; }
+h2 { font-size: 1.22rem; color: var(--arancio); }
+h3 { font-size: 1.02rem; }
+p { margin: 0 0 1rem; }
+a { color: var(--arancio); text-underline-offset: .18em; }
+hr { border: 0; border-top: 1px solid var(--bordo); margin: 2.2rem 0; }
+small, .tenue { color: var(--inchiostro-tenue); }
+.occhiello {
+  text-transform: uppercase; letter-spacing: .12em; font-size: .72rem;
+  color: var(--inchiostro-tenue); margin: 0 0 .4rem;
+}
+.sommario { font-size: 1.06rem; color: var(--inchiostro-tenue); }
+
+/* --- Riquadri -------------------------------------------------------------- */
+.carta {
+  background: var(--fondo-carta);
+  border: 1px solid var(--bordo);
+  border-radius: var(--raggio);
+  padding: clamp(1.1rem, 3.5vw, 1.8rem);
+  box-shadow: var(--ombra);
+}
+.carta + .carta { margin-top: 1.2rem; }
+
+.nota {
+  border-left: 3px solid var(--azzurro);
+  background: var(--fondo-cavo);
+  padding: .85rem 1rem;
+  border-radius: 0 var(--raggio) var(--raggio) 0;
+  font-size: .94rem;
+}
+.nota.calda { border-left-color: var(--arancio); }
+
+.griglia { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); }
+
+.dato { text-align: center; padding: .9rem .6rem; }
+.dato b { display: block; font-size: 1.7rem; font-weight: 600; color: var(--arancio); line-height: 1.1; }
+.dato span { font-size: .8rem; color: var(--inchiostro-tenue); }
+
+/* --- Moduli ---------------------------------------------------------------- */
+form { margin: 0; }
+.campo { margin-bottom: 1.1rem; }
+.campo label { display: block; font-size: .88rem; font-weight: 600; margin-bottom: .32rem; }
+.campo .aiuto { display: block; font-size: .82rem; color: var(--inchiostro-tenue); margin-top: .3rem; }
+
+input[type="text"], input[type="email"], input[type="password"], textarea, select {
+  width: 100%;
+  padding: .62rem .8rem;
+  font: inherit;
+  color: var(--inchiostro);
+  background: var(--fondo);
+  border: 1px solid var(--bordo);
+  border-radius: 8px;
+}
+input:focus-visible, textarea:focus-visible, select:focus-visible, a:focus-visible, button:focus-visible {
+  outline: 2px solid var(--arancio);
+  outline-offset: 2px;
+}
+
+.bottone, button {
+  display: inline-flex; align-items: center; justify-content: center; gap: .45rem;
+  padding: .62rem 1.25rem;
+  font: inherit; font-weight: 600;
+  color: var(--su-arancio); background: var(--arancio);
+  border: 1px solid transparent; border-radius: 8px;
+  cursor: pointer; text-decoration: none;
+  transition: background .12s ease;
+}
+.bottone:hover, button:hover { background: var(--arancio-cupo); }
+.bottone.secondario, button.secondario {
+  background: transparent; color: var(--inchiostro); border-color: var(--bordo);
+}
+.bottone.secondario:hover, button.secondario:hover { background: var(--fondo-cavo); }
+.bottone.tenue, button.tenue {
+  background: none; border: 0; color: var(--inchiostro-tenue);
+  padding: .3rem 0; font-weight: 400; text-decoration: underline;
+}
+.bottoni { display: flex; gap: .7rem; flex-wrap: wrap; align-items: center; margin-top: 1.4rem; }
+
+/* --- Messaggi -------------------------------------------------------------- */
+.avviso {
+  padding: .8rem 1rem; border-radius: var(--raggio); margin-bottom: 1.2rem;
+  border: 1px solid var(--bordo); background: var(--fondo-cavo); font-size: .95rem;
+}
+.avviso.errore  { border-color: var(--rosa);    background: color-mix(in srgb, var(--rosa) 18%, var(--fondo-carta)); }
+.avviso.riuscito{ border-color: var(--verde);   background: color-mix(in srgb, var(--verde) 16%, var(--fondo-carta)); }
+.avviso.attenzione { border-color: var(--arancio); background: color-mix(in srgb, var(--arancio) 14%, var(--fondo-carta)); }
+
+/* --- Tabelle --------------------------------------------------------------- */
+.tabellina { width: 100%; border-collapse: collapse; font-size: .94rem; }
+.tabellina th, .tabellina td { text-align: left; padding: .5rem .6rem; border-bottom: 1px solid var(--bordo); }
+.tabellina th { font-size: .78rem; text-transform: uppercase; letter-spacing: .08em; color: var(--inchiostro-tenue); font-weight: 600; }
+.scorre { overflow-x: auto; }
+
+/* --- Piede ----------------------------------------------------------------- */
+.piede {
+  border-top: 1px solid var(--bordo);
+  padding: 1.4rem clamp(1rem, 4vw, 2rem) 2.4rem;
+  font-size: .84rem; color: var(--inchiostro-tenue);
+  text-align: center;
+}
+.piede a { color: var(--inchiostro-tenue); }
+.piede p { margin: .25rem 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+}
+
+/* ============================================================================
+   Il mondo — componenti della fase F1
+   ========================================================================= */
+
+/* --- La fascia del tempo ------------------------------------------------- */
+.insegna {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem; flex-wrap: wrap;
+  padding: .7rem 1rem;
+  margin-bottom: 1.4rem;
+  border: 1px solid var(--bordo);
+  border-radius: var(--raggio);
+  background: linear-gradient(100deg,
+    color-mix(in srgb, var(--arancio-pallido) 55%, var(--fondo-carta)),
+    var(--fondo-carta) 70%);
+}
+/* Di notte la fascia si raffredda: è l'unico indizio d'ambiente sempre a
+   schermo, e deve dire a colpo d'occhio se fuori è buio. */
+.insegna.notte {
+  background: linear-gradient(100deg,
+    color-mix(in srgb, var(--azzurro-pallido) 60%, var(--fondo-carta)),
+    var(--fondo-carta) 70%);
+}
+.insegna-quando b { font-size: 1.06rem; }
+/* L'anno accanto all'ora: «il primo anno» parla del giro del calendario, non
+   del 1987, e il giocatore ha diritto di sapere in che anno si trova. */
+.insegna-quando .anno {
+  font-size: .72rem; letter-spacing: .1em; color: var(--arancio);
+  vertical-align: .18em; margin-left: .3rem;
+}
+.insegna-quando span[data-contesto] { display: block; font-size: .84rem; color: var(--inchiostro-tenue); }
+.insegna-tempo {
+  display: flex; align-items: baseline; gap: .45rem;
+  font-size: .9rem; color: var(--inchiostro-tenue);
+}
+.insegna-tempo .icona { font-size: 1.2rem; }
+.insegna-tempo b { font-size: 1.02rem; color: var(--inchiostro); }
+.insegna-tempo .ombrello {
+  font-style: normal; font-size: .74rem; letter-spacing: .06em; text-transform: uppercase;
+  color: var(--su-arancio); background: var(--arancio);
+  padding: .1rem .42rem; border-radius: 99px;
+}
+
+.evento-oggi {
+  border-left: 3px solid var(--arancio);
+  background: var(--fondo-cavo);
+  padding: .7rem 1rem; margin: -.6rem 0 1.4rem;
+  border-radius: 0 var(--raggio) var(--raggio) 0;
+}
+.evento-oggi b { display: block; font-size: .98rem; }
+.evento-oggi span { font-size: .9rem; color: var(--inchiostro-tenue); }
+.evento-oggi.tenue-box { border-left-color: var(--azzurro); }
+
+/* --- Per strada ------------------------------------------------------------ */
+.in-viaggio {
+  display: flex; align-items: center; gap: .9rem;
+  padding: .85rem 1rem; margin-bottom: 1.4rem;
+  border: 1px dashed var(--arancio);
+  border-radius: var(--raggio);
+  background: color-mix(in srgb, var(--arancio) 8%, var(--fondo-carta));
+}
+.in-viaggio .passi { color: var(--arancio); font-weight: 700; letter-spacing: -.1em; }
+.in-viaggio b { display: block; }
+.in-viaggio span { font-size: .88rem; color: var(--inchiostro-tenue); }
+
+/* --- La carta ---------------------------------------------------------------- */
+.carta-mappa { padding: .8rem; }
+.carta-mappa canvas { display: block; width: 100%; height: auto; border-radius: 6px; }
+.legenda { margin: .7rem .3rem 0; }
+
+.riga-titolo { margin-bottom: 1.2rem; }
+.riga-titolo h1 { margin: 0; }
+
+/* --- Elenchi del mondo --------------------------------------------------------- */
+.elenco-persone, .uscite, .tracce { list-style: none; margin: 0; padding: 0; }
+.elenco-persone li {
+  padding: .45rem 0; border-bottom: 1px solid var(--bordo);
+  display: flex; gap: .6rem; align-items: baseline; flex-wrap: wrap;
+}
+.elenco-persone li:last-child, .uscite li:last-child { border-bottom: 0; }
+.elenco-persone span { font-size: .86rem; }
+
+.uscite li {
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  padding: .55rem 0; border-bottom: 1px solid var(--bordo);
+}
+.uscite .uscita-testo b { display: block; }
+.uscite .uscita-testo span { font-size: .84rem; }
+.uscite li.chiusa { opacity: .55; }
+.uscite button { padding: .38rem .9rem; font-size: .88rem; }
+
+.tracce li {
+  padding: .5rem 0 .5rem .9rem;
+  border-left: 2px solid var(--bordo);
+  margin-bottom: .45rem;
+  font-size: .94rem;
+}
+.tracce li span { display: block; font-size: .78rem; margin-top: .15rem; }
+
+/* --- Moduli a due colonne --------------------------------------------------------- */
+.coppia { display: grid; gap: 0 1rem; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); }
+.campo .etichetta { display: block; font-size: .88rem; font-weight: 600; margin-bottom: .32rem; }
+.scelte { display: flex; gap: 1.2rem; flex-wrap: wrap; }
+.scelta { display: inline-flex; align-items: center; gap: .4rem; font-size: .95rem; cursor: pointer; }
+.scelta input { accent-color: var(--arancio); }
+
+/* ============================================================================
+   La scheda del personaggio — componenti della fase F2
+   ========================================================================= */
+
+/* --- Scelte larghe (esper / non esper) ----------------------------------- */
+.scelta-larga {
+  display: flex; gap: .75rem; align-items: flex-start;
+  padding: .85rem 1rem; margin-bottom: .6rem;
+  border: 1px solid var(--bordo); border-radius: var(--raggio);
+  background: var(--fondo); cursor: pointer;
+}
+.scelta-larga:hover { background: var(--fondo-cavo); }
+.scelta-larga input { accent-color: var(--arancio); margin-top: .28rem; flex: none; }
+.scelta-larga b { display: block; margin-bottom: .2rem; }
+.scelta-larga span { font-size: .92rem; color: var(--inchiostro-tenue); }
+.scelta-larga b { color: var(--inchiostro); font-size: 1rem; }
+.scelta-larga:has(input:checked) { border-color: var(--arancio); background: color-mix(in srgb, var(--arancio) 7%, var(--fondo-carta)); }
+
+/* --- Distribuzione dei punti ----------------------------------------------- */
+.tabellina.abilita td { vertical-align: top; padding-top: .8rem; padding-bottom: .8rem; }
+.tabellina.abilita input[type="number"] { width: 5rem; padding: .35rem .5rem; }
+.resto { margin-top: 1rem; font-size: .95rem; }
+.resto b { color: var(--arancio); font-size: 1.1rem; }
+.resto.sbagliato b { color: var(--rosa); }
+
+/* --- Barre delle abilità ------------------------------------------------------ */
+.barre { display: grid; gap: .55rem; }
+.barra { display: grid; grid-template-columns: 6.5rem 1fr 2rem; gap: .7rem; align-items: center; }
+.barra-nome { font-size: .92rem; font-weight: 600; }
+.barra-solco {
+  display: block; height: 9px; border-radius: 99px;
+  background: var(--fondo-cavo); overflow: hidden;
+}
+.barra-solco i { display: block; height: 100%; background: var(--arancio); border-radius: 99px; }
+.barra-valore { text-align: right; font-size: 1.02rem; }
+
+.pallini { letter-spacing: .12em; color: var(--arancio); font-size: .82rem; }
+
+/* --- Tratti e poteri ------------------------------------------------------------- */
+.tratto { padding: .9rem 0; border-bottom: 1px solid var(--bordo); }
+.tratto:last-of-type { border-bottom: 0; padding-bottom: .2rem; }
+.tratto h3 { margin: 0 0 .35rem; display: flex; align-items: baseline; gap: .5rem; flex-wrap: wrap; }
+.tratto h3 .tenue { font-weight: 400; font-size: .85rem; }
+.tratto p { margin: 0 0 .5rem; font-size: .95rem; }
+.tratto .obiettivo { font-size: .9rem; }
+.tratto .obiettivo span {
+  display: inline-block; text-transform: uppercase; letter-spacing: .1em;
+  font-size: .68rem; color: var(--su-arancio); background: var(--arancio);
+  padding: .08rem .42rem; border-radius: 99px; margin-right: .4rem;
+  vertical-align: .08em;
+}
+.marchio-primario {
+  font-style: normal; font-size: .68rem; text-transform: uppercase; letter-spacing: .09em;
+  color: var(--su-arancio); background: var(--arancio);
+  padding: .1rem .45rem; border-radius: 99px;
+}
+.controllo { display: grid; grid-template-columns: 7rem 1fr; gap: .6rem; align-items: center; margin-top: .5rem; }
+.controllo .tenue { font-size: .82rem; }
+
+/* ============================================================================
+   Il Segreto — componenti della fase F3
+   ========================================================================= */
+.rischio { font-size: .95rem; padding: .7rem .9rem; border-radius: var(--raggio);
+           background: var(--fondo-cavo); margin: 0 0 1rem; }
+.poteri-qui td { vertical-align: top; }
+.poteri-qui tr.spento { opacity: .5; }
+.poteri-qui button { padding: .3rem .8rem; font-size: .85rem; }
+.rischio-medio { color: var(--arancio); }
+.rischio-alto  { color: var(--rosa); }
+
+.riga-scelta {
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  padding: .7rem 0; border-bottom: 1px solid var(--bordo);
+}
+.riga-scelta:last-of-type { border-bottom: 0; }
+.riga-scelta b { display: block; }
+.riga-scelta span { font-size: .85rem; }
+.riga-scelta button { min-width: 5.5rem; }
+
+.scena .sommario { margin-bottom: .8rem; }
+.tracce li.consumata { opacity: .5; }
+.elenco-persone li { justify-content: space-between; }
+.elenco-persone li > div { flex: 1; }
+
+/* ============================================================================
+   I legami — componenti della fase F4
+   ========================================================================= */
+.barra.assi { grid-template-columns: 6.5rem 1fr 3rem; }
+/* L'affetto va da -100 a +100: il solco ha uno zero in mezzo, e la barra
+   cresce a destra o a sinistra. Un solco che parte da sinistra racconterebbe
+   che «poco affetto» e «molta antipatia» sono la stessa cosa, e non lo sono. */
+.barra-solco.doppio { position: relative; background: var(--fondo-cavo); }
+.barra-solco.doppio::before {
+  content: ''; position: absolute; left: 50%; top: -2px; bottom: -2px;
+  width: 1px; background: var(--bordo);
+}
+.barra-solco.doppio i { position: absolute; top: 0; bottom: 0; background: var(--arancio); }
+.barra-solco.doppio i.negativo { background: var(--rosa); }
+.barra-solco i.fraint { background: var(--azzurro); }
+
+.riga-scelta.spento { opacity: .5; }
+.carta.confessione { border-color: var(--arancio); background: color-mix(in srgb, var(--arancio) 6%, var(--fondo-carta)); }
+.elenco-persone a { text-decoration: none; }
+.elenco-persone a:hover { text-decoration: underline; }
+
+/* --- Il santuario ------------------------------------------------------- */
+.ritratti {
+  display: grid; gap: 1rem; margin: 1.6rem 0 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+}
+.ritratti figure { margin: 0; }
+.ritratti img {
+  width: 100%; height: auto; display: block;
+  border-radius: var(--raggio); border: 1px solid var(--bordo);
+  box-shadow: var(--ombra);
+}
+.ritratti figcaption {
+  margin-top: .5rem; font-size: .84rem; color: var(--inchiostro-tenue); text-align: center;
+}
+.crediti-foto { margin-top: 1.6rem; font-size: .82rem; }
+
+/* --- Gli episodi ---------------------------------------------------------- */
+.episodio-premessa { border-left: 3px solid var(--arancio); }
+.carta.ricordo { border-left: 3px solid var(--azzurro); }
+.carta.ricordo p { font-size: .96rem; }

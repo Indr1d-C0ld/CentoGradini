@@ -1,0 +1,10 @@
+# Segreti e stato locale: tutto il resto e' materiale di lavoro e va conservato.
+/config/config.php
+/storage/logs/*.log
+/storage/*.lock
+/storage/cache/
+/.claude/
+
+.DS_Store
+*.swp
+*~

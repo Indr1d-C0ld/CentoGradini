@@ -1,0 +1,60 @@
+<?php
+/**
+ * @var array<string,mixed> $pg
+ * @var array<string,mixed> $mondo
+ * @var list<array<string,mixed>> $legami
+ * @var array<string,mixed>|null $oggetto
+ */
+use App\Sim\Scuola;
+?>
+
+<?= partial('insegna', ['mondo' => $mondo]) ?>
+
+<p class="occhiello"><a href="<?= e(url('/quartiere')) ?>">← il quartiere</a></p>
+<h1>I legami</h1>
+<p class="sommario">
+  Le persone che conosci, e cosa provi per loro. Quello che loro provano per te non c'è, e non
+  è una dimenticanza: in questa storia nessuno lo sa mai.
+</p>
+
+<?php if ($oggetto !== null): ?>
+<div class="evento-oggi">
+  <b>Hai <?= e(mb_strtolower($oggetto['nome'])) ?>.</b>
+  <span>Puoi darlo a qualcuno che sia dove sei tu. Una volta dato, è dato.</span>
+</div>
+<?php endif; ?>
+
+<?php if ($legami === []): ?>
+  <div class="carta">
+    <p>Non conosci ancora nessuno. È normale: sei arrivato da poco.</p>
+    <p class="tenue">
+      Si comincia stando negli stessi posti delle stesse persone, e scambiando due parole. Il
+      resto viene o non viene.
+    </p>
+  </div>
+<?php endif; ?>
+
+<?php foreach ($legami as $l): ?>
+<div class="carta">
+  <div class="riga-scelta" style="border:0;padding:0">
+    <div>
+      <h2 style="margin:0">
+        <?= e($l['cognome'] . ' ' . $l['nome']) ?>
+        <?php if ((string) $l['stato'] !== 'attivo'): ?>
+          <span class="tenue">— se n'è andato dal quartiere</span>
+        <?php endif; ?>
+      </h2>
+      <span class="tenue"><?= e(Scuola::nomeClasse((string) $l['sezione'], (int) $l['anno'])) ?></span>
+    </div>
+    <div style="text-align:right">
+      <b class="<?= (int) $l['affetto'] < 0 ? 'rischio-alto' : '' ?>" style="font-size:1.2rem">
+        <?= (int) $l['affetto'] > 0 ? '+' : '' ?><?= (int) $l['affetto'] ?>
+      </b>
+      <?php if ((int) $l['fraintendimento'] >= 15): ?>
+        <br><span class="tenue">malinteso <?= (int) $l['fraintendimento'] ?></span>
+      <?php endif; ?>
+    </div>
+  </div>
+  <p style="margin:.7rem 0 0"><?= e($l['dice']) ?></p>
+</div>
+<?php endforeach; ?>
