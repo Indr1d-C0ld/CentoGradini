@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Controllers\AuthController;
 use App\Controllers\HomeController;
 use App\Controllers\QuartiereController;
+use App\Controllers\AdminController;
 use App\Controllers\EpisodiController;
 use App\Controllers\QuartiereVivoController;
 use App\Controllers\LegamiController;
@@ -16,6 +17,8 @@ use App\Core\Router;
 // --- Pubbliche ---------------------------------------------------------------
 $router->get('/', [HomeController::class, 'index']);
 $router->get('/salute', [HomeController::class, 'salute']);
+$router->get('/sw.js', [HomeController::class, 'serviceWorker']);
+$router->get('/manifest.webmanifest', [HomeController::class, 'manifesto']);
 $router->get('/opera', [HomeController::class, 'opera']);
 $router->get('/santuario', [HomeController::class, 'santuario']);
 
@@ -64,6 +67,7 @@ $router->post('/oggetto/raccogli', [LegamiController::class, 'raccogliOggetto'],
 $router->get('/episodio', [EpisodiController::class, 'corrente'], ['active']);
 $router->post('/episodio/scegli', [EpisodiController::class, 'scegli'], ['active', 'throttle']);
 $router->get('/ricordi', [EpisodiController::class, 'ricordi'], ['active']);
+$router->get('/diario', [EpisodiController::class, 'diario'], ['active']);
 
 // --- F6: il quartiere vivo ---------------------------------------------------
 $router->get('/voci', [QuartiereVivoController::class, 'voci'], ['active']);
@@ -82,6 +86,11 @@ $router->post('/club/esci', [QuartiereVivoController::class, 'esciClub'], ['acti
 $router->get('/club/{ckey}', [QuartiereVivoController::class, 'unClub'], ['active']);
 
 $router->get('/calendario', [QuartiereVivoController::class, 'calendario'], ['active']);
+
+// --- F7: amministrazione -----------------------------------------------------
+$router->get('/admin', [AdminController::class, 'index'], ['active', 'admin']);
+$router->post('/admin/battito', [AdminController::class, 'battito'], ['active', 'admin', 'throttle']);
+$router->post('/admin/config', [AdminController::class, 'config'], ['active', 'admin', 'throttle']);
 
 // Le due chiamate che la pagina fa da sola, senza ricaricarsi.
 $router->get('/api/carta', [QuartiereController::class, 'carta'], ['active']);

@@ -578,3 +578,54 @@ label.in_linea { display: inline-flex; align-items: center; gap: .4rem; }
 /* Una tabella larga scorre dentro il suo contenitore: il corpo della pagina
    non deve mai scorrere in orizzontale. */
 .tabella-scorre { overflow-x: auto; }
+
+/* === F7 — rifinitura ===================================================== */
+
+/* Il cruscotto: i numeri devono leggersi a colpo d'occhio, non contarsi. */
+.griglia-numeri {
+  display: grid;
+  gap: .6rem;
+  grid-template-columns: repeat(auto-fit, minmax(7.5rem, 1fr));
+}
+.numero {
+  background: var(--fondo-cavo);
+  border: 1px solid var(--bordo);
+  border-radius: var(--raggio);
+  padding: .6rem .7rem;
+  text-align: center;
+}
+.numero-valore { display: block; font-size: 1.5rem; font-weight: 600; line-height: 1.1; }
+.numero-nome { display: block; font-size: .75rem; color: var(--inchiostro-tenue); }
+
+.riga-config { display: flex; flex-wrap: wrap; gap: .8rem; align-items: end; margin-bottom: 1rem; }
+.riga-config label { display: flex; flex-direction: column; gap: .2rem; }
+.minuto { font-size: .82rem; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+
+/* L'illustrazione di un ricordo: sta in cima alla carta, a tutta larghezza,
+   e si taglia agli angoli come una fotografia infilata in un album. */
+.illustrazione {
+  display: block;
+  width: calc(100% + 2 * clamp(1.1rem, 3.5vw, 1.8rem));
+  margin: calc(-1 * clamp(1.1rem, 3.5vw, 1.8rem)) calc(-1 * clamp(1.1rem, 3.5vw, 1.8rem)) 1rem;
+  height: auto;
+  aspect-ratio: 640 / 260;
+  border-radius: var(--raggio) var(--raggio) 0 0;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .ricordo .illustrazione { transition: filter .3s ease; }
+}
+
+/* L'interruttore dei suoni: piccolo, spento di default, e non chiede
+   attenzione. Sta nell'insegna perché è lì che si guarda il mondo. */
+.interruttore-suoni {
+  background: none;
+  border: 1px solid var(--bordo);
+  border-radius: 999px;
+  color: var(--inchiostro-tenue);
+  cursor: pointer;
+  font-size: .9rem;
+  line-height: 1;
+  padding: .15rem .45rem;
+  margin-left: .4rem;
+}
+.interruttore-suoni[aria-pressed="true"] { color: var(--arancio); border-color: var(--arancio); }

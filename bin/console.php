@@ -102,6 +102,28 @@ try {
                 'abitanti', $a['poteri'], $a['club']));
             break;
 
+        case 'bilancio':
+            // Genera personaggi veri e li cancella: gli id auto-incrementali
+            // avanzano, ed e' il motivo della conferma esplicita.
+            if (!in_array('--conferma', $argv, true)) {
+                riga('Il rapporto di bilanciamento genera personaggi di prova e li cancella.');
+                riga('Non lascia righe, ma fa avanzare gli id: rilancia con --conferma.');
+                riga('');
+                riga('  php bin/console.php bilancio --conferma [--quanti=400]');
+                break;
+            }
+            $quanti = 400;
+            foreach ($argv as $a) {
+                if (str_starts_with((string) $a, '--quanti=')) {
+                    $quanti = (int) substr((string) $a, 9);
+                }
+            }
+            riga('Cento Gradini — bilanciamento');
+            foreach ((new App\Cli\Bilancio($quanti))->esegui() as $l) {
+                riga($l);
+            }
+            break;
+
         case 'status':
             riga('Cento Gradini — stato');
             riga('  configurazione : ' . Config::sourceFile());
@@ -362,6 +384,7 @@ try {
             riga('  Schema');
             riga('    migrate                        applica le migrazioni in attesa');
             riga('    seed                           carica i dati di ambientazione da db/seed/');
+            riga('    bilancio --conferma            rapporto di bilanciamento su schede, poteri, folla');
             riga('    status                         stato di configurazione, schema, utenti, battito, posta');
             riga('');
             riga('  Account');

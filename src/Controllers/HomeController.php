@@ -85,6 +85,36 @@ final class HomeController
     }
 
     /** Sonda di servizio: il monitoraggio e il battito la usano per sapere se l'app e' viva. */
+    /**
+     * Il service worker, servito dalla radice dell'applicazione.
+     *
+     * Non si puo' lasciare in `assets/js/`: un service worker comanda solo
+     * sotto la cartella da cui e' servito, e da li' governerebbe soltanto
+     * gli script. Servito da `/sw.js` il suo raggio d'azione e' tutta
+     * l'applicazione, che e' quello che serve.
+     */
+    public function serviceWorker(Request $request): Response
+    {
+        $f = dirname(__DIR__, 2) . '/assets/js/sw.js';
+        if (!is_file($f)) {
+            return Response::text('// assente', 404);
+        }
+        return Response::text((string) file_get_contents($f))
+            ->withHeader('Content-Type', 'text/javascript; charset=utf-8')
+            ->withHeader('Cache-Control', 'no-cache');
+    }
+
+    /** Il manifesto, accanto al service worker per la stessa ragione. */
+    public function manifesto(Request $request): Response
+    {
+        $f = dirname(__DIR__, 2) . '/assets/manifest.webmanifest';
+        if (!is_file($f)) {
+            return Response::text('{}', 404);
+        }
+        return Response::text((string) file_get_contents($f))
+            ->withHeader('Content-Type', 'application/manifest+json; charset=utf-8');
+    }
+
     public function salute(Request $request): Response
     {
         $db = false;

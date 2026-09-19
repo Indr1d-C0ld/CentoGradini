@@ -243,6 +243,14 @@ final class QuartiereController
             'meteo'    => $m['meteo']['icona'] . ' ' . $m['meteo']['temperatura'] . '°',
             'viaggio'  => $pg === null ? null : $this->viaggio($pg),
             'luogo'    => $pg === null ? null : $pg['luogo'],
+            // Quanta roba nuova c'e' per te. Il client li confronta con i
+            // numeri di prima e, se e' cresciuto qualcosa, lo dice — con un
+            // pallino, e con un suono se l'hai chiesto.
+            'per_te'   => $pg === null ? null : [
+                'voci'      => \App\Game\Voci::quante((int) $pg['id']),
+                'biglietti' => count(\App\Game\Bacheca::quiPer((int) $pg['id'], (string) $pg['luogo'])),
+                'episodio'  => \App\Game\Episodi::mio((int) $pg['id']) !== null,
+            ],
         ]);
     }
 

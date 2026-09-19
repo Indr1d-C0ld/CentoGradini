@@ -526,6 +526,68 @@ curl -sS -o /dev/null -b "${BISCOTTI}" -c "${BISCOTTI}" -d "_token=${T}" \
   "${BASE}/bacheca/affiggi" >/dev/null
 if contiene "${BASE}/bacheca" "Prova di bacheca"; then verde "un avviso appeso si rilegge"; else rosso "l'avviso non compare in bacheca"; fi
 
+# --- F7: la rifinitura -----------------------------------------------------------------------
+titolo "La rifinitura"
+
+# Il diario, che e' un download e non una pagina.
+INTESTAZIONI=$(curl -sS -o /dev/null -D- -b "${BISCOTTI}" "${BASE}/diario")
+if grep -qi 'content-type: text/markdown' <<< "${INTESTAZIONI}"; then verde "il diario esce come markdown"; else rosso "tipo del diario sbagliato"; fi
+if grep -qi 'content-disposition: attachment' <<< "${INTESTAZIONI}"; then verde "e si scarica invece di aprirsi"; else rosso "il diario non si scarica"; fi
+if contiene "${BASE}/diario" "Izumi Matsumoto"; then verde "il diario porta l'attribuzione"; else rosso "il diario non attribuisce l'opera"; fi
+
+# La PWA. Il manifesto e il service worker devono uscire col tipo giusto:
+# col tipo sbagliato il browser li scarta e non lo dice a nessuno.
+if curl -sS -o /dev/null -D- "${BASE}/manifest.webmanifest" | grep -qi 'content-type: application/manifest'; then
+  verde "il manifesto esce col tipo giusto"; else rosso "tipo del manifesto sbagliato"; fi
+if curl -sS -o /dev/null -D- "${BASE}/sw.js" | grep -qi 'content-type: text/javascript'; then
+  verde "il service worker esce col tipo giusto"; else rosso "tipo del service worker sbagliato"; fi
+if contiene "${BASE}/sw.js" "cento-gradini-v"; then verde "il service worker e' il nostro"; else rosso "/sw.js non e' il nostro"; fi
+if contiene "${BASE}/quartiere" 'rel="manifest"'; then verde "la pagina dichiara il manifesto"; else rosso "manca il rel=manifest"; fi
+
+# L'album illustrato. Serve un ricordo vero: su un album vuoto non c'e'
+# niente da illustrare, e la prova direbbe il falso in tutte e due i versi.
+php -r '
+  require "src/autoload.php"; require "src/Support/helpers.php";
+  $GLOBALS["__project_root"] = getcwd();
+  App\Core\Config::load(getcwd());
+  $u = App\Core\Database::first("SELECT id FROM users WHERE username = ?", [$argv[1]]);
+  if ($u === null) { exit; }
+  $p = App\Core\Database::first("SELECT id FROM personaggi WHERE user_id = ?", [(int) $u["id"]]);
+  if ($p === null) { exit; }
+  App\Core\Database::run(
+    "INSERT INTO ricordi (personaggio_id, user_id, titolo, testo, gts, luogo) VALUES (?, ?, ?, ?, ?, ?)",
+    [(int) $p["id"], (int) $u["id"], "Un pomeriggio qualunque",
+     "Non era successo niente, ed era proprio quello il punto.",
+     App\Sim\Orologio::lineare(), "gradini"]);
+' "${UTENTE}" >/dev/null 2>&1 || true
+
+if contiene "${BASE}/ricordi" 'class="illustrazione"'; then verde "l'album e' illustrato"; else rosso "manca l'illustrazione nell'album"; fi
+if contiene "${BASE}/ricordi" 'Un pomeriggio qualunque'; then verde "e il ricordo c'e'"; else rosso "il ricordo non compare"; fi
+
+# /admin: prima negato, poi concesso.
+CODICE=$(curl -sS -o /dev/null -w '%{http_code}' -b "${BISCOTTI}" "${BASE}/admin")
+if [[ "${CODICE}" == "403" ]]; then verde "/admin e' chiuso a chi non e' amministratore"; else rosso "/admin da' ${CODICE} a un giocatore normale"; fi
+
+php bin/console.php user:admin "${UTENTE}" >/dev/null 2>&1 || true
+if contiene "${BASE}/admin" "Amministrazione"; then verde "/admin si apre per un amministratore"; else rosso "/admin non si apre nemmeno da amministratore"; fi
+if contiene "${BASE}/admin" "Le manopole del mondo"; then verde "e mostra le manopole"; else rosso "il pannello e' incompleto"; fi
+
+# Cambiare una manopola dal pannello deve cambiarla davvero.
+PRIMA=$(php bin/console.php config:get voci.durata_giorni 2>/dev/null | tr -dc '0-9')
+T=$(gettone "${BASE}/admin")
+curl -sS -o /dev/null -b "${BISCOTTI}" -c "${BISCOTTI}" -d "_token=${T}" \
+  -d "chiave=voci.durata_giorni" -d "valore=19" "${BASE}/admin/config" >/dev/null
+DOPO=$(php bin/console.php config:get voci.durata_giorni 2>/dev/null | tr -dc '0-9')
+if [[ "${DOPO}" == "19" ]]; then verde "una manopola si cambia dal pannello"; else rosso "la manopola vale '${DOPO}', attesi 19"; fi
+php bin/console.php config:set voci.durata_giorni "${PRIMA:-21}" >/dev/null 2>&1 || true
+
+# Una chiave inventata non si crea da web: le manopole nascono da una migrazione.
+T=$(gettone "${BASE}/admin")
+curl -sS -o /dev/null -b "${BISCOTTI}" -c "${BISCOTTI}" -d "_token=${T}" \
+  -d "chiave=chiave.inventata" -d "valore=7" "${BASE}/admin/config" >/dev/null
+INVENTATA=$(php bin/console.php config:get chiave.inventata 2>&1 | head -1)
+if grep -qiv '^7$' <<< "${INVENTATA}"; then verde "una chiave inventata non si crea dal pannello"; else rosso "il pannello ha creato una chiave nuova"; fi
+
 # --- Uscita ---------------------------------------------------------------------------------
 titolo "Uscita"
 T=$(gettone "${BASE}/quartiere")

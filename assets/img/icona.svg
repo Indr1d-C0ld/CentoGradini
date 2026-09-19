@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img"
+     aria-label="Cento Gradini">
+  <!-- La scalinata della prima pagina del manga: e' l'unica cosa del
+       quartiere che non cambia mai, ed e' il nome del gioco. -->
+  <rect width="512" height="512" rx="96" fill="#e8743c"/>
+  <g fill="#fff8ef">
+    <rect x="128" y="392" width="264" height="26" rx="6"/>
+    <rect x="145" y="352" width="230" height="26" rx="6"/>
+    <rect x="162" y="312" width="196" height="26" rx="6"/>
+    <rect x="179" y="272" width="162" height="26" rx="6"/>
+    <rect x="196" y="232" width="128" height="26" rx="6"/>
+    <rect x="213" y="192" width="94"  height="26" rx="6"/>
+  </g>
+  <g fill="#b84a1e">
+    <path d="M118 418 L203 176 L219 176 L134 418 Z"/>
+    <path d="M394 418 L309 176 L293 176 L378 418 Z"/>
+  </g>
+  <!-- Il cappello di paglia rosso, in cima, dove Kyosuke lo raccoglie. -->
+  <ellipse cx="256" cy="150" rx="62" ry="16" fill="#d94f45"/>
+  <path d="M212 150 a44 34 0 0 1 88 0 Z" fill="#e8655a"/>
+</svg>

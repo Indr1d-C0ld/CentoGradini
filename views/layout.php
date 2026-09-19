@@ -20,6 +20,13 @@ $titoloPagina = (string) ($title ?? $nomeGioco);
 <meta name="description" content="Gioco di ruolo multigiocatore persistente nell'universo di Kimagure Orange Road di Izumi Matsumoto.">
 <meta name="robots" content="noindex">
 <link rel="stylesheet" href="<?= e(asset('css/kor.css')) ?>">
+<link rel="manifest" href="<?= e(url('/manifest.webmanifest')) ?>">
+<link rel="icon" href="<?= e(asset('img/icona.svg')) ?>" type="image/svg+xml">
+<link rel="apple-touch-icon" href="<?= e(asset('img/icona.svg')) ?>">
+<meta name="theme-color" content="#e8743c">
+<meta name="apple-mobile-web-app-title" content="Cento Gradini">
+<script src="<?= e(asset('js/pwa.js')) ?>" data-sw="<?= e(url('/sw.js')) ?>" defer></script>
+<script src="<?= e(asset('js/suoni.js')) ?>" defer></script>
 </head>
 <body<?= $ambiente !== '' ? ' data-ambiente="' . e($ambiente) . '"' : '' ?>>
 

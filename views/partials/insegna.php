@@ -19,6 +19,8 @@ $met = $mondo['meteo'];
     <b><?= e((string) $met['temperatura']) ?>°</b>
     <span><?= e($met['cielo']) ?></span>
     <?php if ($met['ombrello']): ?><em class="ombrello">ombrello</em><?php endif; ?>
+    <button type="button" class="interruttore-suoni" data-suoni
+            aria-pressed="false" title="Suoni">♪̸</button>
   </div>
 </div>
 

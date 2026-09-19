@@ -1,0 +1,27 @@
+{
+  "name": "Cento Gradini",
+  "short_name": "Cento Gradini",
+  "description": "Gioco di ruolo multigiocatore persistente nell'universo di Kimagure Orange Road.",
+  "lang": "it",
+  "dir": "ltr",
+  "start_url": "quartiere",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f4efe6",
+  "theme_color": "#e8743c",
+  "icons": [
+    {
+      "src": "assets/img/icona.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/img/icona.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}

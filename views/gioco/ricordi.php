@@ -5,7 +5,10 @@ use App\Sim\Luoghi;
 use App\Sim\Orologio;
 ?>
 <?= partial('insegna', ['mondo' => $mondo]) ?>
-<p class="occhiello"><a href="<?= e(url('/quartiere')) ?>">← il quartiere</a></p>
+<p class="occhiello">
+  <a href="<?= e(url('/quartiere')) ?>">← il quartiere</a>
+  · <a href="<?= e(url('/diario')) ?>">porta via il diario</a>
+</p>
 <h1>L'album dei ricordi</h1>
 <p class="sommario">
   Quello che è successo, nella tua versione. Resta qui anche se traslochi: le persone si
@@ -18,6 +21,7 @@ use App\Sim\Orologio;
 
 <?php foreach ($ricordi as $r): ?>
 <div class="carta ricordo">
+  <?= \App\Game\Illustrazione::per($r) ?>
   <p class="occhiello">
     <?= e(Orologio::esteso((int) $r['gts'])) ?> · <?= e(Luoghi::nome((string) $r['luogo'])) ?>
     <?php if ($r['cognome'] !== null): ?> · <?= e($r['cognome'] . ' ' . $r['nome']) ?><?php endif; ?>

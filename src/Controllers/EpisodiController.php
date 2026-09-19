@@ -76,6 +76,25 @@ final class EpisodiController
         return redirect('/episodio');
     }
 
+    /**
+     * Il diario, da portarsi via.
+     *
+     * Un gioco persistente che non ti lascia esportare niente ti chiede di
+     * fidarti che il server campi per sempre. Markdown, che si legge anche
+     * in un blocco note fra vent'anni.
+     */
+    public function diario(Request $request): Response
+    {
+        $pg = $this->mio();
+        if ($pg === null) {
+            return redirect('/quartiere');
+        }
+        return Response::text(\App\Game\Diario::componi($pg))
+            ->withHeader('Content-Type', 'text/markdown; charset=utf-8')
+            ->withHeader('Content-Disposition',
+                'attachment; filename="' . \App\Game\Diario::nomeFile($pg) . '"');
+    }
+
     public function ricordi(Request $request): Response
     {
         $pg = $this->mio();

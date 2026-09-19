@@ -60,6 +60,10 @@
           restano = d.viaggio.restano;
           giaChiesto = false;
         }
+        /* Il battito lo ascolta anche chi vuole: i suoni, il pallino delle
+           voci, e quello che verra'. Si passa l'evento invece di chiamarli
+           direttamente, cosi' questo file non deve sapere chi c'e'. */
+        document.dispatchEvent(new CustomEvent('centogradini:battito', { detail: d }));
       })
       .catch(function () { /* meglio un orologio fermo che una pagina rotta */ });
   }

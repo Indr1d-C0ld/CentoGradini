@@ -16,6 +16,10 @@ aventi diritto.
 
 ## Stato
 
+**Il gioco è finito.** Le otto fasi da F0 a F7 sono fatte e in produzione, con
+299 verifiche su 13 file di prova. Da qui in poi si aggiunge contenuto —
+copioni di episodi, luoghi, tratti — non impalcatura.
+
 **F0 — fondamenta: fatta.** Ci si iscrive, si conferma l'indirizzo, si entra.
 
 **F1 — il mondo: fatta.** Orologio ciclico dell'«eterno 1987» (compressione 1:4),
@@ -85,6 +89,39 @@ firmano con il nome che si vuole. Infine i **quattordici eventi stagionali**,
 che sono del server e non del giocatore: i ciliegi, il festival d'estate al
 tempio, il festival culturale, San Valentino. Non inventano meccaniche —
 alzano la Folla e accelerano le voci, e da lì segue tutto il resto.
+
+**F7 — la rifinitura: fatta.** Sei cose, e nessuna è decorazione.
+
+L'**album dei ricordi è illustrato**: ogni ricordo ha una sua scena in SVG,
+generata dalle quattro cose che il motore già sa — il luogo, la stagione,
+l'ora e il tempo che faceva. Non è arte, sono silhouette in controluce; ma
+l'albero dei ricordi ha un albero, i Cento Gradini hanno una scalinata, il
+tempio ha un torii, a giugno piove e in primavera cadono i petali. Due
+ricordi nello stesso posto in due stagioni diverse si riconoscono a colpo
+d'occhio, ed è tutto deterministico: stesso ricordo, stessa immagine, sempre.
+
+Il **diario si porta via**, in `/diario`: tutto quello che è successo a un
+personaggio in un file Markdown che si legge anche in un blocco note fra
+vent'anni, senza il gioco e senza il database. Ci va quello che il
+personaggio **sa** — le voci nella versione deformata che gli è arrivata, non
+nella verità del server.
+
+È una **PWA**: si installa, e il service worker tiene in tasca il guscio del
+sito. Non mette in cache le pagine di gioco, mai: il quartiere cambia ogni
+minuto e una pagina salvata è una bugia su dove si trovano gli altri.
+
+**`/admin`** è una pagina sola, apposta — il battito, le code, i numeri che
+crescono, e le manopole del mondo. Le cose serie restano nella console.
+
+**`bilancio`** è il comando che risponde alle domande che una prova non sa
+porre: una prova dice «la vistosità morde», questo dice *quanto*. Genera
+centinaia di schede col codice vero, le legge e le butta via, e stampa le
+distribuzioni — e la riga che conta è quante volte la prudenza paga rispetto
+all'imprudenza. Oggi 3,2 volte.
+
+I **suoni** sono due note generate al momento, senza un byte di audio da
+scaricare, e sono **spenti in partenza**: un sito che fa rumore senza che
+glielo si sia chiesto è un sito che si chiude.
 
 **La sala del maestro**: `/santuario`, in memoria di Izumi Matsumoto.
 
