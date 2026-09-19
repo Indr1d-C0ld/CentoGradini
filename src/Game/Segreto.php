@@ -73,6 +73,15 @@ final class Segreto
         $luogo = (string) $pg['luogo'];
         $gts   = Orologio::lineare();
 
+        // Prima di tutto: c'è qualcuno qui che sa spegnere i poteri?
+        // Va chiesto adesso, prima di aprire l'incidente, perché un potere
+        // spento non è un potere usato male — è un potere che non è
+        // successo, e non lascia testimoni né anomalie.
+        $spento = self::chiSpegne($pg, $luogo, $gts, (int) $potere['controllo']);
+        if ($spento !== null) {
+            return self::potereSpento($pg, $potere, $spento);
+        }
+
         $vistosita = (int) $potere['vistosita'];
         $folla     = Folla::a($luogo, $gts);
         // Chi è presente e NON sa già: chi sa non si stupisce più.
@@ -154,6 +163,92 @@ final class Segreto
             'notato'    => $stato === 'aperto',
             'folla'     => $folla,
             'racconto'  => self::racconto($potere, $luogo, $notato, $vistoDallaFolla, $folla),
+        ];
+    }
+
+    /**
+     * Chi, fra i presenti, può spegnere questo potere — o null.
+     *
+     * Nel canone il potere di **bloccare i poteri altrui** è di Kazuya e di
+     * nessun altro; qui il codice non guarda il nome, guarda chi ha il
+     * potere `blocco`. È la stessa scelta fatta per i PNG: niente casi
+     * speciali intestati a una persona, perché il giorno che il canone ci
+     * dicesse di un secondo personaggio capace di farlo, funzionerebbe da
+     * solo.
+     *
+     * Il Controllo di chi usa il potere difende, ma non salva: chi ha la mano
+     * fermissima resiste meglio, e basta. Kazuya è il più forte della
+     * famiglia pur avendo otto anni, e deve vedersi.
+     *
+     * @param array<string,mixed> $pg
+     * @return array<string,mixed>|null chi ha spento, se qualcuno ha spento
+     */
+    public static function chiSpegne(array $pg, string $luogo, int $gts, ?int $controllo = null): ?array
+    {
+        $bloccanti = Database::all(
+            'SELECT p.id, p.nome, p.cognome, p.png, pp.controllo
+             FROM personaggi p
+             JOIN personaggio_poteri pp ON pp.personaggio_id = p.id AND pp.pkey = ?
+             WHERE p.luogo = ? AND p.verso IS NULL AND p.stato = ? AND p.id <> ?
+             ORDER BY p.id',
+            ['blocco', $luogo, 'attivo', (int) $pg['id']]
+        );
+        if ($bloccanti === []) {
+            return null;
+        }
+
+        $base       = GameConfig::int('blocco.prob_base', 55);
+        $resistenza = GameConfig::int('blocco.resistenza_controllo', 35);
+        $mio        = $controllo ?? 0;
+
+        foreach ($bloccanti as $b) {
+            $p = $base * (1.0 - ($resistenza / 100.0) * min(1.0, $mio / 100.0));
+            // L'ancora tiene dentro l'ora di gioco e non l'istante: due
+            // tentativi nello stesso minuto hanno lo stesso esito — te lo
+            // sta spegnendo, insistere subito non serve — ma un'ora dopo il
+            // dado è nuovo. È la stessa correzione fatta alle chiacchiere.
+            $rng = Rng::for(GameConfig::int('world.seed', 19870406), 'blocco',
+                (int) $b['id'], (int) $pg['id'], intdiv($gts, 3600));
+            if ($rng->int(1, 100) <= (int) round($p)) {
+                return $b;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Il potere non è successo. Si perde un punto potere lo stesso — la
+     * spinta la si è data — e non c'è nessun incidente da coprire, perché
+     * non c'è stato niente da vedere.
+     *
+     * @param array<string,mixed> $pg
+     * @param array<string,mixed> $potere
+     * @param array<string,mixed> $chi
+     * @return array<string,mixed>
+     */
+    private static function potereSpento(array $pg, array $potere, array $chi): array
+    {
+        $costo = max(0, GameConfig::int('blocco.costo_pp', 1));
+        if ($costo > 0) {
+            Database::run('UPDATE personaggi SET pp = GREATEST(0, pp - ?) WHERE id = ?',
+                [$costo, (int) $pg['id']]);
+        }
+        $nome = trim((string) $chi['nome'] . ' ' . (string) $chi['cognome']);
+        return [
+            'ok'        => true,
+            'spento'    => true,
+            'da'        => $nome,
+            'incidente' => null,
+            'testimoni' => [],
+            'notato'    => false,
+            'folla'     => 0,
+            'racconto'  => sprintf(
+                'Ci provi, e non succede niente. Non è che ti riesca male: proprio non parte, '
+                . 'come una parola che hai in bocca e non esce. Poi ti accorgi che %s ti sta '
+                . 'guardando, e che ti guardava già da prima. Non dice niente. Ha l\'aria di '
+                . 'chi si sta divertendo.',
+                $nome
+            ),
         ];
     }
 

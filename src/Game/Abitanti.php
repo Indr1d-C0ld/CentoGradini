@@ -46,8 +46,11 @@ final class Abitanti
         'manami'  => ['primario' => 'teletrasporto', 'secondari' => ['telecinesi']],
         'kurumi'  => ['primario' => 'teletrasporto', 'secondari' => ['telecinesi', 'ipnosi']],
         'akane'   => ['primario' => 'cambio_identita', 'secondari' => ['teletrasporto', 'fantasmi']],
+        // «blocco» non e' sorteggiabile da nessuno (banda 0-0 nel seme): e'
+        // suo, e basta. E' la ragione per cui un bambino di otto anni e' il
+        // piu' forte della famiglia.
         'kazuya'  => ['primario' => 'telepatia',
-                      'secondari' => ['teletrasporto', 'telecinesi', 'scambio_corpo']],
+                      'secondari' => ['teletrasporto', 'telecinesi', 'scambio_corpo', 'blocco']],
     ];
 
     /**

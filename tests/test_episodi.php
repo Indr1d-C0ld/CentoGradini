@@ -105,6 +105,92 @@ $unaScena = [[
   ],
 ]];
 
+// --- I copioni veri ---------------------------------------------------------
+//
+// Le prove qui sopra usano copioni finti, minimi, che provano il motore. Qui
+// si provano i copioni **veri**, quelli seminati: sono prosa scritta a mano e
+// un campo dimenticato o una chiave di condizione sbagliata non si vede
+// finche' l'episodio non prova ad aprirsi in faccia a un giocatore.
+
+prova('ogni copione seminato ha la forma che il motore si aspetta', function () {
+    $copioni = Database::all("SELECT * FROM copioni WHERE ckey NOT LIKE 'zz%' ORDER BY ckey");
+    vero(count($copioni) >= 9, 'ci si aspettano almeno nove copioni, sono ' . count($copioni));
+
+    $abilita = ['nessuna', 'rissa', 'testa', 'dai_suki', 'cuore',
+                'inglese', 'sport', 'guida', 'kakko', 'nuoto', 'musica', 'cucina', 'candore'];
+    $effetti = ['affetto_cast', 'malinteso_cast', 'compostezza', 'pf', 'pp', 'calore'];
+
+    foreach ($copioni as $c) {
+        $scene = json_decode((string) $c['scene'], true);
+        vero(is_array($scene) && $scene !== [], "«{$c['ckey']}»: le scene non sono JSON valido");
+        foreach ($scene as $i => $scena) {
+            $dove = "«{$c['ckey']}» scena " . ($i + 1);
+            vero(trim((string) ($scena['testo'] ?? '')) !== '', "{$dove}: manca il testo");
+            $opzioni = $scena['opzioni'] ?? [];
+            vero(count($opzioni) >= 2, "{$dove}: servono almeno due strade, ce ne sono " . count($opzioni));
+            $chiavi = [];
+            foreach ($opzioni as $o) {
+                $k = (string) ($o['k'] ?? '');
+                vero($k !== '', "{$dove}: un'opzione senza chiave");
+                vero(!isset($chiavi[$k]), "{$dove}: la chiave «{$k}» e' ripetuta");
+                $chiavi[$k] = true;
+                foreach (['testo', 'prova', 'difficolta', 'ok', 'ko',
+                          'effetti_ok', 'effetti_ko', 'peso'] as $campo) {
+                    vero(array_key_exists($campo, $o), "{$dove} opzione «{$k}»: manca «{$campo}»");
+                }
+                vero(in_array((string) $o['prova'], $abilita, true),
+                    "{$dove} opzione «{$k}»: prova «{$o['prova']}» non esiste");
+                // Se c'e' una prova vera, ci deve essere anche il testo di
+                // quando va male: se no il fallimento non racconta niente.
+                if ((string) $o['prova'] !== 'nessuna') {
+                    vero(trim((string) $o['ko']) !== '',
+                        "{$dove} opzione «{$k}»: ha una prova ma non dice cosa succede se fallisce");
+                }
+                foreach (['effetti_ok', 'effetti_ko'] as $quale) {
+                    foreach ((array) $o[$quale] as $che => $_) {
+                        vero(in_array((string) $che, $effetti, true),
+                            "{$dove} opzione «{$k}»: effetto «{$che}» non esiste, non farebbe niente");
+                    }
+                }
+                foreach ((array) $o['peso'] as $campo => $_) {
+                    vero(in_array((string) $campo, $abilita, true) && (string) $campo !== 'nessuna',
+                        "{$dove} opzione «{$k}»: peso su «{$campo}», che non e' un'abilita'");
+                }
+            }
+        }
+    }
+});
+
+prova('ogni condizione usata dai copioni e\' una condizione che esiste', function () {
+    // Una condizione scritta male non da' errore: il copione semplicemente
+    // non si apre mai, e nessuno se ne accorge per mesi.
+    $m = new ReflectionMethod(Episodi::class, 'condizioneSoddisfatta');
+    $m->setAccessible(true);
+    $note = ['sempre', 'autunno', 'estate', 'inverno', 'primavera', 'pioggia', 'rovescio',
+             'neve', 'scuola', 'vacanza', 'sospetto', 'pettegolezzo', 'festa'];
+    $eventi = array_column(Database::all('SELECT ekey FROM eventi'), 'ekey');
+
+    foreach (Database::all("SELECT ckey, condizione FROM copioni WHERE ckey NOT LIKE 'zz%'") as $c) {
+        $cond = (string) $c['condizione'];
+        if (str_starts_with($cond, 'evento:')) {
+            vero(in_array(substr($cond, 7), $eventi, true),
+                "«{$c['ckey']}»: l'evento «" . substr($cond, 7) . "» non esiste nel calendario");
+            continue;
+        }
+        vero(in_array($cond, $note, true), "«{$c['ckey']}»: condizione «{$cond}» sconosciuta");
+    }
+});
+
+prova('i luoghi dei copioni esistono', function () {
+    foreach (Database::all("SELECT ckey, luogo FROM copioni WHERE ckey NOT LIKE 'zz%'") as $c) {
+        if ($c['luogo'] === null || (string) $c['luogo'] === '') {
+            continue;   // copione senza luogo fisso: va bene
+        }
+        vero(App\Sim\Luoghi::esiste((string) $c['luogo']),
+            "«{$c['ckey']}»: il luogo «{$c['luogo']}» non esiste");
+    }
+});
+
 // --- Apertura ---------------------------------------------------------------
 
 prova('un episodio si apre quando le condizioni ci sono', function () use ($unaScena) {
@@ -244,6 +330,151 @@ prova('la scena scaduta va avanti lo stesso, e lo annota', function () use ($una
     uguale(2, count($scelte), 'ha scelto per entrambi');
     foreach ($scelte as $s) {
         uguale(1, (int) $s['da_solo'], 'ed è segnato che non c\'erano');
+    }
+});
+
+prova('UN COPIONE VERO SI GIOCA DALL\'INIZIO ALLA FINE', function () {
+    // Le prove qui sopra usano copioni finti da due opzioni. Questa prende
+    // uno dei copioni veri, con la sua prosa e le sue prove sulle abilita',
+    // e lo porta fino al ricordo: e' l'unico modo di accorgersi che una
+    // difficolta' impossibile o un effetto scritto male rendono un episodio
+    // ingiocabile invece che difficile.
+    Database::run('DELETE FROM episodi');
+    Database::run('UPDATE copioni SET attivo = 0 WHERE ckey <> ?', ['chiacchiere']);
+    Database::run('UPDATE copioni SET attivo = 1 WHERE ckey = ?', ['chiacchiere']);
+
+    // Il copione «chiacchiere» non ha un luogo fisso: si apre dove ci sono
+    // giocatori, e sceglie il posto piu' affollato. Perche' la prova sia
+    // ripetibile bisogna che gli unici giocatori disponibili siano i nostri
+    // due — e spostare gli altri non basta, perche' il posto dove li si
+    // sposta diventa subito il candidato migliore. Li si mette **in
+    // viaggio**: `verso` non nullo e' l'unico stato che li toglie sia dai
+    // luoghi candidati sia dal cast.
+    $fermati = array_map('intval', array_column(
+        Database::all('SELECT id FROM personaggi WHERE png IS NULL AND verso IS NULL'), 'id'));
+    Database::run('UPDATE personaggi SET verso = ?, arrivo_gts = ? WHERE png IS NULL AND verso IS NULL',
+        ['gradini', Orologio::lineare() + 99999]);
+    $rimetti = static function () use (&$fermati): void {
+        foreach ($fermati as $id) {
+            Database::run('UPDATE personaggi SET verso = NULL, arrivo_gts = NULL WHERE id = ?', [$id]);
+        }
+    };
+
+    $a = attore('Vero1');
+    $b = attore('Vero2');
+    scena($a, $b);   // nati dopo il fermo: sono gli unici due liberi
+
+    // «chiacchiere» si apre solo se in giro c'e' una voce che ha gia' fatto
+    // tre passaggi. Gliela si mette.
+    Database::run('DELETE FROM voci WHERE luogo = ?', [PALCO]);
+    Database::run('INSERT INTO voci (tipo, soggetto_id, luogo, gts, dettaglio, seme)
+                   VALUES (?, ?, ?, ?, ?, ?)',
+        ['potere', (int) $a['id'], PALCO, Orologio::lineare(), 'telecinesi', 12345]);
+    $vid = (int) Database::lastInsertId();
+    Database::run('INSERT INTO voci_versioni (voce_id, personaggio_id, precisione, tono, passaggi, gts)
+                   VALUES (?, ?, 30, -20, 4, ?)', [$vid, (int) $b['id'], Orologio::lineare()]);
+
+    try {
+        vero(Episodi::verificaAperture() >= 1, 'il copione vero non si e\' aperto');
+        $ep = Database::first('SELECT * FROM episodi WHERE ckey = ?', ['chiacchiere']);
+        vero($ep !== null, 'nessun episodio «chiacchiere»');
+
+        $scene = json_decode((string) Database::first(
+            'SELECT scene FROM copioni WHERE ckey = ?', ['chiacchiere'])['scene'], true);
+
+        // Si lascia decidere all'agente autonomo scena dopo scena, facendo
+        // scadere la finestra: e' il percorso che fa il motore da solo.
+        for ($giro = 0; $giro < count($scene) + 2; $giro++) {
+            $ep = Database::first('SELECT * FROM episodi WHERE id = ?', [(int) $ep['id']]);
+            if ($ep === null || (string) $ep['stato'] !== 'aperto') {
+                break;
+            }
+            Database::run('UPDATE episodi SET scade_reale = ? WHERE id = ?',
+                [Orologio::adessoReale() - 10, (int) $ep['id']]);
+            Episodi::scadute();
+        }
+
+        $ep = Database::first('SELECT * FROM episodi WHERE id = ?', [(int) $ep['id']]);
+        vero($ep === null || (string) $ep['stato'] !== 'aperto',
+            'l\'episodio non si e\' mai chiuso: una scena non porta alla successiva');
+
+        foreach ([$a, $b] as $chi) {
+            $r = Database::first('SELECT titolo, testo FROM ricordi WHERE personaggio_id = ?',
+                [(int) $chi['id']]);
+            vero($r !== null, "{$chi['nome']} non si e\' portato via nessun ricordo");
+            vero(mb_strlen((string) $r['testo']) > 60,
+                'il ricordo e\' troppo corto per essere un ricordo: ' . (string) $r['testo']);
+        }
+    } finally {
+        Database::run('DELETE FROM voci WHERE id = ?', [$vid]);
+        Database::run('UPDATE copioni SET attivo = 1');
+        $rimetti();
+    }
+});
+
+prova('UN ABITANTE NEL CAST NON FA ESPLODERE LA CHIUSURA', function () use ($unaScena) {
+    // Difetto vero, trovato aprendo i copioni nuovi. Dalla F6 gli abitanti
+    // canonici sono personaggi veri e possono entrare nel cast — ma non hanno
+    // un utente, e `concludi()` provava a intestargli un ricordo lo stesso.
+    // La INSERT falliva sul vincolo verso `users`, dentro il battito: in
+    // produzione sarebbe bastato che un giocatore si trovasse nello stesso
+    // posto di Komatsu perche' il battito si piantasse.
+    copioneDiProva('zzpng', $unaScena);
+    Database::run('UPDATE copioni SET attivo = 0 WHERE ckey <> ?', ['zzpng']);
+    Database::run('DELETE FROM episodi');
+
+    $g = attore('Giocatore');
+    scena($g);
+    // Si porta sul palco un abitante vero, con user_id NULL.
+    $png = Database::first('SELECT * FROM personaggi WHERE png IS NOT NULL LIMIT 1');
+    vero($png !== null, 'serve almeno un abitante canonico seminato');
+    $dovEra = (string) $png['luogo'];
+    Database::run('UPDATE personaggi SET luogo = ?, verso = NULL WHERE id = ?',
+        [PALCO, (int) $png['id']]);
+
+    try {
+        vero(Episodi::verificaAperture() >= 1, 'l\'episodio non si e\' aperto');
+        $ep = Database::first('SELECT * FROM episodi WHERE ckey = ?', ['zzpng']);
+        vero($ep !== null);
+        $cast = Database::all('SELECT personaggio_id FROM episodio_cast WHERE episodio_id = ?',
+            [(int) $ep['id']]);
+        vero(in_array((int) $png['id'], array_map('intval', array_column($cast, 'personaggio_id')), true),
+            'l\'abitante doveva entrare nel cast: e\' il punto di averli come personaggi veri');
+
+        Database::run('UPDATE episodi SET scade_reale = ? WHERE id = ?',
+            [Orologio::adessoReale() - 10, (int) $ep['id']]);
+        Episodi::scadute();   // qui esplodeva
+
+        uguale(0, (int) Database::first('SELECT COUNT(*) n FROM ricordi WHERE personaggio_id = ?',
+            [(int) $png['id']])['n'], 'gli abitanti non tengono un album: non hanno un utente');
+        vero((int) Database::first('SELECT COUNT(*) n FROM ricordi WHERE personaggio_id = ?',
+            [(int) $g['id']])['n'] >= 1, 'il giocatore invece il ricordo se lo porta via');
+    } finally {
+        Database::run('UPDATE personaggi SET luogo = ? WHERE id = ?', [$dovEra, (int) $png['id']]);
+    }
+});
+
+prova('un episodio non si apre se ci sono solo abitanti', function () use ($unaScena) {
+    copioneDiProva('zzsoli', $unaScena);
+    Database::run('UPDATE copioni SET attivo = 0 WHERE ckey <> ?', ['zzsoli']);
+    Database::run('DELETE FROM episodi');
+    Database::run('UPDATE personaggi SET luogo = ? WHERE luogo = ? AND png IS NULL', [LIMBO, PALCO]);
+
+    $png = Database::all('SELECT * FROM personaggi WHERE png IS NOT NULL LIMIT 3');
+    vero(count($png) >= 2, 'servono almeno due abitanti');
+    $dove = [];
+    foreach ($png as $a) {
+        $dove[(int) $a['id']] = (string) $a['luogo'];
+        Database::run('UPDATE personaggi SET luogo = ?, verso = NULL WHERE id = ?', [PALCO, (int) $a['id']]);
+    }
+    try {
+        // Una storia recitata da soli PNG non la legge nessuno, e brucia la
+        // pausa fra un episodio e l'altro per tutti quanti.
+        uguale(0, Episodi::verificaAperture(), 'non deve aprirsi niente senza un giocatore');
+    } finally {
+        foreach ($dove as $id => $l) {
+            Database::run('UPDATE personaggi SET luogo = ? WHERE id = ?', [$l, $id]);
+        }
     }
 });
 

@@ -163,6 +163,34 @@ return [
            'Uno del terzo anno che sta sempre a un passo dietro Komatsu.',
            'Alto e magro, capelli lisci, macchina fotografica al collo.'),
 
+        // --- Le complicazioni -------------------------------------------------
+        // Trovate rileggendo i 156 riassunti (CANONE §7-bis): erano fra le
+        // questioni aperte di FONTI.md, e adesso hanno un capitolo ciascuna.
+        // Sono antagoniste non violente — non fanno del male a nessuno,
+        // complicano la vita a tutti — che e' esattamente quello che serviva
+        // a un gioco in cui non si combatte.
+
+        // Sayuri Hirose (capp. 88-89): da' la caccia ai bei ragazzi e ha un
+        // metodo, studiato. Quando Kyosuke non ci casca, ne conclude che il
+        // problema sia la concorrenza. Kakko altissimo, candore bassissimo:
+        // sa benissimo quello che fa.
+        $p('sayuri', 'Sayuri', 'Hirose', 'f', 'superiori', 2, 6, 3, 1970, false,
+           'commerciale', 'commerciale,liceo,abcb,dischi,stazione,sala_giochi',
+           [7, 12, 14, 6], [7, 6, 5, 10, 6, 6, 6, 2], 8, 0,
+           'Una del secondo anno che ti sorride come se vi conosceste da sempre. Non e\' vero.',
+           'Curatissima, sempre a fuoco, e ti guarda un mezzo secondo piu\' del necessario.'),
+
+        // Hiromi Sugi (capp. 83, 85): studentessa nuova, ex compagna di
+        // classe di Kyosuke nella scuola di prima. Arriva con le fotografie
+        // di com'era, e il fascino di lui crolla. E' la memoria che nessuno
+        // ha chiesto — e in un gioco costruito sul Segreto, una persona che
+        // ti ha conosciuto *prima* e' una minaccia con le gambe.
+        $p('hiromi', 'Hiromi', 'Sugi', 'f', 'superiori', 3, 1, 22, 1970, false,
+           'liceo', 'liceo,commerciale,abcb,parco,gradini',
+           [5, 13, 10, 8], [8, 5, 4, 6, 5, 5, 7, 6], 8, 0,
+           'Una del terzo anno appena trasferita, che pero\' si ricorda di te.',
+           'Occhiali, quaderno sempre in mano, e un album di fotografie che non doveva portare.'),
+
         // --- Il quartiere -----------------------------------------------------
         // Il Master non esce mai dall'ABCB. Giro di un luogo solo: è il punto
         // fermo della mappa, e chi vuole sapere qualcosa passa da lui.

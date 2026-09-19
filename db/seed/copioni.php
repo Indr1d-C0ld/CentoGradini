@@ -264,5 +264,448 @@ return [
  ),
 ],
 
+// ─────────────────────────────────────────────────────────────────────────
+[
+ 'ckey' => 'valentino',
+ 'titolo' => 'Quattordici febbraio. Chi lo dà a chi',
+ 'occhiello' => 'Il giorno più lungo dell\'anno scolastico',
+ 'premessa' => 'In Giappone il cioccolato di San Valentino lo regalano le ragazze, e non è '
+     . 'una faccenda privata: è pubblica. Quello comprato si chiama giri-choko, cioccolato '
+     . 'd\'obbligo, e si dà a tutti. Quello fatto in casa si chiama honmei-choko, e si dà a '
+     . 'una persona sola. La differenza la vedono tutti, e tutti la commentano.',
+ 'luogo' => 'liceo',
+ 'condizione' => 'evento:san_valentino',
+ 'min_cast' => 2, 'max_cast' => 6, 'finestra' => 1800,
+ 'scene' => $scene(
+   [
+    'testo' => 'L\'aula prima dell\'appello è un mercato. Ci sono sacchetti che passano di mano '
+        . 'sotto i banchi, e altri che vengono consegnati in piedi, davanti a tutti, con la '
+        . 'faccia rossa. Komatsu ne ha già ricevuti quattro e li conta ad alta voce. Hatta zero, '
+        . 'e finge di non aver notato. Sul tuo banco, quando torni dal corridoio, ce n\'è uno '
+        . 'che non c\'era prima. Non ha un biglietto.',
+    'opzioni' => [
+      ['k' => 'apri', 'testo' => 'Aprirlo subito, lì, davanti a tutti',
+       'prova' => 'nessuna', 'difficolta' => 0,
+       'ok' => 'È fatto in casa. Si vede dalla forma, che non è una forma: è quello che viene '
+           . 'quando si versa il cioccolato in uno stampo di carta. Mezza classe ha smesso di '
+           . 'parlare. Tu non hai idea di chi sia stato, e adesso non hai nemmeno la possibilità '
+           . 'di far finta di niente.',
+       'ko' => '', 'effetti_ok' => ['compostezza' => -2, 'affetto_cast' => 1], 'effetti_ko' => [],
+       'peso' => ['dai_suki' => 3, 'kakko' => 1]],
+      ['k' => 'tasca', 'testo' => 'Farlo sparire in borsa senza guardarlo',
+       'prova' => 'kakko', 'difficolta' => 35,
+       'ok' => 'Un movimento solo, e il sacchetto non c\'è più. Nessuno ha visto niente, e per '
+           . 'tutto il giorno hai addosso una cosa che non sai di chi sia.',
+       'ko' => 'Ti cade. Rotola fino al piede di qualcun altro, che lo raccoglie e te lo porge '
+           . 'guardandoti come si guarda una persona che ha appena mentito male.',
+       'effetti_ok' => [], 'effetti_ko' => ['compostezza' => -2, 'malinteso_cast' => 4],
+       'peso' => ['kakko' => 3, 'testa' => 1]],
+      ['k' => 'cerca', 'testo' => 'Chiedere in giro chi lo ha messo lì',
+       'prova' => 'testa', 'difficolta' => 45,
+       'ok' => 'Non lo scopri, ma capisci una cosa: due persone in questa stanza sanno la '
+           . 'risposta, e nessuna delle due sei tu. È già qualcosa.',
+       'ko' => 'Lo chiedi alla persona sbagliata, che diventa rossa, e adesso il malinteso è due: '
+           . 'quello di prima e quello che hai appena fatto.',
+       'effetti_ok' => [], 'effetti_ko' => ['malinteso_cast' => 8],
+       'peso' => ['testa' => 3]],
+    ],
+   ],
+   [
+    'testo' => 'Fine delle lezioni. Nel corridoio delle scarpe c\'è la coda, e la coda è lenta '
+        . 'perché tutti stanno guardando tutti. Chi ha ancora un sacchetto in mano a quest\'ora '
+        . 'lo ha perché non è riuscito a darlo, e lo sanno anche i muri.',
+    'opzioni' => [
+      ['k' => 'dallo', 'testo' => 'Darlo adesso, a chi volevi darlo, e finirla',
+       'prova' => 'cuore', 'difficolta' => 40,
+       'ok' => 'Glielo metti in mano e dici una frase che non avevi preparato, e proprio per '
+           . 'questo suona vera. Quello che succede dopo non lo decidi tu, ma la parte tua l\'hai fatta.',
+       'ko' => 'Arrivi a mezzo metro e dici che fa freddo. Poi che domani c\'è compito. Poi ciao. '
+           . 'Il sacchetto è ancora in borsa.',
+       'effetti_ok' => ['affetto_cast' => 8, 'compostezza' => -2],
+       'effetti_ko' => ['compostezza' => -3],
+       'peso' => ['cuore' => 4]],
+      ['k' => 'obbligo', 'testo' => 'Darlo a tutti, così non vuol dire niente',
+       'prova' => 'dai_suki', 'difficolta' => 30,
+       'ok' => 'Ne dai uno a testa, ridendo, e il sacchetto che contava sparisce dentro il mucchio. '
+           . 'Nessuno capisce niente, che era esattamente lo scopo.',
+       'ko' => 'Li distribuisci, ma ne resta uno, e si vede che era diverso dagli altri. '
+           . 'Adesso lo sanno tutti tranne la persona giusta.',
+       'effetti_ok' => ['affetto_cast' => 2],
+       'effetti_ko' => ['malinteso_cast' => 10, 'affetto_cast' => 1],
+       'peso' => ['dai_suki' => 4]],
+      ['k' => 'tieni', 'testo' => 'Tenerlo. Un altro anno',
+       'prova' => 'nessuna', 'difficolta' => 0,
+       'ok' => 'Esci con il sacchetto in borsa. Non è successo niente, e non succederà niente, '
+           . 'e lo sai già mentre cammini verso casa. C\'è sempre il prossimo febbraio.',
+       'ko' => '', 'effetti_ok' => ['compostezza' => 1, 'affetto_cast' => -1], 'effetti_ko' => [],
+       'peso' => ['cuore' => -2, 'testa' => 1]],
+    ],
+   ],
+ ),
+],
+
+// ─────────────────────────────────────────────────────────────────────────
+[
+ 'ckey' => 'fuochi',
+ 'titolo' => 'La sera dei fuochi',
+ 'occhiello' => 'Festival d\'estate al tempio',
+ 'premessa' => 'Lanterne di carta lungo tutta la salita, bancarelle che friggono, e alle nove '
+     . 'i fuochi sopra il fiume. È la sera dell\'anno in cui il quartiere sta tutto nello '
+     . 'stesso posto: ci sono i compagni di classe, i professori in borghese, la gente dei '
+     . 'negozi, e chiunque tu stia evitando da tre settimane.',
+ 'luogo' => 'tempio',
+ 'condizione' => 'evento:festival_estate',
+ 'min_cast' => 2, 'max_cast' => 6, 'finestra' => 1800,
+ 'scene' => $scene(
+   [
+    'testo' => 'La salita è piena. Si cammina a passi di dieci centimetri, spalla contro spalla, '
+        . 'e ogni tanto la folla si muove tutta insieme e ti porta dove non volevi andare. '
+        . 'Qualcuno del gruppo è già rimasto indietro. Con lo yukata non si corre.',
+    'opzioni' => [
+      ['k' => 'mano', 'testo' => 'Prendere per mano chi hai vicino, per non perdervi',
+       'prova' => 'cuore', 'difficolta' => 35,
+       'ok' => 'Lo fai come se fosse una cosa pratica, perché lo è. Resta una cosa pratica per '
+           . 'circa quattro secondi.',
+       'ko' => 'Allunghi la mano e afferri una manica. Della persona sbagliata. Che si gira.',
+       'effetti_ok' => ['affetto_cast' => 5],
+       'effetti_ko' => ['malinteso_cast' => 7, 'compostezza' => -1],
+       'peso' => ['cuore' => 3]],
+      ['k' => 'grida', 'testo' => 'Metterti a gridare il punto di ritrovo sopra la folla',
+       'prova' => 'dai_suki', 'difficolta' => 30,
+       'ok' => 'Urli tre volte «al torii!» e si girano cinquanta persone, ma il gruppo ha capito. '
+           . 'Sei rosso, funziona.',
+       'ko' => 'Urli, e la tua voce sparisce dentro il tamburo che ha appena cominciato. '
+           . 'Nessuno ti ha sentito, e adesso siete sparpagliati.',
+       'effetti_ok' => ['affetto_cast' => 2, 'compostezza' => -1],
+       'effetti_ko' => ['affetto_cast' => -1],
+       'peso' => ['dai_suki' => 4]],
+      ['k' => 'lato', 'testo' => 'Sgusciare fuori dalla calca per il sentiero laterale',
+       'prova' => 'kakko', 'difficolta' => 40,
+       'ok' => 'Conosci un passaggio dietro le bancarelle. Sbuchi sopra la salita con il fiato '
+           . 'a posto mentre gli altri arrancano, e per un momento sei l\'unico che sa dov\'è tutti.',
+       'ko' => 'Il sentiero è chiuso da un furgone delle bancarelle. Torni indietro contro '
+           . 'corrente, e contro corrente con lo yukata è un\'impresa.',
+       'effetti_ok' => ['affetto_cast' => 1],
+       'effetti_ko' => ['pf' => -1, 'compostezza' => -1],
+       'peso' => ['kakko' => 3, 'testa' => 2]],
+    ],
+   ],
+   [
+    'testo' => 'Sopra, il piazzale del tempio è più largo e si respira. Cominciano i fuochi. '
+        . 'Fra uno scoppio e l\'altro c\'è un silenzio lungo in cui si sente solo la gente che '
+        . 'fa oh, e in quel silenzio la persona accanto a te dice qualcosa che non capisci '
+        . 'perché arriva il secondo colpo.',
+    'opzioni' => [
+      ['k' => 'richiedi', 'testo' => 'Chiederle di ripetere',
+       'prova' => 'nessuna', 'difficolta' => 0,
+       'ok' => 'Lei scuote la testa e dice «niente, niente». E guarda in alto. Ma non era niente, '
+           . 'e lo sapete tutti e due.',
+       'ko' => '', 'effetti_ok' => ['affetto_cast' => 2, 'malinteso_cast' => 3], 'effetti_ko' => [],
+       'peso' => ['testa' => 2, 'cuore' => 1]],
+      ['k' => 'rispondi', 'testo' => 'Rispondere come se avessi capito',
+       'prova' => 'kakko', 'difficolta' => 50,
+       'ok' => 'Dici una cosa abbastanza generica da andare bene per qualunque frase, e per '
+           . 'fortuna va bene anche per quella. Lei sorride.',
+       'ko' => 'Rispondi a una domanda che non era una domanda. Adesso lei pensa una cosa che tu '
+           . 'non hai detto, e tu non sai nemmeno quale.',
+       'effetti_ok' => ['affetto_cast' => 4],
+       'effetti_ko' => ['malinteso_cast' => 12],
+       'peso' => ['kakko' => 4]],
+      ['k' => 'guarda', 'testo' => 'Stare zitto e guardare i fuochi',
+       'prova' => 'nessuna', 'difficolta' => 0,
+       'ok' => 'Ce ne sono ancora per dieci minuti. Nessuno dei due dice più niente, e non è '
+           . 'imbarazzante: è una delle poche volte in cui non parlare è la cosa giusta.',
+       'ko' => '', 'effetti_ok' => ['affetto_cast' => 3, 'compostezza' => 2], 'effetti_ko' => [],
+       'peso' => ['cuore' => 2, 'candore' => -1]],
+    ],
+   ],
+ ),
+],
+
+// ─────────────────────────────────────────────────────────────────────────
+[
+ 'ckey' => 'culturale',
+ 'titolo' => 'Il festival culturale, e la classe che non sa cosa fare',
+ 'occhiello' => 'Due giorni, e la scuola aperta a chiunque',
+ 'premessa' => 'Ogni classe deve montare qualcosa: un bar, una casa stregata, uno spettacolo. '
+     . 'La riunione per decidere cosa fare è cominciata quaranta minuti fa e non ha ancora '
+     . 'prodotto niente, perché ci sono tre proposte e nessuna maggioranza. Il tempo per '
+     . 'costruire è quello che è.',
+ 'luogo' => 'liceo',
+ 'condizione' => 'evento:culturale',
+ 'min_cast' => 2, 'max_cast' => 6, 'finestra' => 1800,
+ 'scene' => $scene(
+   [
+    'testo' => 'Alla lavagna ci sono tre parole: BAR, FANTASMI, BAND. Chi ha proposto il bar dice '
+        . 'che è sicuro. Chi ha proposto i fantasmi dice che è l\'unico che si ricorderà '
+        . 'qualcuno. Chi ha proposto la band non ha proposto niente: ha solo detto che sa '
+        . 'suonare, e adesso guarda fuori dalla finestra come se la cosa non lo riguardasse.',
+    'opzioni' => [
+      ['k' => 'bar', 'testo' => 'Stare col bar: funziona sempre e non si fa figuracce',
+       'prova' => 'testa', 'difficolta' => 30,
+       'ok' => 'Fai due conti sul retro di un quaderno — costi, turni, quanti caffè servono — e '
+           . 'la sala si convince perché i numeri non litigano con nessuno.',
+       'ko' => 'Parli di numeri a gente che voleva parlare di idee. Ti ascoltano e poi riprendono '
+           . 'da dove erano.',
+       'effetti_ok' => ['affetto_cast' => 2], 'effetti_ko' => ['compostezza' => -1],
+       'peso' => ['testa' => 4]],
+      ['k' => 'fantasmi', 'testo' => 'Spingere per la casa stregata',
+       'prova' => 'dai_suki', 'difficolta' => 40,
+       'ok' => 'Descrivi il corridoio al buio, la mano che esce dal muro, la ragazza che urla. '
+           . 'A metà del discorso hanno già cominciato a dividersi i compiti.',
+       'ko' => 'Ti entusiasmi da solo per tre minuti. Quando finisci, qualcuno chiede se si '
+           . 'torna al bar.',
+       'effetti_ok' => ['affetto_cast' => 3, 'compostezza' => -1],
+       'effetti_ko' => ['compostezza' => -2],
+       'peso' => ['dai_suki' => 4, 'kakko' => 1]],
+      ['k' => 'band', 'testo' => 'Dire che chi sa suonare dovrebbe suonare',
+       'prova' => 'cuore', 'difficolta' => 45,
+       'ok' => 'Lo dici guardando la finestra, non la classe. Lei si gira. Non dice di sì, ma '
+           . 'non dice nemmeno di no, e in questa scuola è la stessa cosa.',
+       'ko' => 'Lo dici, e lei risponde che non se ne parla. Il tono chiude la faccenda e apre '
+           . 'qualcos\'altro, che non sai bene cosa sia.',
+       'effetti_ok' => ['affetto_cast' => 6],
+       'effetti_ko' => ['malinteso_cast' => 6, 'affetto_cast' => -1],
+       'peso' => ['cuore' => 4, 'musica' => 2]],
+    ],
+   ],
+   [
+    'testo' => 'Secondo giorno, pomeriggio. Quello che avete montato è in piedi, più o meno, e '
+        . 'la gente entra. Poi entra anche un gruppo di un\'altra scuola che ha deciso che la '
+        . 'cosa divertente è rovinarla: spostano una cosa, ridono, ne spostano un\'altra. '
+        . 'Il professore è dall\'altra parte dell\'edificio.',
+    'opzioni' => [
+      ['k' => 'affronta', 'testo' => 'Andare lì e dirgli di smettere',
+       'prova' => 'rissa', 'difficolta' => 45,
+       'ok' => 'Non serve alzare le mani: basta arrivare vicino, restare fermo, e non abbassare '
+           . 'gli occhi per il tempo che serve. Se ne vanno borbottando.',
+       'ko' => 'Uno ti dà una spinta, tu ne dai una indietro, e adesso c\'è un capannello. '
+           . 'Finisce in niente, ma ti fa male una spalla e il banchetto è per terra.',
+       'effetti_ok' => ['affetto_cast' => 5],
+       'effetti_ko' => ['pf' => -3, 'affetto_cast' => 2, 'compostezza' => -2],
+       'peso' => ['rissa' => 4]],
+      ['k' => 'professore', 'testo' => 'Andare a chiamare il professore',
+       'prova' => 'nessuna', 'difficolta' => 0,
+       'ok' => 'Ci metti quattro minuti. Quando tornate se ne sono andati, e resta da rimettere '
+           . 'a posto. Nessuno si è fatto male, e nessuno si ricorderà che sei stato tu a '
+           . 'risolverla.',
+       'ko' => '', 'effetti_ok' => ['affetto_cast' => 1], 'effetti_ko' => [],
+       'peso' => ['testa' => 3, 'rissa' => -2]],
+      ['k' => 'accogli', 'testo' => 'Trattarli da clienti e metterli a lavorare',
+       'prova' => 'kakko', 'difficolta' => 55,
+       'ok' => 'Dai a quello più grosso un grembiule e gli dici che serve uno all\'ingresso. '
+           . 'Ci casca. Fanno il turno, si divertono, e a fine giornata uno chiede se domani '
+           . 'può tornare.',
+       'ko' => 'Provi a fare lo spiritoso e passi per quello che li prende in giro. '
+           . 'Peggiora tutto.',
+       'effetti_ok' => ['affetto_cast' => 7, 'compostezza' => 1],
+       'effetti_ko' => ['pf' => -2, 'compostezza' => -2],
+       'peso' => ['kakko' => 4, 'dai_suki' => 2]],
+    ],
+   ],
+ ),
+],
+
+// ─────────────────────────────────────────────────────────────────────────
+[
+ 'ckey' => 'capodanno',
+ 'titolo' => 'La prima visita dell\'anno',
+ 'occhiello' => 'Hatsumōde, all\'una di notte',
+ 'premessa' => 'Si va al tempio la notte del primo gennaio, e ci va tutto il quartiere insieme. '
+     . 'La fila scende per tutta la salita e avanza di un metro ogni due minuti. Fa freddo, si '
+     . 'vede il fiato, e c\'è un chiosco che vende amazake caldo a metà strada. Alla fine si '
+     . 'tira la corda, si battono le mani due volte, e si chiede una cosa sola.',
+ 'luogo' => 'tempio',
+ 'condizione' => 'evento:capodanno',
+ 'min_cast' => 2, 'max_cast' => 6, 'finestra' => 1800,
+ 'scene' => $scene(
+   [
+    'testo' => 'Quaranta minuti di fila. A quest\'ora e con questo freddo la gente parla di cose '
+        . 'di cui non parlerebbe mai alle tre del pomeriggio: propositi, paure, quello che è '
+        . 'andato storto quest\'anno. Poi arriva il tuo turno davanti alla campana.',
+    'opzioni' => [
+      ['k' => 'chiedi', 'testo' => 'Chiedere la cosa che vuoi davvero',
+       'prova' => 'cuore', 'difficolta' => 30,
+       'ok' => 'Tiri la corda, batti le mani, e per mezzo secondo la formuli anche a te stesso, '
+           . 'che è la parte difficile. Esci sapendo una cosa in più di quando sei entrato.',
+       'ko' => 'Tiri la corda, batti le mani, e ti accorgi che non sai cosa chiedere. Chiedi '
+           . 'salute per la famiglia, che va sempre bene e non impegna nessuno.',
+       'effetti_ok' => ['compostezza' => 2], 'effetti_ko' => [],
+       'peso' => ['cuore' => 3]],
+      ['k' => 'omikuji', 'testo' => 'Tirare l\'omikuji, il foglietto della sorte',
+       'prova' => 'nessuna', 'difficolta' => 0,
+       'ok' => 'Esce **piccola fortuna**. Il foglietto dice che quello che aspetti arriverà, ma '
+           . 'non da dove lo stai guardando. Lo leggi tre volte e poi lo leghi al ramo con gli '
+           . 'altri, come si fa con le cose che non si vogliono portare a casa.',
+       'ko' => '', 'effetti_ok' => ['affetto_cast' => 1], 'effetti_ko' => [],
+       'peso' => ['candore' => 2, 'dai_suki' => 1]],
+      ['k' => 'amazake', 'testo' => 'Saltare la fila e andare a prendere l\'amazake per tutti',
+       'prova' => 'dai_suki', 'difficolta' => 35,
+       'ok' => 'Torni con cinque bicchieri di carta in equilibrio e non ne rovesci nemmeno uno. '
+           . 'Per dieci minuti sei la persona più popolare del tempio.',
+       'ko' => 'Torni che la fila è avanzata, il gruppo non c\'è più, e tu hai cinque bicchieri '
+           . 'e nessuno a cui darli.',
+       'effetti_ok' => ['affetto_cast' => 4, 'pf' => 1],
+       'effetti_ko' => ['affetto_cast' => -1],
+       'peso' => ['dai_suki' => 4]],
+    ],
+   ],
+ ),
+],
+
+// ─────────────────────────────────────────────────────────────────────────
+[
+ 'ckey' => 'chiacchiere',
+ 'titolo' => 'Quello che dicono di te',
+ 'occhiello' => 'Una storia che ha fatto troppa strada',
+ 'premessa' => 'Da qualche giorno gira una storia. Non si sa chi l\'abbia messa in giro e non '
+     . 'somiglia più a quello che è successo — se è successo. Il problema delle voci è che a '
+     . 'un certo punto smettono di avere un\'origine: le sanno tutti, e quindi sono vere.',
+ 'luogo' => null,
+ 'condizione' => 'pettegolezzo',
+ 'min_cast' => 2, 'max_cast' => 5, 'finestra' => 1500,
+ 'scene' => $scene(
+   [
+    'testo' => 'Te ne accorgi da come si interrompono quando arrivi. Non è ostilità: è '
+        . 'curiosità, che è peggio, perché l\'ostilità almeno si affronta. Uno del gruppo ti '
+        . 'guarda e ti chiede, con tono leggero, se è vero. Non specifica cosa.',
+    'opzioni' => [
+      ['k' => 'smentisci', 'testo' => 'Smentire, punto e basta',
+       'prova' => 'kakko', 'difficolta' => 45,
+       'ok' => 'Dici di no con la faccia di chi trova la domanda noiosa, e la noia è l\'unica '
+           . 'cosa che uccide un pettegolezzo. Cambiano argomento da soli.',
+       'ko' => 'Neghi troppo in fretta e troppo forte. Adesso ci credono anche quelli che non '
+           . 'ci credevano.',
+       'effetti_ok' => ['calore' => -8],
+       'effetti_ko' => ['malinteso_cast' => 10, 'calore' => 6],
+       'peso' => ['kakko' => 4]],
+      ['k' => 'origine', 'testo' => 'Chiedere a chi l\'ha sentita da chi',
+       'prova' => 'testa', 'difficolta' => 40,
+       'ok' => 'Risali tre passaggi e arrivi a una persona che dice di averla sentita da te. '
+           . 'Non è vero, e a questo punto è quasi divertente.',
+       'ko' => 'Ognuno l\'ha sentita da un altro e nessuno si ricorda da chi. È così che '
+           . 'funziona, e adesso lo sai.',
+       'effetti_ok' => ['calore' => -4, 'affetto_cast' => 2],
+       'effetti_ko' => ['compostezza' => -1],
+       'peso' => ['testa' => 4]],
+      ['k' => 'peggiora', 'testo' => 'Raccontarla tu, ma molto peggio, finché non regge più',
+       'prova' => 'dai_suki', 'difficolta' => 50,
+       'ok' => 'Ci aggiungi un elicottero e una banda di motociclisti. Quando finisci ridono '
+           . 'tutti, e la versione seria è morta.',
+       'ko' => 'La tua versione esagerata piace, e comincia a girare **anche quella**. '
+           . 'Adesso ce ne sono due.',
+       'effetti_ok' => ['calore' => -10, 'affetto_cast' => 3],
+       'effetti_ko' => ['calore' => 10, 'malinteso_cast' => 6],
+       'peso' => ['dai_suki' => 4, 'kakko' => 2]],
+    ],
+   ],
+   [
+    'testo' => 'Più tardi trovi la persona da cui, secondo tre passaggi di corridoio, sarebbe '
+        . 'partita. È seduta da sola e non sta scappando. Quando ti vede arrivare non si alza.',
+    'opzioni' => [
+      ['k' => 'ascolta', 'testo' => 'Sederti e lasciarla parlare per prima',
+       'prova' => 'cuore', 'difficolta' => 35,
+       'ok' => 'Racconta una cosa che aveva visto per metà, e che ripetendo è diventata un\'altra. '
+           . 'Non lo ha fatto per cattiveria. Quasi mai è per cattiveria.',
+       'ko' => 'Non parla. Il silenzio dura abbastanza da diventare una risposta, e la risposta '
+           . 'non ti piace.',
+       'effetti_ok' => ['affetto_cast' => 6, 'calore' => -5],
+       'effetti_ko' => ['malinteso_cast' => 5],
+       'peso' => ['cuore' => 4, 'testa' => 1]],
+      ['k' => 'accusa', 'testo' => 'Dirle in faccia che è stata lei',
+       'prova' => 'rissa', 'difficolta' => 40,
+       'ok' => 'Ammette. Si scusa, pure, e la cosa finisce lì — ma per un po\' non vi parlerete, '
+           . 'e lo sapete tutti e due.',
+       'ko' => 'Non era stata lei. Adesso c\'è una persona in più che ha una buona ragione per '
+           . 'parlare male di te.',
+       'effetti_ok' => ['calore' => -6, 'affetto_cast' => -4],
+       'effetti_ko' => ['affetto_cast' => -8, 'malinteso_cast' => 12],
+       'peso' => ['rissa' => 4]],
+      ['k' => 'lascia', 'testo' => 'Girare i tacchi e lasciar perdere',
+       'prova' => 'nessuna', 'difficolta' => 0,
+       'ok' => 'Fra due settimane nessuno se ne ricorderà, perché ci sarà una storia nuova. '
+           . 'È vero, e non consola granché.',
+       'ko' => '', 'effetti_ok' => ['compostezza' => 1], 'effetti_ko' => [],
+       'peso' => ['testa' => 2, 'cuore' => -1]],
+    ],
+   ],
+ ),
+],
+
+// ─────────────────────────────────────────────────────────────────────────
+[
+ 'ckey' => 'neve',
+ 'titolo' => 'La prima neve',
+ 'occhiello' => 'Il quartiere zitto',
+ 'premessa' => 'Ha cominciato di notte e nessuno se n\'è accorto. La mattina il quartiere è '
+     . 'un\'altra cosa: tutto più chiaro, tutto più basso, e soprattutto zitto — la neve si '
+     . 'porta via i rumori. I treni vanno a rilento, le strade sono mezze vuote, e per qualche '
+     . 'ora sembra lecito non fare niente.',
+ 'luogo' => null,
+ 'condizione' => 'neve',
+ 'min_cast' => 2, 'max_cast' => 5, 'finestra' => 1500,
+ 'scene' => $scene(
+   [
+    'testo' => 'Nessuno ha voglia di andare dove doveva andare. Ci si ferma, si guarda in alto '
+        . 'con la bocca aperta come si fa a sei anni, e si sta lì. Poi qualcuno raccoglie della '
+        . 'neve e la stringe in mano, senza ancora aver deciso cosa farne.',
+    'opzioni' => [
+      ['k' => 'tira', 'testo' => 'Tirargliela addosso per primo',
+       'prova' => 'sport', 'difficolta' => 30,
+       'ok' => 'Centro in pieno, sulla spalla. Quello che segue è una guerra di dieci minuti in '
+           . 'cui nessuno ha più diciassette anni.',
+       'ko' => 'Manchi, e la palla finisce nel cappuccio di uno che passava. Che si gira. '
+           . 'E che adesso è dalla parte degli altri.',
+       'effetti_ok' => ['affetto_cast' => 5, 'pf' => -1],
+       'effetti_ko' => ['affetto_cast' => 2, 'pf' => -2, 'compostezza' => -1],
+       'peso' => ['sport' => 3, 'dai_suki' => 3]],
+      ['k' => 'pupazzo', 'testo' => 'Metterti a fare un pupazzo, serissimo',
+       'prova' => 'nessuna', 'difficolta' => 0,
+       'ok' => 'Ci si mettono in tre. Viene brutto e storto, ha un sasso per occhio e una '
+           . 'sciarpa che qualcuno rivorrà indietro. Resterà lì fino a giovedì.',
+       'ko' => '', 'effetti_ok' => ['affetto_cast' => 4], 'effetti_ko' => [],
+       'peso' => ['candore' => 3, 'cuore' => 2]],
+      ['k' => 'guarda', 'testo' => 'Restare fermo a guardare, senza toccare niente',
+       'prova' => 'nessuna', 'difficolta' => 0,
+       'ok' => 'Il quartiere così non lo hai mai visto e non lo rivedrai uguale, perché domani '
+           . 'sarà fango. Uno del gruppo si ferma accanto a te e guarda dove guardi tu, e non '
+           . 'chiede niente.',
+       'ko' => '', 'effetti_ok' => ['affetto_cast' => 3, 'compostezza' => 2], 'effetti_ko' => [],
+       'peso' => ['cuore' => 3, 'dai_suki' => -1]],
+    ],
+   ],
+   [
+    'testo' => 'Verso sera comincia a gelare, e la discesa davanti alla stazione diventa una '
+        . 'pista. Una signora con le buste è ferma in cima e non se la sente. Dietro di lei si '
+        . 'sta formando una piccola coda di gente che non se la sente neanche loro.',
+    'opzioni' => [
+      ['k' => 'accompagna', 'testo' => 'Darle un braccio e scendere piano',
+       'prova' => 'nessuna', 'difficolta' => 0,
+       'ok' => 'Venti metri in tre minuti. In fondo ti ringrazia e ti mette in mano un mandarino, '
+           . 'perché è il genere di signora che ha sempre dei mandarini.',
+       'ko' => '', 'effetti_ok' => ['affetto_cast' => 3, 'pf' => 1], 'effetti_ko' => [],
+       'peso' => ['cuore' => 4]],
+      ['k' => 'sabbia', 'testo' => 'Andare a cercare sabbia o cenere da buttare sul ghiaccio',
+       'prova' => 'testa', 'difficolta' => 35,
+       'ok' => 'Dal cantiere dietro l\'angolo. Ne spargete due secchi e la discesa torna una '
+           . 'discesa. Nessuno vi ha visto, e va benissimo così.',
+       'ko' => 'Non trovi niente, e quando torni la coda si è sciolta da sola perché qualcuno '
+           . 'ha avuto un\'idea migliore.',
+       'effetti_ok' => ['affetto_cast' => 2], 'effetti_ko' => [],
+       'peso' => ['testa' => 4]],
+      ['k' => 'scivola', 'testo' => 'Scendere di corsa per dimostrare che si può',
+       'prova' => 'sport', 'difficolta' => 55,
+       'ok' => 'Arrivi in fondo in piedi, con le braccia larghe, e ti giri come se niente fosse. '
+           . 'Applausi di quattro persone, ma quattro persone sono quattro persone.',
+       'ko' => 'Il primo metro va bene. Poi il mondo gira di novanta gradi e tu sei seduto in '
+           . 'fondo alla discesa con la neve nei pantaloni.',
+       'effetti_ok' => ['affetto_cast' => 3, 'compostezza' => 1],
+       'effetti_ko' => ['pf' => -3, 'compostezza' => -3],
+       'peso' => ['kakko' => 3, 'sport' => 2]],
+    ],
+   ],
+ ),
+],
+
     ],
 ];

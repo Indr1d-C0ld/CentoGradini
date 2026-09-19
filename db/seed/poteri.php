@@ -178,5 +178,17 @@ $p('voce', 'Manipolazione della voce', '声色', null, 2, 93, 96, 4,
   'La voce sì, il resto no: chi ti guarda vede te. Funziona al telefono, dietro una porta, '
   . 'al buio.'),
 
+// --- Il potere che non si tira ------------------------------------------
+// Banda 0-0, cioe' fuori dall'intervallo del dado (1-100): non esce mai.
+// Nel canone e' di Kazuya e di nessun altro, e lasciarlo sorteggiabile lo
+// renderebbe una carta fortunata invece che un tratto di quel personaggio.
+$p('blocco', 'Bloccare i poteri', '超能力封じ', null, 4, 0, 0, 0,
+  'Spegnere il potere di un altro esper mentre lo sta usando. Non lo si toglie e non lo si '
+  . 'ruba: semplicemente, per un momento, quella persona non riesce piu\' a farlo. Chi lo '
+  . 'subisce se ne accorge benissimo, e capisce anche chi e\' stato.',
+  'Funziona solo su chi e\' presente, e solo mentre sta usando un potere. Non si puo\' tenere '
+  . 'acceso: e\' un interruttore, non una parete. Nel canone lo sa fare Kazuya, che e\' il piu\' '
+  . 'forte della famiglia pur essendo il piu\' piccolo.'),
+
     ],
 ];

@@ -269,6 +269,118 @@ prova('davanti a un testimone attento, un teletrasporto si vede', function () {
     }
 });
 
+// --- Il potere che spegne i poteri --------------------------------------------
+
+prova('chi sa bloccare spegne il potere di un altro', function () {
+    sgombra();
+    $a = suPalco(attore('Esper', true, ['teletrasporto']));
+    $k = suPalco(attore('Bloccante', true, ['teletrasporto']));
+    Database::run('INSERT INTO personaggio_poteri (personaggio_id, pkey, primario, controllo)
+                   VALUES (?, ?, 0, 60) ON DUPLICATE KEY UPDATE controllo = 60',
+        [(int) $k['id'], 'blocco']);
+
+    // Con la mano poco ferma la difesa e' minima: su venti tentativi in ore
+    // diverse ne deve spegnere parecchi. Non tutti, pero': non e' una parete.
+    $spenti = 0;
+    for ($i = 0; $i < 20; $i++) {
+        $r = Segreto::chiSpegne(ricarica($a), PALCO, Orologio::lineare() + $i * 3600, 0);
+        if ($r !== null) { $spenti++; }
+    }
+    // p = 55%: media 11, scarto 2,2. La soglia a 4 sta a tre scarti.
+    vero($spenti >= 4, "su venti tentativi ne ha spenti solo {$spenti}");
+    vero($spenti <= 19, 'non deve spegnerli sempre: e\' un interruttore, non una parete');
+});
+
+prova('la mano ferma difende, ma non salva', function () {
+    sgombra();
+    $a = suPalco(attore('Espertissimo', true, ['teletrasporto']));
+    $k = suPalco(attore('Bloccante2', true, ['teletrasporto']));
+    Database::run('INSERT INTO personaggio_poteri (personaggio_id, pkey, primario, controllo)
+                   VALUES (?, ?, 0, 60) ON DUPLICATE KEY UPDATE controllo = 60',
+        [(int) $k['id'], 'blocco']);
+
+    $g = Orologio::lineare();
+    $conta = static function (int $controllo) use ($a, $g): int {
+        $n = 0;
+        for ($i = 0; $i < 60; $i++) {
+            if (Segreto::chiSpegne(ricarica($a), PALCO, $g + $i * 3600, $controllo) !== null) { $n++; }
+        }
+        return $n;
+    };
+    $senza = $conta(0);
+    $con   = $conta(100);
+    vero($con < $senza, "il Controllo deve difendere: {$senza} senza, {$con} con");
+    vero($con > 0, 'ma non deve annullare il blocco: il Controllo al massimo toglie un terzo');
+});
+
+prova('senza nessuno che blocchi, non si blocca niente', function () {
+    sgombra();
+    $a = suPalco(attore('Solitario', true, ['teletrasporto']));
+    vero(Segreto::chiSpegne(ricarica($a), PALCO, Orologio::lineare(), 0) === null,
+        'in un posto vuoto nessuno puo\' spegnerti niente');
+});
+
+prova('un potere spento non lascia incidenti ne\' testimoni', function () {
+    sgombra();
+    $a = suPalco(attore('Zitto', true, ['teletrasporto']));
+    $k = suPalco(attore('Guardiano', true, ['teletrasporto']));
+    Database::run('INSERT INTO personaggio_poteri (personaggio_id, pkey, primario, controllo)
+                   VALUES (?, ?, 0, 90) ON DUPLICATE KEY UPDATE controllo = 90',
+        [(int) $k['id'], 'blocco']);
+
+    $primaInc = (int) Database::first('SELECT COUNT(*) n FROM incidenti WHERE attore_id = ?',
+        [(int) $a['id']])['n'];
+
+    // Le ore vanno fatte passare davvero. L'ancora del blocco contiene l'ora
+    // di gioco: ripetere il tentativo nello stesso minuto da' quaranta volte
+    // lo stesso esito — e' voluto, insistere subito non deve servire — ma
+    // una prova che lo ignora passa o cade a seconda degli id che le tocca.
+    $epoca = 1735689600;
+    Orologio::fingiEpoca($epoca);
+    $spento = null;
+    try {
+        for ($i = 0; $i < 40 && $spento === null; $i++) {
+            Orologio::fingiAdesso($epoca + $i * 3600);
+            Database::run('UPDATE personaggi SET pp = pp_max WHERE id = ?', [(int) $a['id']]);
+            $r = Segreto::usa(ricarica($a), 'teletrasporto');
+            if (($r['spento'] ?? false) === true) { $spento = $r; }
+        }
+    } finally {
+        Orologio::fingiEpoca(null);
+        Orologio::fingiAdesso(null);
+    }
+    vero($spento !== null, 'in quaranta tentativi almeno uno doveva essere spento');
+    vero($spento['incidente'] === null, 'un potere spento non apre un incidente');
+    uguale([], $spento['testimoni'], 'e non lascia testimoni: non c\'era niente da vedere');
+    vero(str_contains((string) $spento['racconto'], 'Guardiano'),
+        'il racconto deve dire chi e\' stato: chi lo subisce se ne accorge');
+});
+
+prova('il blocco non si tira alla creazione', function () {
+    // Nel canone e\' di Kazuya e di nessun altro. Banda 0-0 nel seme, che e\'
+    // fuori dall\'intervallo del dado: non deve uscire mai.
+    $riga = Database::first('SELECT da, a, costo_primario FROM poteri WHERE pkey = ?', ['blocco']);
+    vero($riga !== null, 'il potere deve esistere in tabella');
+    vero((int) $riga['da'] === 0 && (int) $riga['a'] === 0,
+        'banda ' . (int) $riga['da'] . '-' . (int) $riga['a'] . ': sarebbe sorteggiabile');
+    vero($riga['costo_primario'] === null, 'non puo\' essere un potere primario');
+
+    // E nessuno dei personaggi generati finora ce l\'ha, a parte chi gliel\'ha
+    // dato una prova o il seme degli abitanti.
+    $n = (int) Database::first(
+        'SELECT COUNT(*) n FROM personaggio_poteri pp JOIN personaggi p ON p.id = pp.personaggio_id
+         WHERE pp.pkey = ? AND p.png IS NULL AND p.cognome <> ?',
+        ['blocco', ucfirst(PREFISSO)])['n'];
+    uguale(0, $n, 'nessun giocatore deve poterlo avere');
+});
+
+prova('Kazuya ce l\'ha', function () {
+    $k = Database::first(
+        'SELECT 1 x FROM personaggio_poteri pp JOIN personaggi p ON p.id = pp.personaggio_id
+         WHERE p.png = ? AND pp.pkey = ?', ['kazuya', 'blocco']);
+    vero($k !== null, 'e\' il suo tratto piu\' caratteristico: e\' per questo che e\' il piu\' forte');
+});
+
 // --- La copertura -------------------------------------------------------------
 
 prova('non coprire lascia un\'anomalia al testimone', function () {

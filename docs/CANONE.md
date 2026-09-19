@@ -320,6 +320,115 @@ storia dura diciotto volumi per questo, e adesso il sistema lo dice con i numeri
 
 ---
 
+## 7-bis. Quello che hanno detto i 156 riassunti
+
+Il 19 settembre 2026 orangeroad.it è tornato su e il raccoglitore paziente ha finito il
+lavoro: **156 riassunti su 156**, circa quarantamila parole di sinossi capitolo per capitolo.
+Sono la fonte più capillare che abbiamo, e hanno chiuso o spostato parecchie domande.
+
+### Confermato, adesso con il capitolo
+
+| Cosa | Dove |
+|:---|:---|
+| Kyosuke e **Hikaru compiono gli anni lo stesso giorno, il 15 novembre** | cap. 36, tutto costruito sull'equivoco |
+| **Madoka compie diciassette anni** durante la serie | cap. 111, «la vigilia del 17º compleanno» |
+| **Kazuya è telepate**, e Kyosuke no | capp. 35, 39, 43, 46 — «a Kyosuke piacerebbe essere un telepate come il cugino» |
+| **Kurumi ipnotizza** | cap. 126, usa il potere ipnotico su Hikaru |
+| **Il cappello di paglia rosso** è il filo dell'opera | cap. 1 (glielo regala), 132 (gliene ricompra uno), 155 (Manami lo mostra a Hikaru, ed è la fine) |
+| **I Kasuga si erano appena trasferiti** quando la storia comincia | cap. 1, prima riga |
+| **Il Trasloco è la minaccia vera** | cap. 141: se il programma va in onda «rischia di non avere più un posto dove trasferirsi» |
+| L'**orologio del nonno** e il **pappagallo telepatico** | capp. 107, 109, 110 — l'orologio «va ricaricato», e chi ha i poteri lo sa usare |
+
+### La scalinata, per la terza volta
+
+Il capitolo 1 dice che Kyosuke e Madoka **discutono sul numero dei gradini e si accordano su
+99,5**. È la terza attestazione indipendente — la FAQ 12, l'OAV, e adesso il capitolo — e non
+cambia la conclusione di §5 (cento è il nome canonico della scalinata), ma la rende più bella:
+il conto ufficiale è cento, quello su cui si sono messi d'accordo loro due è novantanove e
+mezzo, e quel mezzo gradino è la prima cosa che si sono detti.
+
+### I club scolastici: nel manga non ci sono
+
+Questa è la risposta più netta, ed è una risposta negativa. Su 156 capitoli, le uniche
+occorrenze di un club sono tre:
+
+- **cap. 117** — Toba invita **Madoka** a entrare nel *club di atletica*. Lei non entra: è la
+  conferma a livello di capitolo di quello che la FAQ 40 dice in generale, cioè che Madoka
+  non aderisce a niente.
+- **cap. 145** — Akane e le amiche fondano per scherzo il «club delle zitelle d'oro».
+- **capp. 138-139** — il *club radiofonico*, ma è in Shin KOR, non nell'opera originale.
+
+Tennis, basket e atletica compaiono come **attività**, non come club: partite fra amici, ore
+di educazione fisica, un torneo in vacanza. Il 部活 che struttura la vita di tanti manga
+scolastici in *Kimagure Orange Road* **non c'è**.
+
+Quindi i dieci club di `db/seed/club.php` restano quello che erano dichiarati: nostra
+ricostruzione, e adesso lo sappiamo con certezza invece che per mancanza di prove. Non è un
+motivo per toglierli — servono a una funzione di gioco che l'opera non aveva bisogno di avere,
+cioè far circolare le voci fra chi non si incontra — ma è un motivo per non spacciarli mai
+per canone.
+
+### La scuola unica: il corpus ci dà ragione
+
+Avevamo messo medie e superiori nello stesso luogo (`liceo`) chiamandola una semplificazione
+nostra. Il corpus la sostiene: al **cap. 27** Kurumi, che è delle medie, colpisce Yusaku in
+faccia con una palla **durante l'intervallo, a scuola**, e Yusaku è al primo anno di
+superiori. Al **cap. 7** Manami e Kurumi muovono un pettegolezzo che gira per «tutta la
+scuola», la stessa dove sta Kyosuke. Nell'opera i fratelli Kasuga e i liceali stanno nello
+stesso posto, e il nostro modello a un edificio solo non tradisce niente.
+
+### Restano ignoti
+
+I **compleanni** di Manami, Kurumi, Akane e Kazuya: quarantamila parole e non compaiono mai.
+I nostri restano scelti per far tornare la coorte scolastica, e adesso sappiamo che non c'è un
+dato vero da mettere al loro posto.
+
+Dove **abitano Hikaru e Yusaku**: casa di Hikaru c'è eccome — ci si festeggia l'Hinamatsuri
+(cap. 49), il capodanno (cap. 92), ci si mangia la torta (cap. 78) — ma il quartiere non la
+colloca mai. La nostra scelta di metterli in via commerciale resta una scelta nostra.
+
+Il **potere di Kazuya di bloccare i poteri altrui** non compare in nessuno dei 156 riassunti.
+Lo abbiamo implementato lo stesso, perché la scheda giapponese e la FAQ lo danno per fermo e
+perché spiega come mai un bambino di otto anni sia il più forte della famiglia — ma va
+registrato che **poggia sulle schede, non su una scena**. Confidenza `documentato`, non
+`canone`.
+
+### Il censimento dei poteri, e una trappola
+
+Con il corpus completo `bin/censimento_poteri.php` trova **58 usi di poteri** distribuiti
+così:
+
+| potere | capitoli |
+|:---|---:|
+| teletrasporto | 16 |
+| telepatia | 9 |
+| sogni premonitori | 8 |
+| ipnosi | 6 |
+| cambio d'identità | 5 |
+| autoipnosi, salto nel tempo, telecinesi, proiezione di fantasmi | 3 ciascuno |
+| scambio di corpo | 2 |
+
+**La trappola è leggerlo come una frequenza di possesso.** Non lo è: è una frequenza
+*narrativa*. La telecinesi compare in tre capitoli non perché sia rara — il canone la chiama
+«il potere di base della stirpe» e ce l'hanno tutti — ma perché spostare un oggetto non fa
+una scena. Il teletrasporto ne fa sedici perché è vistoso, risolve e mette nei guai, che è
+esattamente il motivo per cui nel nostro gioco ha vistosità 9.
+
+Chi un giorno volesse ritarare le bande del tiro non deve usare questa tabella: misura quanto
+un potere è *interessante da raccontare*, non quanto è diffuso.
+
+### Due personaggi che ci mancavano, e adesso hanno una fonte
+
+- **Sayuri Hirose** (capp. 88-89): dà la caccia ai bei ragazzi e ha un metodo, studiato.
+  Quando Kyosuke non ci casca, ne conclude che il problema è la concorrenza.
+- **Hiromi Sugi** (capp. 83, 85): studentessa nuova, ex compagna di classe di Kyosuke nella
+  scuola di prima. Arriva con le fotografie di com'era, e il fascino di lui crolla.
+
+Sono esattamente gli antagonisti non violenti che `FONTI.md` §5 chiedeva: non fanno del male
+a nessuno, complicano la vita a tutti.
+
+---
+
 ## 8. Cosa resta da fare
 
 1. **I 156 capitoli ci sono, i loro contenuti no.** `fonti/capitoli_manga.tsv` ha numero, anno,
@@ -329,9 +438,11 @@ storia dura diciotto volumi per questo, e adesso il sistema lo dice con i numeri
    Serve la *Media Arts Database* dell'Agenzia per gli Affari Culturali.
 2. **Il censimento degli usi dei poteri**, capitolo per capitolo, con peso, distanza e durata.
    L'impalcatura c'è: `bin/censimento_poteri.php` legge i riassunti in `fonti/riassunti/`, li
-   incrocia con l'indice dei 156 capitoli e produce `fonti/censimento_poteri.tsv`. Mancano
-   **144 riassunti su 156**: orangeroad.it è andato in HTTP 500 mentre li scaricavo (vedi
-   `FONTI.md`) e `fonti/siti/riprendi_capitoli.py` aspetta che torni su.
+   incrocia con l'indice dei 156 capitoli e produce `fonti/censimento_poteri.tsv`. Il corpus
+   adesso è **completo, 156 riassunti su 156**: il sito è tornato su il 19/09/2026 e il
+   raccoglitore paziente ha finito il lavoro. Cosa ne è uscito: §7-bis. Resta da fare la
+   parte difficile, cioè ricavarne peso, distanza e durata: i riassunti dicono *che* un
+   potere è stato usato, non *quanto* pesava la cosa che si è mossa.
 3. **Quante volte i Kasuga hanno traslocato.** Il *perché* è chiuso (FAQ 26: quando i poteri
    diventano di dominio pubblico); resta da trovare il numero esatto, che è il parametro che
    tara la soglia.

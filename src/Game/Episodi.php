@@ -60,6 +60,13 @@ final class Episodi
                 if (count($cast) < (int) $c['min_cast']) {
                     continue;
                 }
+                // Serve almeno un giocatore. Gli abitanti canonici possono
+                // entrare nel cast — e' il bello di averli come personaggi
+                // veri — ma una storia recitata da soli PNG non la legge
+                // nessuno e consuma la pausa fra un episodio e l'altro.
+                if (!self::c_eUnGiocatore($cast)) {
+                    continue;
+                }
                 if (self::apri($c, $lkey, $cast, $gts) !== null) {
                     $n++;
                     if ($aperti + $n >= $max) {
@@ -70,6 +77,21 @@ final class Episodi
             }
         }
         return $n;
+    }
+
+    /**
+     * C'e' almeno una persona in carne e ossa in questo cast?
+     *
+     * @param list<array<string,mixed>> $cast
+     */
+    private static function c_eUnGiocatore(array $cast): bool
+    {
+        foreach ($cast as $m) {
+            if (($m['png'] ?? null) === null) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static function condizioneSoddisfatta(string $cond, int $gts): bool
@@ -90,8 +112,36 @@ final class Episodi
             // «Sospetto» non guarda il calendario: guarda se in giro c'è
             // qualcuno che ha capito qualcosa che non doveva capire.
             'sospetto'  => Database::first("SELECT 1 FROM sanno WHERE come = 'scoperto' LIMIT 1") !== null,
-            default     => false,
+            // E «pettegolezzo» guarda se c'è una voce che ha fatto abbastanza
+            // strada da non somigliare più a quello che è successo.
+            'pettegolezzo' => Database::first(
+                'SELECT 1 FROM voci_versioni WHERE passaggi >= 3 LIMIT 1') !== null,
+            // Qualunque evento stagionale in corso.
+            'festa'     => Eventi::inCorso($gts) !== [],
+            default     => self::condizioneEvento($cond, $gts),
         };
+    }
+
+    /**
+     * `evento:festival_estate` e simili: l'episodio si apre solo mentre quel
+     * preciso evento del calendario e' in corso.
+     *
+     * E' il modo per cui una storia puo' succedere «la sera dei fuochi» senza
+     * che il copione debba sapere che i fuochi sono il 25 luglio: la data sta
+     * in un posto solo, nel seme degli eventi.
+     */
+    private static function condizioneEvento(string $cond, int $gts): bool
+    {
+        if (!str_starts_with($cond, 'evento:')) {
+            return false;
+        }
+        $ekey = substr($cond, 7);
+        foreach (Eventi::inCorso($gts) as $e) {
+            if ((string) $e['ekey'] === $ekey) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /** @return list<string> */
@@ -101,11 +151,15 @@ final class Episodi
             return [(string) $copione['luogo']];
         }
         // Copione senza luogo fisso: si cerca dove c'è abbastanza gente.
+        // Si contano i **giocatori**, non le teste: da F6 il liceo ha nove
+        // abitanti canonici dentro tutte le mattine, e ordinare per numero
+        // di presenti avrebbe aperto ogni episodio senza luogo fisso sempre
+        // li', in mezzo a gente che non lo gioca.
         $righe = Database::all(
             "SELECT luogo, COUNT(*) n FROM personaggi
-             WHERE verso IS NULL AND stato = 'attivo' AND scheda = 'completa'
-             GROUP BY luogo HAVING n >= ? ORDER BY n DESC LIMIT 4",
-            [(int) $copione['min_cast']]
+             WHERE verso IS NULL AND stato = 'attivo' AND scheda = 'completa' AND png IS NULL
+             GROUP BY luogo HAVING n >= 1 ORDER BY n DESC LIMIT 4",
+            []
         );
         return array_map(static fn (array $r): string => (string) $r['luogo'], $righe);
     }
@@ -126,7 +180,7 @@ final class Episodi
                  SELECT 1 FROM episodio_cast ec JOIN episodi e ON e.id = ec.episodio_id
                  WHERE ec.personaggio_id = p.id
                    AND (e.stato = 'aperto' OR e.chiuso_gts > ?))
-             ORDER BY p.visto_gts DESC
+             ORDER BY (p.png IS NOT NULL), p.visto_gts DESC
              LIMIT ?",
             [$lkey, $gts - $pausa, $max]
         );
@@ -451,7 +505,12 @@ final class Episodi
         foreach ($cast as $membro) {
             $pgId = (int) $membro['id'];
             $utente = Database::first('SELECT user_id FROM personaggi WHERE id = ?', [$pgId]);
-            if ($utente === null) {
+            // Gli abitanti canonici partecipano agli episodi ma non tengono
+            // un album: non hanno un utente a cui intestarlo. Il controllo
+            // guardava la riga e non il valore, e da quando esistono i PNG
+            // (F6) la INSERT falliva sul vincolo verso `users` — dentro il
+            // battito, che quindi si piantava tutto.
+            if ($utente === null || $utente['user_id'] === null) {
                 continue;
             }
             $mie = array_values(array_filter($scelte,

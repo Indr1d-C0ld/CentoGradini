@@ -276,10 +276,27 @@ Elenco aperto, da chiudere prima di scrivere i seed definitivi (fase F2).
 4. Elenco degli artefatti canonici (orologio del vol. 13, macchina fotografica del vol. 9,
    pappagallo del vol. 13) con i loro effetti esatti.
 5. Geografia interna coerente del quartiere: quali luoghi confinano con quali, nelle tavole.
-6. Il ruolo esatto di Sayuri Hirose e Hiromi (solo manga), che il regolamento tratta di sfuggita
-   ma che servono come PNG antagonisti non violenti.
-7. **I club veri del Kōryō**, se l'opera ne nomina altri oltre al karate di Yusaku: i riassunti
-   dei capitoli che ci mancano (144 su 156) sono il posto dove cercarli.
-8. **I compleanni canonici** di Manami, Kurumi, Kazuya e Akane, se esistono da qualche parte:
-   i nostri sono scelti per far tornare la coorte, e andrebbero sostituiti da quelli veri.
-9. **Dove abitano** Hikaru, Yusaku, Komatsu e Hatta, se le tavole lo mostrano.
+6. ~~Il ruolo di Sayuri Hirose e Hiromi~~ — **chiusa il 19/09/2026**. **Sayuri Hirose**
+   (capp. 88-89) dà la caccia ai bei ragazzi con un metodo studiato, e quando Kyosuke non ci
+   casca conclude che il problema è la concorrenza. **Hiromi Sugi** (capp. 83, 85) è una
+   studentessa nuova, ex compagna di classe di Kyosuke nella scuola di prima, e arriva con le
+   fotografie di com'era. Sono esattamente gli antagonisti non violenti che servivano, e sono
+   stati seminati come abitanti.
+7. ~~I club veri del Kōryō~~ — **chiusa, con una risposta negativa**: su 156 riassunti l'opera
+   non ha un sistema di club. Le sole occorrenze sono l'invito a Madoka al club di atletica
+   che lei declina (cap. 117), il «club delle zitelle d'oro» fondato per scherzo da Akane
+   (cap. 145) e il club radiofonico, che però è di Shin KOR (capp. 138-139). I nostri dieci
+   club restano una ricostruzione, e adesso lo sappiamo per certo invece che per mancanza di
+   prove. Vedi `CANONE.md` §7-bis.
+8. ~~I compleanni canonici di Manami, Kurumi, Akane e Kazuya~~ — **chiusa, negativamente**:
+   quarantamila parole di riassunti e non compaiono mai. I nostri restano quelli che fanno
+   tornare la coorte scolastica, e non c'è un dato vero da metterci al posto. In compenso il
+   cap. 36 conferma che **Kyosuke e Hikaru compiono gli anni lo stesso giorno, il 15
+   novembre**, e il cap. 111 che Madoka compie diciassette anni durante la serie.
+9. **Dove abitano Hikaru e Yusaku** — resta aperta. Casa di Hikaru esiste e ci si va spesso
+   (Hinamatsuri al cap. 49, capodanno al cap. 92, la torta al cap. 78), ma il quartiere non la
+   colloca mai. Servirebbero le tavole, non i riassunti.
+10. **Il potere di Kazuya di bloccare i poteri altrui** non compare in nessuno dei 156
+    riassunti. È implementato (`poteri.blocco`, migrazione 0012) sulla base della scheda
+    giapponese e della FAQ: confidenza `documentato`, **non** `canone`. Se una tavola lo
+    mostrasse, andrebbe promossa.

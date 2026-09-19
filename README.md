@@ -17,8 +17,16 @@ aventi diritto.
 ## Stato
 
 **Il gioco è finito.** Le otto fasi da F0 a F7 sono fatte e in produzione, con
-299 verifiche su 13 file di prova. Da qui in poi si aggiunge contenuto —
-copioni di episodi, luoghi, tratti — non impalcatura.
+311 verifiche su 13 file di prova. Da qui in poi si aggiunge contenuto, non
+impalcatura: al momento **nove copioni di episodi**, **tredici abitanti**
+canonici e **dieci club**.
+
+**La rilettura dell'opera è completa**: tutti e 156 i riassunti dei capitoli
+sono stati raccolti e spogliati. Cosa ne è uscito sta in
+[`docs/CANONE.md`](docs/CANONE.md) §7-bis — fra le altre cose, che nel manga
+**i club scolastici non esistono** (i nostri dieci sono dichiaratamente una
+ricostruzione), che Kyosuke e Hikaru compiono gli anni lo stesso giorno, e che
+sulla scalinata i due si accordano su novantanove gradini e mezzo.
 
 **F0 — fondamenta: fatta.** Ci si iscrive, si conferma l'indirizzo, si entra.
 
