@@ -474,7 +474,7 @@ Stessa impalcatura di [SubSpazio] e [Atlantik], che su questa macchina è collau
 | **F3** ✔ | **Il Segreto**: uso dei poteri, testimoni, tiri di Nota, Copertura, anomalie, Taccuino, Sospetto fondato, Voci, calore, Trasloco | **Fatta.** Un esper imprudente si fa scoprire e trasloca davvero |
 | **F4** ✔ | Relazioni: Affetto/Fraintendimento, verbi relazionali, gesti ambigui, chiarimenti, gelosia, confessione, Cappello Rosso | **Fatta.** Si può rovinare un'amicizia per un equivoco e poi ricucirla |
 | **F5** ✔ | Episodi: motore, cast, turni, finestra reale, agente autonomo per gli assenti, tre copioni seminati (funghi, acquazzone, sospetti in aula), album dei ricordi | **Fatta.** Tre giocatori giocano un episodio insieme dall'inizio alla fine, e chi non si fa vivo lo gioca il motore |
-| **F6** | Multigiocatore pieno: bacheca, biglietti, club scolastici, eventi stagionali di server, PNG canonici vivi, propagazione delle voci fra giocatori | Il quartiere è pieno di gente che non hai mai incontrato ma di cui hai sentito parlare |
+| **F6** ✔ | Multigiocatore pieno: le **voci** con precisione e tono che si degradano di bocca in bocca, 11 **abitanti canonici** che girano per il quartiere da soli, 10 **club** come secondo canale di propagazione, **bacheca** e **biglietti**, 14 **eventi stagionali** di server | **Fatta.** Il quartiere è pieno di gente che non hai mai incontrato ma di cui hai sentito parlare |
 | **F7** | Rifinitura: album dei ricordi illustrato, esportazione del diario, PWA, `/admin`, comando di bilanciamento, suoni | Il gioco è finito |
 
 ---

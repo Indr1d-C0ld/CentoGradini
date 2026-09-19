@@ -22,6 +22,22 @@ $luogo = $qui['luogo'];
       · <a href="<?= e(url('/ricordi')) ?>">ricordi</a>
       · <a href="<?= e(url('/taccuino')) ?>">taccuino</a>
     </p>
+    <p class="occhiello">
+      <?php $quanteVoci = \App\Game\Voci::quante((int) $pg['id']); ?>
+      <a href="<?= e(url('/voci')) ?>">quello che si dice<?php
+        if ($quanteVoci > 0): ?> <span class="pastiglia"><?= $quanteVoci ?></span><?php
+        endif; ?></a>
+      · <a href="<?= e(url('/bacheca')) ?>">bacheca<?php
+        $quantiAvvisi = \App\Game\Bacheca::quantiAvvisi((string) $pg['luogo']);
+        if ($quantiAvvisi > 0): ?> <span class="pastiglia"><?= $quantiAvvisi ?></span><?php
+        endif; ?></a>
+      <?php $bigliettiQui = \App\Game\Bacheca::quiPer((int) $pg['id'], (string) $pg['luogo']); ?>
+      · <a href="<?= e(url('/biglietti')) ?>">biglietti<?php
+        if ($bigliettiQui !== []): ?> <span class="pastiglia"><?= count($bigliettiQui) ?></span><?php
+        endif; ?></a>
+      · <a href="<?= e(url('/club')) ?>">club</a>
+      · <a href="<?= e(url('/calendario')) ?>">calendario</a>
+    </p>
     <h1>Il quartiere</h1>
   </div>
 </div>

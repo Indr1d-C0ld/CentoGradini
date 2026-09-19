@@ -205,6 +205,19 @@ final class Legami
         Personaggio::traccia((string) $pg['luogo'], (int) $pg['id'], 'gesto',
             self::riempi((string) $g['lettura_vera'], $pg, $altro), $gts, 60);
 
+        // Il gesto diventa una voce, e i presenti la sanno di prima mano
+        // (F6). Un gesto ambiguo la fa nascere come «insieme» invece che
+        // come «gesto»: chi passava non ha visto un abbraccio, ha visto due
+        // persone vicine — ed e' esattamente da li' che parte il guaio.
+        $testimoni = self::presentiAltri((string) $pg['luogo'], (int) $pg['id'], (int) $altro['id']);
+        if ($testimoni !== []) {
+            Voci::nasce(
+                (int) $g['ambiguo'] === 1 ? 'insieme' : 'gesto',
+                (int) $pg['id'], (int) $altro['id'], (string) $pg['luogo'],
+                $testimoni, $gkey, $gts
+            );
+        }
+
         return [
             'ok'        => true,
             'visto_da'  => $fraintesi['visti'],
@@ -214,6 +227,36 @@ final class Legami
                     ? ' È la stessa cosa di sempre, e comincia a non voler più dire niente.'
                     : ''),
         ];
+    }
+
+    /**
+     * Una confessione detta ad alta voce davanti a qualcuno diventa una voce.
+     *
+     * @param list<int> $testimoni
+     */
+    private static function vocedellaConfessione(array $pg, int $versoId, array $testimoni, int $gts): void
+    {
+        if ($testimoni === []) {
+            return;
+        }
+        Voci::nasce('confessione', (int) $pg['id'], $versoId, (string) $pg['luogo'], $testimoni, '', $gts);
+    }
+
+    /**
+     * Chi c'e' a guardare, esclusi i due protagonisti.
+     *
+     * @return list<int>
+     */
+    private static function presentiAltri(string $lkey, int $a, int $b): array
+    {
+        return array_map(
+            static fn (array $r): int => (int) $r['id'],
+            Database::all(
+                'SELECT id FROM personaggi WHERE luogo = ? AND verso IS NULL AND stato = ?
+                   AND id NOT IN (?, ?)',
+                [$lkey, 'attivo', $a, $b]
+            )
+        );
     }
 
     /**
@@ -374,6 +417,11 @@ final class Legami
             (int) $pg['id'], $versoId, $gts);
         $prob = max(5, min(90, 20 + (int) $pg['cuore'] * 5 - (int) round($loro['fraintendimento'] / 2)));
 
+        // Una confessione riuscita, davanti a gente, fa il giro della scuola
+        // in tre giorni (F6). Quella non detta non la sa nessuno, ed e'
+        // giusto cosi': e' il punto di tutta la storia.
+        $testimoni = self::presentiAltri((string) $pg['luogo'], (int) $pg['id'], $versoId);
+
         if ($rng->int(1, 100) > $prob) {
             // Non è uscito niente. Succede, ed è la cosa più fedele di tutte.
             self::muovi($versoId, (int) $pg['id'], 2, 0, $gts);
@@ -391,7 +439,8 @@ final class Legami
         if ($loro['affetto'] >= $soglia) {
             self::muovi($versoId, (int) $pg['id'], 15, 0, $gts);
             self::muovi((int) $pg['id'], $versoId, 15, 0, $gts);
-            return ['ok' => true, 'detto' => true, 'esito' => 'accolta', 'racconto' =>
+            self::vocedellaConfessione($pg, $versoId, $testimoni, $gts);
+        return ['ok' => true, 'detto' => true, 'esito' => 'accolta', 'racconto' =>
                 'Lo dici. Lo dici davvero, con le parole più goffe che avresti potuto scegliere, e '
                 . $altro['nome'] . ' non dice niente per un tempo che ti sembra lunghissimo. Poi '
                 . 'annuisce, una volta sola. Non è successo niente di clamoroso e da adesso è tutto '
@@ -399,13 +448,15 @@ final class Legami
         }
         if ($loro['affetto'] >= 15) {
             self::muovi($versoId, (int) $pg['id'], 5, 5, $gts);
-            return ['ok' => true, 'detto' => true, 'esito' => 'sospesa', 'racconto' =>
+            self::vocedellaConfessione($pg, $versoId, $testimoni, $gts);
+        return ['ok' => true, 'detto' => true, 'esito' => 'sospesa', 'racconto' =>
                 'Lo dici, e ' . $altro['nome'] . ' ti chiede tempo. Non è un no. È peggio di un no, '
                 . 'per certi versi: adesso ci sarà una cosa non detta fra voi ogni volta che vi '
                 . 'incontrate.'];
         }
         self::muovi((int) $pg['id'], $versoId, -8, 0, $gts);
         self::muovi($versoId, (int) $pg['id'], -2, 8, $gts);
+        self::vocedellaConfessione($pg, $versoId, $testimoni, $gts);
         return ['ok' => true, 'detto' => true, 'esito' => 'respinta', 'racconto' =>
             'Lo dici, e ' . $altro['nome'] . ' ti risponde con gentilezza, che è il modo peggiore. '
             . 'Ti accompagna anche un pezzo di strada, parlando d\'altro, e tu cammini accanto a '

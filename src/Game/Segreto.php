@@ -135,6 +135,16 @@ final class Segreto
                 Personaggio::traccia($luogo, null, 'voce',
                     self::vocePassante($potere, $rng), $gts, 70);
             }
+
+            // E qui nasce la voce vera (F6). I testimoni la sanno bene
+            // perche' c'erano; da domani comincera' a deformarsi passando di
+            // bocca in bocca, e fra quattro passaggi sara' «uno del terzo
+            // anno ha fatto una cosa strana». E' il modo in cui la caccia
+            // all'esper parte da sola, senza che nessuno la programmi.
+            $chiSa = array_map(static fn (array $t): int => (int) $t['id'], $notato);
+            if ($chiSa !== [] || $vistoDallaFolla) {
+                Voci::nasce('potere', (int) $pg['id'], null, $luogo, $chiSa, $pkey, $gts);
+            }
         }
 
         return [
@@ -684,6 +694,20 @@ final class Segreto
         Personaggio::traccia((string) $pg['luogo'], null, 'trasloco',
             sprintf('La famiglia di %s ha traslocato, all\'improvviso, senza salutare nessuno.',
                 Personaggio::nomeCompleto($pg)), $gts, 90);
+
+        // Una sparizione improvvisa e' la voce che corre di piu' (F6), e la
+        // sanno tutti quelli che lo conoscevano — non solo chi era li'. E'
+        // l'unica voce che nasce senza testimoni oculari: il quartiere si
+        // accorge di un'assenza anche quando non ha visto nessuno partire.
+        $conoscenti = array_map(
+            static fn (array $r): int => (int) $r['chi'],
+            Database::all(
+                'SELECT DISTINCT da_id AS chi FROM legami WHERE a_id = ? AND da_id <> ?
+                 UNION SELECT DISTINCT chi_sa_id AS chi FROM sanno WHERE esper_id = ?',
+                [$id, $id, $id]
+            )
+        );
+        Voci::nasce('partenza', $id, null, (string) $pg['luogo'], $conoscenti, '', $gts);
 
         return ['ok' => true, 'racconto' =>
             'Il camioncino arriva di mattina presto, quando la strada è ancora vuota. Tuo padre non '

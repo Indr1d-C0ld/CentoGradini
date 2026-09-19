@@ -500,3 +500,81 @@ input:focus-visible, textarea:focus-visible, select:focus-visible, a:focus-visib
 .episodio-premessa { border-left: 3px solid var(--arancio); }
 .carta.ricordo { border-left: 3px solid var(--azzurro); }
 .carta.ricordo p { font-size: .96rem; }
+
+/* === F6 — il quartiere vivo ============================================== */
+
+/* Le voci. Il bordo a sinistra dice quanto ci si può contare: pieno e scuro
+   se l'hai vista tu, tratteggiato e sbiadito se sono chiacchiere. È la stessa
+   informazione della riga di sotto, ma la si legge senza leggerla. */
+.voce { padding: 1rem 1.15rem; }
+.voce + .voce { margin-top: .7rem; }
+.voce-testo { margin: 0 0 .35rem; font-size: 1.05rem; line-height: 1.5; }
+.voce .aiuto { margin: 0; }
+
+.voce-certa   { border-left: 4px solid var(--arancio-vivo); }
+.voce-buona   { border-left: 4px solid var(--arancio); }
+.voce-incerta { border-left: 4px dashed var(--bordo); }
+.voce-nebbia  { border-left: 4px dotted var(--bordo); }
+.voce-incerta .voce-testo { color: var(--inchiostro-tenue); }
+.voce-nebbia  .voce-testo { color: var(--inchiostro-tenue); font-style: italic; }
+
+/* La bacheca: fogli appesi, leggermente storti. Il tipo si vede dal colore
+   del filo in alto. */
+.avviso-bacheca { border-top: 3px solid var(--bordo); }
+.avviso-bacheca.tipo-cerca   { border-top-color: var(--azzurro); }
+.avviso-bacheca.tipo-offre   { border-top-color: var(--verde); }
+.avviso-bacheca.tipo-club    { border-top-color: var(--arancio); }
+.avviso-bacheca.tipo-anonimo { border-top-color: var(--inchiostro-tenue); border-top-style: dashed; }
+
+/* I biglietti: carta piegata, piccola. */
+.biglietto {
+  background: var(--fondo-cavo);
+  border: 1px solid var(--bordo);
+  border-radius: var(--raggio);
+  padding: .8rem 1rem;
+}
+.biglietto + .biglietto { margin-top: .7rem; }
+.biglietto.chiuso { border-style: dashed; }
+.riga-biglietto { margin: .3rem 0; }
+
+/* I club, a griglia su schermi larghi e in colonna sul telefono. */
+.griglia-club {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+}
+.griglia-club .carta + .carta { margin-top: 0; }
+.carta.club.mio { border-color: var(--arancio); }
+.riga-membro { margin: .3rem 0; }
+
+/* La pastiglia: un'etichetta minuscola accanto a un nome o a un collegamento
+   («capitano», «ci sei», il numero delle voci non lette). */
+.pastiglia {
+  display: inline-block;
+  padding: .05rem .45rem;
+  border-radius: 999px;
+  background: var(--arancio);
+  color: var(--su-arancio);
+  font-size: .72rem;
+  font-weight: 600;
+  vertical-align: .1em;
+}
+
+/* Gli eventi in corso si vedono da lontano. */
+.carta.evento.in-corso { border-left: 4px solid var(--arancio-vivo); }
+
+/* Una tabella leggibile, che sul telefono scorre invece di sfondare. */
+.tabella { width: 100%; border-collapse: collapse; font-size: .95rem; }
+.tabella th, .tabella td {
+  text-align: left;
+  padding: .4rem .6rem;
+  border-bottom: 1px solid var(--bordo);
+}
+.tabella th { font-weight: 600; color: var(--inchiostro-tenue); font-size: .85rem; }
+.tabella tr:last-child td { border-bottom: none; }
+
+label.in_linea { display: inline-flex; align-items: center; gap: .4rem; }
+.bottone.piccolo { padding: .3rem .7rem; font-size: .85rem; }
+/* Una tabella larga scorre dentro il suo contenitore: il corpo della pagina
+   non deve mai scorrere in orizzontale. */
+.tabella-scorre { overflow-x: auto; }

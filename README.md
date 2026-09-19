@@ -58,6 +58,34 @@ giocarlo è il motore. Quello che resta finisce nei **ricordi**, in `/ricordi`.
 Tre copioni per cominciare: i funghi che tolgono la voglia di mentire,
 l'acquazzone sotto la stessa tettoia, e i sospetti in aula.
 
+**F6 — il quartiere vivo: fatta.** È il pezzo che trasforma quattro giocatori
+in un quartiere. Al centro ci sono le **voci**, e la scelta che le tiene in
+piedi è che *il testo non esiste a database*: esistono un fatto — chi, cosa,
+dove, quando — e tante versioni soggettive quante sono le persone che ne hanno
+sentito parlare, ognuna con una **precisione** e un **tono**. La frase si
+ricostruisce al momento di leggerla, e a ogni passaggio di bocca si perde
+qualcosa nell'ordine in cui lo perde la gente: prima il nome — «Kyosuke
+Kasuga» diventa «uno del terzo anno», e da lì può essere chiunque del terzo
+anno — poi il posto, poi il fatto. Il tono non torna mai verso lo zero: si
+polarizza, perché è così che funziona una scuola.
+
+Le voci hanno bisogno di gambe, e le gambe sono gli **abitanti**: undici
+personaggi canonici che vivono nel quartiere, ciascuno col suo giro, che il
+calendario scolastico interrompe quando è ora di lezione. Non sono comparse —
+sono righe di `personaggi` come i giocatori, quindi vedono, annotano, ricevono
+gesti, entrano nel cast di un episodio. E i **club** sono il secondo canale,
+l'unico che non passa dalla geografia: due iscritti si parlano anche se non si
+incrociano mai, ed è come il quartiere raggiunge chi gioca poco.
+
+Poi i due modi di scrivere agli altri, che sono l'opposto l'uno dell'altro: la
+**bacheca**, pubblica e a scadenza, dove quello che appendi lo legge chiunque
+passi; e i **biglietti**, che non arrivano — si *trovano*, nel posto dove li
+hai lasciati, e se il destinatario non ci passa restano lì. Entrambi si
+firmano con il nome che si vuole. Infine i **quattordici eventi stagionali**,
+che sono del server e non del giocatore: i ciliegi, il festival d'estate al
+tempio, il festival culturale, San Valentino. Non inventano meccaniche —
+alzano la Folla e accelerano le voci, e da lì segue tutto il resto.
+
 **La sala del maestro**: `/santuario`, in memoria di Izumi Matsumoto.
 
 La tabella completa delle fasi è in [`docs/PROGETTO.md`](docs/PROGETTO.md), e la

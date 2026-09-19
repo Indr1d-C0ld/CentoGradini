@@ -220,6 +220,49 @@ Due fonti scartate, e perché:
 - **orangeroad.fandom.com via `action=raw`**: risponde con la pagina di attesa di Cloudflare
   e codice 200. Va interrogato dall'**API** (`api.php?action=query&prop=revisions`).
 
+## 4-ter. Su cosa poggia F6 — abitanti, club, eventi
+
+Questa sezione esiste perché F6 ha messo nel gioco parecchia roba che il canone **non**
+attesta, e distinguere è più importante che riempire.
+
+### Attestato dall'opera (`canone`)
+
+- **Yusaku Hino fa karate**, e ha cominciato da bambino perché Hikaru gli disse che se fosse
+  diventato forte l'avrebbe sposato — FAQ 36. È l'unico club dell'elenco che l'opera dichiara.
+- **Madoka non è iscritta a nessun club.** FAQ 40: è nota a molte bande e non ha mai aderito
+  a nessuna, il che «rinforza la sua immagine di solitaria». Nel gioco resta senza club, e
+  metterla in uno per simmetria sarebbe la cosa più sbagliata da fare a questo personaggio.
+- **I poteri dei canonici** vengono dalla rilettura in `CANONE.md` §2 e §3: Kyosuke senza
+  telepatia, Kazuya unico telepate e più forte di lui, Akane con il cambio d'identità a un
+  bersaglio per volta, Kurumi con l'ipnosi che *si impara* (FAQ 42).
+- **Date di nascita** di Kyosuke (15/11/1969), Madoka (25/05/1969) e Hikaru (15/11/1971).
+- **Komatsu Seiji** e **Hatta Kazuya**: nomi completi ricavati dal corpus italiano
+  (`confidence: documentato`, due occorrenze indipendenti).
+
+### Nostra ricostruzione (`ricostruita`) — e va detto
+
+- **Gli altri nove club.** Sono costruiti su com'era davvero un liceo giapponese nel 1987
+  (il 部活 come struttura sociale, i giorni di ritrovo, le dimensioni), non su scene
+  dell'opera. Ogni riga di `db/seed/club.php` porta il proprio campo `confidenza`.
+- **I compleanni** di Manami, Kurumi, Kazuya, Akane, Yusaku, Komatsu, Hatta e del Master: il
+  canone non li dà. Sono scelti in modo che la **coorte scolastica torni** — è l'unico
+  vincolo duro, ed è verificato da una prova.
+- **La taratura numerica di tutte le schede.** Sono scritte a mano e non tirate: Madoka è
+  brava a sci, tennis, surf, atletica, canto, chitarra, tastiere, cucina, cucito, equitazione
+  e inglese perché ognuna ha il suo capitolo (§4), ma il *numero* che ci mettiamo è nostro.
+- **Dove dormono Hikaru, Yusaku, Komatsu e Hatta.** Le loro case non sono sulla nostra mappa;
+  li abbiamo messi in via commerciale, che nel Giappone del 1987 è fatta di negozi con
+  l'appartamento sopra.
+- **Il calendario dei quattordici eventi.** Le ricorrenze sono reali e datate correttamente
+  (Golden Week, 文化祭, 体育祭, 初詣, San Valentino e White Day con l'usanza giapponese, la
+  vigilia di Natale come sera di coppia); *quali* di esse il quartiere celebri e con quanto
+  richiamo è scelta nostra.
+- **Le frasi delle voci.** Le quattro fasce di degrado e le scale di frasi in
+  `src/Game/Voci.php` sono scritte a mano e non hanno una fonte: sono il modo in cui secondo
+  noi si racconta un pettegolezzo in italiano.
+
+---
+
 ## 5. Da verificare leggendo l'opera
 
 Elenco aperto, da chiudere prima di scrivere i seed definitivi (fase F2).
@@ -235,3 +278,8 @@ Elenco aperto, da chiudere prima di scrivere i seed definitivi (fase F2).
 5. Geografia interna coerente del quartiere: quali luoghi confinano con quali, nelle tavole.
 6. Il ruolo esatto di Sayuri Hirose e Hiromi (solo manga), che il regolamento tratta di sfuggita
    ma che servono come PNG antagonisti non violenti.
+7. **I club veri del Kōryō**, se l'opera ne nomina altri oltre al karate di Yusaku: i riassunti
+   dei capitoli che ci mancano (144 su 156) sono il posto dove cercarli.
+8. **I compleanni canonici** di Manami, Kurumi, Kazuya e Akane, se esistono da qualche parte:
+   i nostri sono scelti per far tornare la coorte, e andrebbero sostituiti da quelli veri.
+9. **Dove abitano** Hikaru, Yusaku, Komatsu e Hatta, se le tavole lo mostrano.

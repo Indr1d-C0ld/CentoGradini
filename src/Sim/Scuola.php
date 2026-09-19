@@ -39,6 +39,13 @@ final class Scuola
 {
     public const MEDIE     = 'medie';
     public const SUPERIORI = 'superiori';
+    // Fuori dalle classi giocabili, ma dentro il quartiere: i bambini delle
+    // elementari (Kazuya ha otto anni) e gli adulti (il Master dell'ABCB).
+    // Non si possono scegliere alla creazione — lo dice GIOCABILI — ma
+    // esistono, e il modello deve saperli nominare senza inventarsi una
+    // classe che non hanno.
+    public const ELEMENTARI = 'elementari';
+    public const ADULTI     = 'adulti';
 
     /** Anno scolastico contenitore: comincia nell'aprile di quest'anno. */
     public const ANNO_COORTE_BASE = 1987;
@@ -65,16 +72,26 @@ final class Scuola
         return in_array([$sezione, $anno], self::GIOCABILI, true);
     }
 
-    /** «3ª media», «1ª superiore» */
+    /** «3ª media», «1ª superiore», «2ª elementare» — e per gli adulti, niente. */
     public static function nomeClasse(string $sezione, int $anno): string
     {
-        return $anno . 'ª ' . ($sezione === self::MEDIE ? 'media' : 'superiore');
+        return match ($sezione) {
+            self::ADULTI     => 'fuori dalla scuola',
+            self::ELEMENTARI => $anno . 'ª elementare',
+            self::MEDIE      => $anno . 'ª media',
+            default          => $anno . 'ª superiore',
+        };
     }
 
-    /** Come lo direbbero loro: 中3, 高1. */
+    /** Come lo direbbero loro: 小2, 中3, 高1. */
     public static function siglaClasse(string $sezione, int $anno): string
     {
-        return ($sezione === self::MEDIE ? '中' : '高') . $anno;
+        return match ($sezione) {
+            self::ADULTI     => '—',
+            self::ELEMENTARI => '小' . $anno,
+            self::MEDIE      => '中' . $anno,
+            default          => '高' . $anno,
+        };
     }
 
     /**
@@ -87,10 +104,18 @@ final class Scuola
         return self::assoluto($sezA, $annoA) - self::assoluto($sezB, $annoB);
     }
 
-    /** 1..6 dalla prima media alla terza superiore. */
+    /**
+     * Posizione assoluta nella scala scolastica: -5..0 le elementari,
+     * 1..3 le medie, 4..6 le superiori. La scala e' continua apposta, cosi'
+     * distanza() funziona anche fra un bambino e un maturando.
+     */
     public static function assoluto(string $sezione, int $anno): int
     {
-        return ($sezione === self::MEDIE ? 0 : 3) + $anno;
+        return match ($sezione) {
+            self::ELEMENTARI => $anno - 6,
+            self::MEDIE      => $anno,
+            default          => $anno + 3,
+        };
     }
 
     /**

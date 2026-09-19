@@ -276,7 +276,7 @@ final class Personaggio
     {
         $righe = Database::all(
             'SELECT id, nome, cognome, sesso, sezione, anno, anno_nascita, nato_mese, nato_giorno,
-                    esper, arrivato_gts
+                    esper, arrivato_gts, png, png_nota
              FROM personaggi
              WHERE luogo = ? AND verso IS NULL AND id <> ? AND stato = ?
              ORDER BY arrivato_gts',

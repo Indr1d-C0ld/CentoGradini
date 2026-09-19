@@ -491,6 +491,41 @@ SPAZI=$(php -r '
 ')
 if [[ "${SPAZI}" == "Kyosuke Kasuga" ]]; then verde "gli spazi doppi si normalizzano"; else rosso "normalizzazione: ottenuto '${SPAZI}'"; fi
 
+# --- F6: il quartiere vivo -------------------------------------------------------------------
+titolo "Il quartiere vivo"
+
+# Le sei schermate nuove devono rendersi davvero, non solo rispondere 200:
+# php -l non vede un metodo mancante, e una vista che esplode a meta' pagina
+# manda 200 con dentro mezza pagina. Si cerca un pezzo di testo di ognuna.
+if contiene "${BASE}/voci" "Quello che si dice"; then verde "le voci si aprono"; else rosso "/voci"; fi
+if contiene "${BASE}/bacheca" "La bacheca"; then verde "la bacheca si apre"; else rosso "/bacheca"; fi
+if contiene "${BASE}/biglietti" "I biglietti"; then verde "i biglietti si aprono"; else rosso "/biglietti"; fi
+if contiene "${BASE}/club" "I club"; then verde "l'elenco dei club si apre"; else rosso "/club"; fi
+if contiene "${BASE}/club/karate" "Club di karate"; then verde "la scheda di un club si apre"; else rosso "/club/karate"; fi
+if contiene "${BASE}/calendario" "Il calendario"; then verde "il calendario si apre"; else rosso "/calendario"; fi
+
+# E il quartiere deve linkarle, se no non le trova nessuno.
+if contiene "${BASE}/quartiere" "quello che si dice"; then verde "il quartiere rimanda alle voci"; else rosso "manca il collegamento alle voci"; fi
+
+# Un club inventato non deve dare un errore: rimanda all'elenco.
+DEST=$(curl -sS -o /dev/null -w '%{redirect_url}' -b "${BISCOTTI}" "${BASE}/club/non_esiste")
+if [[ "${DEST}" == *"/club" ]]; then verde "un club inventato riporta all'elenco"; else rosso "club inventato -> '${DEST}'"; fi
+
+# Iscrizione vera a un club, e uscita.
+T=$(gettone "${BASE}/club")
+curl -sS -o /dev/null -b "${BISCOTTI}" -c "${BISCOTTI}" -d "_token=${T}" -d "club=letteratura" "${BASE}/club/iscrivi" >/dev/null
+if contiene "${BASE}/club/letteratura" "Lascia il club"; then verde "ci si iscrive a un club"; else rosso "iscrizione al club non riuscita"; fi
+T=$(gettone "${BASE}/club")
+curl -sS -o /dev/null -b "${BISCOTTI}" -c "${BISCOTTI}" -d "_token=${T}" -d "club=letteratura" "${BASE}/club/esci" >/dev/null
+if contiene "${BASE}/club/letteratura" "Iscriviti"; then verde "e si esce"; else rosso "uscita dal club non riuscita"; fi
+
+# Un avviso in bacheca, appeso e riletto.
+T=$(gettone "${BASE}/bacheca")
+curl -sS -o /dev/null -b "${BISCOTTI}" -c "${BISCOTTI}" -d "_token=${T}" \
+  -d "tipo=avviso" -d "titolo=Prova di bacheca" -d "testo=Un testo qualunque, scritto da una prova." \
+  "${BASE}/bacheca/affiggi" >/dev/null
+if contiene "${BASE}/bacheca" "Prova di bacheca"; then verde "un avviso appeso si rilegge"; else rosso "l'avviso non compare in bacheca"; fi
+
 # --- Uscita ---------------------------------------------------------------------------------
 titolo "Uscita"
 T=$(gettone "${BASE}/quartiere")

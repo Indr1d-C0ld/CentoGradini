@@ -22,9 +22,12 @@ $projectRoot = require __DIR__ . '/_bootstrap.php';
 use App\Core\Database;
 use App\Core\Posta;
 use App\Core\RateLimiter;
+use App\Game\Abitanti;
+use App\Game\Bacheca;
 use App\Game\Personaggio;
 use App\Game\Episodi;
 use App\Game\Segreto;
+use App\Game\Voci;
 
 $avvio = microtime(true);
 $lock  = $projectRoot . '/storage/tick.lock';
@@ -71,6 +74,21 @@ try {
     // collegato: il camioncino arriva di mattina presto e non chiede permesso.
     $partiti = $fase('traslochi', static fn (): int => Segreto::traslochiDovuti(), 0);
 
+    // Gli abitanti canonici seguono il loro giro. Vanno mossi PRIMA delle
+    // chiacchiere: e' il loro spostarsi che mette in contatto persone che
+    // altrimenti non si incontrerebbero mai, ed e' il motivo per cui una
+    // voce attraversa la mappa invece di restare dov'e' nata.
+    $abitanti = $fase('abitanti', static fn (): int => Abitanti::muovi(), 0);
+
+    // Il quartiere chiacchiera: chi e' nello stesso posto si racconta le
+    // cose, e le voci si deformano passando di bocca in bocca.
+    $ciarle = $fase('voci', static fn (): array => Voci::giro(),
+        ['di_persona' => 0, 'per_club' => 0]);
+
+    // E le voci vecchie si spengono, come le tracce.
+    $vociPotate = $fase('voci_potate', static fn (): int => Voci::pota(), 0);
+    $avvisi     = $fase('bacheca', static fn (): int => Bacheca::potaAvvisi(), 0);
+
     // Le scene la cui finestra e' scaduta si chiudono da sole: per chi non
     // ha scelto decide l'agente autonomo, e il mondo non aspetta nessuno.
     $scene = $fase('scene', static fn (): int => Episodi::scadute(), 0);
@@ -93,6 +111,10 @@ try {
                 'traslocati'   => $partiti,
                 'scene_chiuse' => $scene,
                 'episodi_nuovi'=> $nuovi,
+                'abitanti'     => $abitanti,
+                'voci'         => $ciarle,
+                'voci_potate'  => $vociPotate,
+                'avvisi_potati'=> $avvisi,
                 'posta'        => $posta,
                 'freni_potati' => $freni,
             ], JSON_UNESCAPED_UNICODE),

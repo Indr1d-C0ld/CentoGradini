@@ -30,7 +30,7 @@ return [
 
         // --- L'asse della ferrovia, a ovest ---------------------------------
         [
-            'lkey' => 'stazione', 'nome' => 'Nakagawa',
+            'lkey' => 'stazione', 'dove' => 'alla stazione', 'nome' => 'Nakagawa',
             'sottotitolo' => 'La stazione: da qui si parte e qui si torna',
             'descrizione' => 'Due binari, una pensilina di lamiera e il tabellone degli orari che '
                 . 'nessuno guarda perché il treno passa sempre alla stessa ora. È il posto dove '
@@ -40,7 +40,7 @@ return [
             'apre' => 300, 'chiude' => 1450, 'ordine' => 10,
         ],
         [
-            'lkey' => 'passaggio', 'nome' => 'Il passaggio a livello',
+            'lkey' => 'passaggio', 'dove' => 'al passaggio a livello', 'nome' => 'Il passaggio a livello',
             'sottotitolo' => 'Le sbarre si abbassano sempre al momento sbagliato',
             'descrizione' => 'Il campanello comincia, le sbarre scendono, e per un minuto e mezzo '
                 . 'non si va da nessuna parte. Un minuto e mezzo è lunghissimo se dall\'altra parte '
@@ -51,7 +51,7 @@ return [
 
         // --- La strada commerciale -------------------------------------------
         [
-            'lkey' => 'commerciale', 'nome' => 'La via commerciale',
+            'lkey' => 'commerciale', 'dove' => 'in via commerciale', 'nome' => 'La via commerciale',
             'sottotitolo' => 'Tettoia di plastica ondulata, musichetta in filodiffusione',
             'descrizione' => 'Il fruttivendolo che grida i prezzi, la tintoria, il negozio di '
                 . 'croquette con la coda all\'uscita da scuola. Tutti conoscono tutti, il che è '
@@ -60,7 +60,7 @@ return [
             'apre' => 540, 'chiude' => 1200, 'ordine' => 30,
         ],
         [
-            'lkey' => 'dischi', 'nome' => 'Il negozio di dischi',
+            'lkey' => 'dischi', 'dove' => 'al negozio di dischi', 'nome' => 'Il negozio di dischi',
             'sottotitolo' => 'Vinili, cassette e un poster sbiadito in vetrina',
             'descrizione' => 'Stretto e lungo, con i contenitori di legno dove si sfogliano le '
                 . 'copertine in piedi per mezz\'ora. Il proprietario mette quello che gli pare e '
@@ -70,7 +70,7 @@ return [
             'apre' => 660, 'chiude' => 1230, 'ordine' => 40,
         ],
         [
-            'lkey' => 'sala_giochi', 'nome' => 'La sala giochi',
+            'lkey' => 'sala_giochi', 'dove' => 'in sala giochi', 'nome' => 'La sala giochi',
             'sottotitolo' => 'Buio, rumore e monetine da cento yen',
             'descrizione' => 'Cabinati in fila, fumo che non dovrebbe esserci e il tizio del terzo '
                 . 'anno che tiene il primato su tutto da sei mesi. È il posto dove finiscono i '
@@ -82,7 +82,7 @@ return [
 
         // --- Orange Road ------------------------------------------------------
         [
-            'lkey' => 'abcb', 'nome' => 'ABCB',
+            'lkey' => 'abcb', 'dove' => 'all\'ABCB', 'nome' => 'ABCB',
             'sottotitolo' => 'Il bar sulla strada arancione',
             'descrizione' => 'Legno scuro, luce bassa, un bancone lungo e il padrone che asciuga '
                 . 'bicchieri senza mai chiedere niente a nessuno. È il posto più neutrale del '
@@ -93,7 +93,7 @@ return [
             'apre' => 660, 'chiude' => 1380, 'ordine' => 60,
         ],
         [
-            'lkey' => 'viale', 'nome' => 'Il viale degli alberi',
+            'lkey' => 'viale', 'dove' => 'sul viale degli alberi', 'nome' => 'Il viale degli alberi',
             'sottotitolo' => 'La strada di casa, quella lunga',
             'descrizione' => 'Un doppio filare che copre tutta la carreggiata: verde tenero in '
                 . 'aprile, ombra fitta d\'estate, arancione a novembre. È la strada che si fa due '
@@ -103,7 +103,7 @@ return [
 
         // --- Il centro di tutto ---------------------------------------------------
         [
-            'lkey' => 'gradini', 'nome' => 'I Cento Gradini',
+            'lkey' => 'gradini', 'dove' => 'sui Cento Gradini', 'nome' => 'I Cento Gradini',
             'sottotitolo' => 'Dove tutto è cominciato',
             'descrizione' => 'Una scalinata di pietra fra due muri di cinta, che sale dal quartiere '
                 . 'basso fino alla collina della scuola. In cima ci si ferma sempre un momento a '
@@ -113,7 +113,7 @@ return [
             'tipo' => 'strada', 'x' => 604, 'y' => 358, 'ordine' => 80,
         ],
         [
-            'lkey' => 'liceo', 'nome' => 'Liceo Kōryō',
+            'lkey' => 'liceo', 'dove' => 'al Kōryō', 'nome' => 'Liceo Kōryō',
             'sottotitolo' => 'Aule, corridoi, tetto, e il retro della palestra',
             'descrizione' => 'Tre piani di cemento e finestre, un cortile di terra battuta e una '
                 . 'palestra che d\'inverno è più fredda di fuori. Sul tetto si mangia il bentō e si '
@@ -126,7 +126,7 @@ return [
 
         // --- Le case ------------------------------------------------------------------
         [
-            'lkey' => 'casa_kasuga', 'nome' => 'La palazzina dei Kasuga',
+            'lkey' => 'casa_kasuga', 'dove' => 'dai Kasuga', 'nome' => 'La palazzina dei Kasuga',
             'sottotitolo' => 'Secondo piano, la porta in fondo',
             'descrizione' => 'Un appartamento piccolo per quattro persone, con la camera oscura del '
                 . 'padre ricavata in uno sgabuzzino e un gatto che tenta la fuga ogni volta che si '
@@ -135,7 +135,7 @@ return [
             'tipo' => 'casa', 'x' => 520, 'y' => 434, 'privato' => 1, 'ordine' => 100,
         ],
         [
-            'lkey' => 'casa_ayukawa', 'nome' => 'Casa Ayukawa',
+            'lkey' => 'casa_ayukawa', 'dove' => 'da Ayukawa', 'nome' => 'Casa Ayukawa',
             'sottotitolo' => 'Grande, ordinata e quasi sempre vuota',
             'descrizione' => 'Una casa con il giardino e il cancello, in cui vive una persona sola. '
                 . 'Di sera è illuminata una finestra soltanto. Non ci entra quasi nessuno, e non '
@@ -145,7 +145,7 @@ return [
 
         // --- Gli spazi aperti ----------------------------------------------------------------
         [
-            'lkey' => 'parco', 'nome' => 'Il parco',
+            'lkey' => 'parco', 'dove' => 'al parco', 'nome' => 'Il parco',
             'sottotitolo' => 'Altalene, una fontanella e tre ciliegi',
             'descrizione' => 'Di giorno ci sono i bambini e le madri; dopo il tramonto resta solo la '
                 . 'luce arancione di un lampione e le altalene che si muovono da sole. È il posto '
@@ -154,7 +154,7 @@ return [
             'tipo' => 'natura', 'x' => 386, 'y' => 452, 'ordine' => 120,
         ],
         [
-            'lkey' => 'albero', 'nome' => 'L\'albero dei ricordi',
+            'lkey' => 'albero', 'dove' => 'sotto l\'albero dei ricordi', 'nome' => 'L\'albero dei ricordi',
             'sottotitolo' => 'Con un\'incisione nel tronco, e una data',
             'descrizione' => 'In fondo al parco, dove non passa quasi nessuno, c\'è un albero '
                 . 'grande con qualcosa inciso nella corteccia a mezza altezza: una frase e un '
@@ -165,7 +165,7 @@ return [
             'tipo' => 'natura', 'x' => 300, 'y' => 540, 'ordine' => 125,
         ],
         [
-            'lkey' => 'argine', 'nome' => 'L\'argine del fiume',
+            'lkey' => 'argine', 'dove' => 'sull\'argine del fiume', 'nome' => 'L\'argine del fiume',
             'sottotitolo' => 'Erba, cemento e nessuno per centinaia di metri',
             'descrizione' => 'Un terrapieno lungo, con il fiume sotto e la città dall\'altra parte. '
                 . 'Ci si viene a correre, a provare uno strumento, a tirare sassi nell\'acqua, o a '
@@ -174,7 +174,7 @@ return [
             'tipo' => 'natura', 'x' => 432, 'y' => 600, 'ordine' => 130,
         ],
         [
-            'lkey' => 'tempio', 'nome' => 'Il tempio',
+            'lkey' => 'tempio', 'dove' => 'al tempio', 'nome' => 'Il tempio',
             'sottotitolo' => 'Un cortile di ghiaia e due canfore molto vecchie',
             'descrizione' => 'Fuori mano, silenzioso trecentosessanta giorni l\'anno e affollatissimo '
                 . 'negli altri cinque. Si sale una scalinata più corta di quella dei Cento Gradini e '
@@ -183,7 +183,7 @@ return [
             'tipo' => 'natura', 'x' => 792, 'y' => 398, 'ordine' => 140,
         ],
         [
-            'lkey' => 'luna_park', 'nome' => 'Il luna park',
+            'lkey' => 'luna_park', 'dove' => 'al luna park', 'nome' => 'Il luna park',
             'sottotitolo' => 'Montagne russe, ruota panoramica, zucchero filato',
             'descrizione' => 'Ai margini del quartiere, aperto solo il pomeriggio. Le montagne russe '
                 . 'fanno un giro completo con la testa in giù, e c\'è chi giura che in quel momento '
@@ -195,7 +195,7 @@ return [
 
         // --- Fuori dal quartiere ---------------------------------------------------------------
         [
-            'lkey' => 'spiaggia', 'nome' => 'La spiaggia',
+            'lkey' => 'spiaggia', 'dove' => 'in spiaggia', 'nome' => 'La spiaggia',
             'sottotitolo' => 'Due ore di treno e un\'altra estate',
             'descrizione' => 'Sabbia scura, capanni di legno, il mare che non è mai freddo abbastanza. '
                 . 'Ci si va in comitiva, con i bagagli e i costumi comprati apposta, e si torna la sera '
@@ -205,7 +205,7 @@ return [
             'stagione' => 'estate', 'fuori' => 1, 'ordine' => 160,
         ],
         [
-            'lkey' => 'montagna', 'nome' => 'La Montagna d\'Inverno',
+            'lkey' => 'montagna', 'dove' => 'in montagna', 'nome' => 'La Montagna d\'Inverno',
             'sottotitolo' => 'La casa dei nonni, e la vetta accanto',
             'descrizione' => 'Una casa di legno in mezzo ai boschi, con la stufa accesa e i nonni che '
                 . 'trattano i poteri come una cosa di tutti i giorni. Accanto c\'è una montagna più '

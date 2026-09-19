@@ -34,6 +34,12 @@ function prova(string $nome, callable $f): void
     }
 }
 
+/** Un'intestazione di gruppo, per leggere l'esito a colpo d'occhio. */
+function titolo(string $testo): void
+{
+    fwrite(STDOUT, "\n\033[1;36m{$testo}\033[0m\n");
+}
+
 function vero(mixed $v, string $perche = ''): void
 {
     if (!$v) {

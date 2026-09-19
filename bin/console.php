@@ -94,6 +94,12 @@ try {
             foreach ((new Seeder($projectRoot))->all() as $l) {
                 riga($l);
             }
+            // I canonici hanno due cose che non stanno in una tabella sola:
+            // i poteri e le iscrizioni ai club. Vanno dopo la semina, perche'
+            // hanno bisogno che i personaggi e i club esistano gia'.
+            $a = App\Game\Abitanti::assicura();
+            riga(sprintf('%-22s %4d poteri, %d iscrizioni ai club  (abitanti canonici)',
+                'abitanti', $a['poteri'], $a['club']));
             break;
 
         case 'status':

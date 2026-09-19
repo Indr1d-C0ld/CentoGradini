@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Sim;
 
+use App\Game\Eventi;
 /**
  * Quanta gente c'è in giro.
  *
@@ -115,6 +116,16 @@ final class Folla
                 'argine'    => $cal['md'] === '08-01' ? 10.0 : 1.2,
                 default     => 1.3,
             };
+        }
+
+        // --- Gli eventi stagionali del server ----------------------------------
+        // Non inventano una meccanica: alzano questo numero, e tutto il resto
+        // — testimoni, calore, probabilità di essere notati — segue da solo.
+        // È il motivo per cui usare un potere al festival d'estate è la cosa
+        // più imprudente dell'anno.
+        $richiamo = Eventi::richiamo($lkey, $gts);
+        if ($richiamo > 0) {
+            $f *= 1.0 + $richiamo / 50.0;
         }
 
         return max(0, (int) round($f));

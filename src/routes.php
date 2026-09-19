@@ -6,6 +6,7 @@ use App\Controllers\AuthController;
 use App\Controllers\HomeController;
 use App\Controllers\QuartiereController;
 use App\Controllers\EpisodiController;
+use App\Controllers\QuartiereVivoController;
 use App\Controllers\LegamiController;
 use App\Controllers\SegretoController;
 use App\Core\Router;
@@ -63,6 +64,24 @@ $router->post('/oggetto/raccogli', [LegamiController::class, 'raccogliOggetto'],
 $router->get('/episodio', [EpisodiController::class, 'corrente'], ['active']);
 $router->post('/episodio/scegli', [EpisodiController::class, 'scegli'], ['active', 'throttle']);
 $router->get('/ricordi', [EpisodiController::class, 'ricordi'], ['active']);
+
+// --- F6: il quartiere vivo ---------------------------------------------------
+$router->get('/voci', [QuartiereVivoController::class, 'voci'], ['active']);
+
+$router->get('/bacheca', [QuartiereVivoController::class, 'bacheca'], ['active']);
+$router->post('/bacheca/affiggi', [QuartiereVivoController::class, 'affiggi'], ['active', 'throttle']);
+$router->post('/bacheca/stacca', [QuartiereVivoController::class, 'stacca'], ['active', 'throttle']);
+
+$router->get('/biglietti', [QuartiereVivoController::class, 'biglietti'], ['active']);
+$router->post('/biglietto/lascia', [QuartiereVivoController::class, 'lascia'], ['active', 'throttle']);
+$router->post('/biglietto/leggi', [QuartiereVivoController::class, 'leggiBiglietto'], ['active', 'throttle']);
+
+$router->get('/club', [QuartiereVivoController::class, 'club'], ['active']);
+$router->post('/club/iscrivi', [QuartiereVivoController::class, 'iscrivi'], ['active', 'throttle']);
+$router->post('/club/esci', [QuartiereVivoController::class, 'esciClub'], ['active', 'throttle']);
+$router->get('/club/{ckey}', [QuartiereVivoController::class, 'unClub'], ['active']);
+
+$router->get('/calendario', [QuartiereVivoController::class, 'calendario'], ['active']);
 
 // Le due chiamate che la pagina fa da sola, senza ricaricarsi.
 $router->get('/api/carta', [QuartiereController::class, 'carta'], ['active']);
