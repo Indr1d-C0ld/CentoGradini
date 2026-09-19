@@ -14,6 +14,7 @@ declare(strict_types=1);
 require __DIR__ . '/_prova.php';
 
 use App\Core\Config;
+use App\Sim\Folla;
 use App\Sim\Luoghi;
 use App\Sim\Orologio;
 
@@ -46,7 +47,8 @@ prova('i collegamenti a piedi sono reciproci', function () {
     // Le uniche asimmetrie ammesse sono volute e documentate: la scalinata,
     // che collega la cima della collina a tutto il quartiere che sta sotto.
     $attese = [['gradini', 'liceo'], ['gradini', 'abcb'], ['gradini', 'viale'],
-               ['gradini', 'casa_ayukawa'], ['gradini', 'casa_hiyama']];
+               ['gradini', 'casa_ayukawa'], ['gradini', 'casa_hiyama'],
+               ['gradini', 'giardini']];
     foreach (Luoghi::archi() as $da => $lista) {
         foreach ($lista as $arco) {
             $ritorno = Luoghi::minuti($arco['a'], $da);
@@ -74,7 +76,7 @@ prova('LA SCALINATA VA NEL VERSO GIUSTO', function () {
     //
     // `gradini` è il pianerottolo in alto: quello dove ha raccolto il
     // cappello. Da lì si scende verso tutto il resto.
-    foreach (['liceo', 'abcb', 'viale', 'casa_ayukawa', 'casa_hiyama'] as $sotto) {
+    foreach (['liceo', 'abcb', 'viale', 'casa_ayukawa', 'casa_hiyama', 'giardini'] as $sotto) {
         $giu = Luoghi::minuti('gradini', $sotto);
         $su  = Luoghi::minuti($sotto, 'gradini');
         vero($giu !== null && $su !== null, "manca il collegamento con {$sotto}");
@@ -185,6 +187,91 @@ prova('ogni luogo ha un testo suo', function () {
         vero(mb_strlen((string) $l['descrizione']) > 80, "{$k}: descrizione troppo corta");
         vero(!isset($visti[$l['descrizione']]), "{$k}: descrizione copiata da un altro luogo");
         $visti[$l['descrizione']] = true;
+    }
+});
+
+// --- La collina ---------------------------------------------------------------
+
+prova('la cima della collina e\' fatta come dice il canone', function () {
+    // La ricostruzione del grande escalier (CANONE §7-ter): in cima ci sono
+    // la palazzina dei Kasuga, l'area giochi subito a destra e la scaletta
+    // di dietro; sul versante i giardini pensili; tutto il resto sta sotto.
+    foreach (['area_giochi', 'giardini', 'scaletta', 'casa_hiyama'] as $l) {
+        vero(Luoghi::esiste($l), "manca {$l}");
+    }
+    uguale(1, Luoghi::minuti('gradini', 'area_giochi'),
+        'l\'area giochi e\' subito a destra arrivando in cima');
+    uguale(Luoghi::minuti('gradini', 'area_giochi'), Luoghi::minuti('area_giochi', 'gradini'),
+        'sono sullo stesso piano: nessun dislivello');
+});
+
+prova('LA GRANDE SCALINATA E\' DESERTA, LA SCALETTA NO', function () {
+    // E' canone, ed e' il motivo per cui in un quartiere pieno di gente
+    // Kyosuke e Madoka in cima riescono sempre a stare da soli: nella serie
+    // nessuno a parte lui fa quella scalinata, perche' c'e' un'altra strada
+    // piu' comoda che fa un giro. Prima avevamo la folla dei gradini a 7 con
+    // scritto «ci passano tutti»: era esattamente il contrario.
+    $ore = 0;
+    $gradini = $scaletta = 0;
+    for ($h = 8; $h <= 20; $h += 2, $ore++) {
+        $t = Orologio::lineare() + $h * 3600;
+        $gradini  += Folla::a('gradini', $t);
+        $scaletta += Folla::a('scaletta', $t);
+    }
+    vero($scaletta > $gradini * 2,
+        "di qui passa il quartiere: scaletta {$scaletta}, gradini {$gradini}");
+    uguale(0, Folla::a('giardini', Orologio::lineare()),
+        'ai giardini pensili non passa nessuno: ci si viene per non essere sentiti');
+});
+
+prova('la veduta cambia con l\'ora, e solo dove c\'e\' qualcosa da vedere', function () {
+    Orologio::fingiEpoca(1735689600);
+    try {
+        // Un\'ora diurna e una notturna, cercate sul calendario invece che
+        // calcolate: l\'ora che conta e\' quella di Tokyo.
+        $giorno = $sera = $notte = null;
+        for ($i = 0; $i < 24 * 4 && ($giorno === null || $sera === null || $notte === null); $i++) {
+            Orologio::fingiAdesso(1735689600 + $i * 900);
+            $t = Orologio::lineare();
+            $h = (int) Orologio::data($t)->format('G');
+            if ($h === 13) { $giorno = $t; }
+            if ($h === 18) { $sera   = $t; }
+            if ($h === 2)  { $notte  = $t; }
+        }
+        vero($giorno && $sera && $notte, 'le tre ore devono esistere nel giro di un giorno');
+
+        // I gradini guardano a ovest: alla sera ci si aggiunge il sole.
+        $g = Luoghi::veduta('gradini', $giorno);
+        $s = Luoghi::veduta('gradini', $sera);
+        $n = Luoghi::veduta('gradini', $notte);
+        vero($g !== '', 'i gradini devono avere una veduta');
+        vero(str_contains($s, 'sole'), "alla sera si vede il tramonto: {$s}");
+        vero(!str_contains($g, 'sole'), "a mezzogiorno no: {$g}");
+        vero(str_contains($n, 'buio'), "di notte si dice che e' buio: {$n}");
+
+        // Un posto chiuso non ha vedute e non deve inventarsene.
+        uguale('', Luoghi::veduta('sala_giochi', $sera));
+        uguale('', Luoghi::veduta('non_esiste', $sera));
+    } finally {
+        Orologio::fingiEpoca(null);
+        Orologio::fingiAdesso(null);
+    }
+});
+
+prova('ogni veduta e\' una frase intera', function () {
+    // Il primo tentativo incollava «Da qui si vede» davanti a un sintagma e
+    // produceva «si vede i tetti». Adesso la veduta e' una frase, e la prova
+    // lo pretende: maiuscola in testa, punto in coda.
+    foreach (Luoghi::tutti() as $k => $l) {
+        $v = trim((string) ($l['veduta'] ?? ''));
+        if ($v === '') {
+            continue;
+        }
+        vero(mb_strtoupper(mb_substr($v, 0, 1)) === mb_substr($v, 0, 1),
+            "{$k}: la veduta non comincia con la maiuscola");
+        vero(str_ends_with($v, '.'), "{$k}: la veduta non finisce con un punto");
+        vero(in_array((string) $l['guarda'], ['', 'nord', 'sud', 'est', 'ovest'], true),
+            "{$k}: «{$l['guarda']}» non e' un punto cardinale");
     }
 });
 

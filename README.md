@@ -17,9 +17,11 @@ aventi diritto.
 ## Stato
 
 **Il gioco è finito.** Le otto fasi da F0 a F7 sono fatte e in produzione, con
-311 verifiche su 13 file di prova. Da qui in poi si aggiunge contenuto, non
+315 verifiche su 13 file di prova. Da qui in poi si aggiunge contenuto, non
 impalcatura: al momento **nove copioni di episodi**, **tredici abitanti**
 canonici e **dieci club**.
+
+Il quartiere ha **22 luoghi** e **dieci copioni**.
 
 **La rilettura dell'opera è completa**: tutti e 156 i riassunti dei capitoli
 sono stati raccolti e spogliati. Cosa ne è uscito sta in

@@ -629,3 +629,13 @@ label.in_linea { display: inline-flex; align-items: center; gap: .4rem; }
   margin-left: .4rem;
 }
 .interruttore-suoni[aria-pressed="true"] { color: var(--arancio); border-color: var(--arancio); }
+
+/* Cosa si vede da qui. Sta sotto la descrizione del luogo e cambia con l'ora:
+   la si nota se si legge, non se si scorre. */
+.veduta {
+  border-left: 3px solid var(--arancio-pallido);
+  padding-left: .8rem;
+  color: var(--inchiostro-tenue);
+  font-style: italic;
+  margin: .8rem 0;
+}

@@ -24,6 +24,10 @@ $luogo = $dati['luogo'];
 
 <div class="carta">
   <p><?= e($luogo['descrizione']) ?></p>
+  <?php $veduta = Luoghi::veduta((string) $luogo['lkey'], $mondo['lineare']); ?>
+  <?php if ($veduta !== ''): ?>
+    <p class="veduta"><?= e($veduta) ?></p>
+  <?php endif; ?>
   <p class="tenue">
     Qui <?= e($dati['folla_dice'] ?? '') ?>.
     <?php if (($dati['calore_dice'] ?? '') !== ''): ?><em><?= e($dati['calore_dice']) ?></em><?php endif; ?>

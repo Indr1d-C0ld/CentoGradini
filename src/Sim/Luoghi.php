@@ -152,6 +152,50 @@ final class Luoghi
         return [true, null];
     }
 
+    /**
+     * Cosa si sta guardando da qui, adesso — o stringa vuota.
+     *
+     * Serve l'orientamento (colonna `guarda`) più l'ora. Un luogo che si apre
+     * a ovest, al tramonto, ha il sole dentro la veduta; lo stesso luogo a
+     * mezzogiorno ha solo la veduta. Una stanza chiusa non ha né l'una né
+     * l'altro, e infatti non dice niente.
+     *
+     * Viene dalla ricostruzione del grande escalier (CANONE §7-ter): dal
+     * fatto che nell'episodio 42 il sole tramonta sulla destra di chi guarda
+     * giù dai gradini si deduce che la scalinata è orientata nord-sud, e che
+     * dalla cima si guarda la città verso ovest. È l'unico pezzo di quella
+     * ricostruzione che poteva diventare una meccanica invece di una nota, e
+     * allora è diventato una meccanica.
+     */
+    public static function veduta(string $lkey, ?int $gts = null): string
+    {
+        $l = Luoghi::uno($lkey);
+        if ($l === null) {
+            return '';
+        }
+        $che = trim((string) ($l['veduta'] ?? ''));
+        if ($che === '') {
+            return '';
+        }
+
+        // La veduta e' una **frase intera**, e l'ora ne aggiunge un'altra
+        // accanto. Il primo tentativo incollava un prefisso davanti a un
+        // sintagma — «Da qui si vede» + «i tetti bassi» — e produceva «si
+        // vede i tetti», che non e' italiano: il verbo non puo' accordarsi
+        // con un pezzo di frase che non conosce. Due frasi separate non
+        // hanno questo problema, e si leggono anche meglio.
+        $dove = (string) ($l['guarda'] ?? '');
+        $ora  = (int) Orologio::data($gts ?? Orologio::lineare())->format('G');
+
+        $quando = match (true) {
+            $dove === 'ovest' && $ora >= 17 && $ora < 20 => ' Il sole sta calando proprio lì in fondo.',
+            $dove === 'est'   && $ora >= 5  && $ora < 8  => ' Il sole sta salendo proprio da lì.',
+            $ora < 5 || $ora >= 20                       => ' Adesso, al buio, si intuisce appena.',
+            default                                       => '',
+        };
+        return $che . $quando;
+    }
+
     public static function orario(int $minuti): string
     {
         return sprintf('%d:%02d', intdiv($minuti, 60) % 24, $minuti % 60);

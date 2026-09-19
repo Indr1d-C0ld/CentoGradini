@@ -44,7 +44,17 @@ final class Folla
         'albero'       => 0,    // in fondo al parco, dove non passa quasi nessuno
         'tempio'       => 2,
         'montagna'     => 1,
-        'gradini'      => 7,    // ci passano tutti, ma uno per volta
+        // La grande scalinata NON la usa nessuno, ed e' canone: nella serie
+        // «hormis Kyosuke, aucun badaud ne passe par cet escalier», e in Shin
+        // KOR Hikaru glielo dice in faccia — c'e' un'altra strada, piu'
+        // comoda, che fa un giro. Quella strada e' la scaletta di dietro.
+        // Prima avevamo 7 con scritto «ci passano tutti»: era il contrario,
+        // ed e' il motivo per cui in cima Kyosuke e Madoka riescono sempre a
+        // stare da soli in un quartiere pieno di gente.
+        'gradini'      => 1,
+        'scaletta'     => 8,    // di qui scende e sale il quartiere
+        'area_giochi'  => 2,    // i bambini di giorno, nessuno dopo cena
+        'giardini'     => 0,    // ci si viene per non essere sentiti
     ];
 
     /**

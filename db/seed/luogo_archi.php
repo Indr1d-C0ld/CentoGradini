@@ -33,6 +33,20 @@ $biDirezionali = [
     ['casa_hiyama', 'liceo',       4],
     ['casa_hiyama', 'abcb',        5],
     ['casa_hiyama', 'casa_ayukawa',4],
+
+    // --- La cima della collina ---------------------------------------------
+    // L'area giochi sta subito a destra arrivando in cima, e i giardini
+    // pensili sono sul versante, a mezza discesa: si raggiungono dalla
+    // scalinata e da nient'altro.
+    ['area_giochi', 'casa_kasuga', 3],
+    ['area_giochi', 'giardini',    2],
+    ['giardini',    'casa_kasuga', 4],
+
+    // La scaletta di dietro: e' la strada vera del quartiere. Parte dalla
+    // palazzina, gira dall'altra parte e scende dove scendono tutti.
+    ['scaletta',    'casa_kasuga', 3],
+    ['scaletta',    'commerciale', 6],
+    ['scaletta',    'viale',       5],
     ['casa_ayukawa','argine',      8],
     ['parco',       'argine',      7],
     ['parco',       'albero',      3],
@@ -92,6 +106,12 @@ $suGiu('abcb',         4, 7);
 $suGiu('viale',        3, 5);
 $suGiu('casa_ayukawa', 5, 8);
 $suGiu('casa_hiyama',  5, 8);
+
+// L'area giochi e' in cima accanto alla scalinata: nessun dislivello. I
+// giardini stanno a mezza discesa, quindi un po' di salita c'e'.
+$aggiungi('gradini', 'area_giochi', 1, 'piedi');
+$aggiungi('area_giochi', 'gradini', 1, 'piedi');
+$suGiu('giardini', 2, 3);
 
 return [
     'tabella'     => 'luogo_archi',

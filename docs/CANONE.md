@@ -473,15 +473,41 @@ scendere verso liceo, ABCB, viale, casa Ayukawa e casa Hiyama costa meno che ris
 palazzina dei Kasuga è l'unica cosa che sta sullo stesso piano della scalinata, e infatti è
 l'unico collegamento simmetrico.
 
-### Altre cose che la Réflexion 16 dà, e che non abbiamo ancora usato
+### Il resto della Réflexion 16, entrato nel gioco il 19/09/2026
 
-- Un **secondo scalinata** dietro la residenza, che scende a destra invece che a sinistra.
-- L'**area giochi** per bambini (altalena e scivolo) subito a destra arrivando in cima, e i
-  **giardini pensili** a terrazze sul versante — è lì che al cap. 45 Madoka dice a Kyosuke
-  che se ne va in America.
-- L'orientamento: la scalinata è **nord-sud**, e guardando giù si è rivolti a sud.
-- Il conto dei gradini per settori: nell'episodio 1, settori da quindici più un ultimo da
-  venti.
+Tutto quello che quella fonte dava è diventato qualcosa di giocabile, non una nota.
+
+**Tre luoghi nuovi sulla collina.**
+
+| luogo | cos'è | e a cosa serve |
+|:---|:---|:---|
+| `area_giochi` | Altalena e scivolo dietro una bassa ringhiera, subito a destra arrivando in cima | Un minuto dai gradini, nessun dislivello. Di giorno i bambini, dopo cena nessuno |
+| `giardini` | I giardini pensili: spiazzi quadrati a terrazze sul versante, due panchine rivolte a sud | **Folla zero**. Ci si arriva solo volendoci arrivare, ed è il posto delle conversazioni difficili |
+| `scaletta` | La seconda scalinata dietro la residenza, che gira a destra, più corta, coi lampioni | È la strada vera del quartiere |
+
+**La scalinata è deserta, e adesso il gioco lo dice.** Nella serie «hormis Kyosuke, aucun
+badaud ne passe par cet escalier», e in *Shin KOR* Hikaru glielo dice in faccia: nessuno la
+fa, perché c'è un'altra strada più comoda che fa un giro. Quella strada è la scaletta di
+dietro. Noi avevamo la folla dei gradini a **7**, con scritto nel codice «ci passano tutti»:
+era esattamente il contrario. Adesso i gradini stanno a 1 e la scaletta a 8 — ed è il motivo
+per cui, in un quartiere pieno di gente, Kyosuke e Madoka in cima riescono sempre a stare da
+soli.
+
+**L'orientamento è diventato una meccanica.** Dall'episodio 42 si deduce che la scalinata è
+nord-sud, perché il sole tramonta sulla destra di chi guarda giù. Da lì la colonna
+`luoghi.guarda` (migrazione 0013) e `Luoghi::veduta()`: un luogo che si apre a ovest, fra le
+cinque e le otto di sera, si porta dietro il tramonto; uno che guarda a est ha l'alba; di
+notte tutti dicono che al buio si intuisce appena. Dai Cento Gradini si vede la città fino
+alla ferrovia, e alle sette di sera il sole le va a finire dentro.
+
+**E il capitolo 45 è diventato un copione.** Ai giardini pensili Madoka dice a Kyosuke che se
+ne va in America; il copione `addio` è ambientato lì e non ha altra condizione che il luogo —
+perché ai giardini non ci si capita, ci si viene, e chi ci convoca qualcuno ha già deciso cosa
+dirgli. Il problema è dirlo.
+
+Resta fuori una cosa sola, per ora: il conto dei gradini per settori (quindici per volta più
+un ultimo da venti, nell'episodio 1), che è nella descrizione del luogo ma non in nessun
+numero.
 
 ---
 

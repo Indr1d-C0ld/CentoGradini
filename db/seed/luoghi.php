@@ -105,12 +105,17 @@ return [
         [
             'lkey' => 'gradini', 'dove' => 'sui Cento Gradini', 'nome' => 'I Cento Gradini',
             'sottotitolo' => 'Dove tutto è cominciato',
-            'descrizione' => 'Una scalinata di pietra fra due muri di cinta, che sale dal quartiere '
-                . 'basso fino alla collina della scuola. In cima ci si ferma sempre un momento a '
-                . 'riprendere fiato, e da lì si vede tutto: i tetti, la ferrovia, il cielo. Di tanto '
-                . 'in tanto qui succede qualcosa che non dovrebbe: non spesso, e mai quando lo si '
-                . 'cerca.',
+            'descrizione' => 'Una scalinata di pietra che sale dal quartiere basso fino in cima '
+                . 'alla collina, dove abitano i Kasuga. È divisa in rampe: quindici gradini per '
+                . 'volta, e venti nell\'ultima. Gira a sinistra a metà, così da sopra non si vede '
+                . 'dove finisce. Quasi nessuno la fa — c\'è la scaletta di dietro, che è più corta '
+                . 'e ci si arriva in macchina — e infatti in cima non c\'è mai nessuno: solo il '
+                . 'fiato che si riprende, la città sotto, e il posto dove è cominciato tutto. Di '
+                . 'tanto in tanto qui succede qualcosa che non dovrebbe: non spesso, e mai quando '
+                . 'lo si cerca.',
             'tipo' => 'strada', 'x' => 604, 'y' => 358, 'ordine' => 80,
+            'guarda' => 'ovest',
+            'veduta' => 'Da quassù la città è tutta lì sotto, fino alla ferrovia.',
         ],
         [
             'lkey' => 'liceo', 'dove' => 'al Kōryō', 'nome' => 'Liceo Kōryō',
@@ -136,6 +141,44 @@ return [
                 . 'regole che nessuno spiega.',
             'tipo' => 'casa', 'x' => 520, 'y' => 434, 'privato' => 1, 'ordine' => 100,
         ],
+        [
+            'lkey' => 'area_giochi', 'dove' => 'all\'area giochi', 'nome' => 'L\'area giochi',
+            'sottotitolo' => 'Un\'altalena, uno scivolo, e le catene che cigolano',
+            'descrizione' => 'Subito a destra arrivando in cima ai gradini, dietro una bassa '
+                . 'ringhiera di metallo: terra battuta, un\'altalena, uno scivolo, e il verde che '
+                . 'comincia lì dietro. Di giorno ci sono i bambini del quartiere; dopo cena non c\'è '
+                . 'nessuno e le catene dell\'altalena si muovono da sole. È il posto dove i grandi '
+                . 'vengono a dirsi le cose che non sanno dove dirsi.',
+            'tipo' => 'natura', 'x' => 690, 'y' => 398,
+            'apre' => null, 'chiude' => null, 'ordine' => 82,
+            'guarda' => 'est', 'veduta' => 'Oltre la ringhiera ci sono i palazzi sul fianco della collina, e sotto di loro il verde.',
+        ],
+
+        [
+            'lkey' => 'giardini', 'dove' => 'ai giardini pensili', 'nome' => 'I giardini pensili',
+            'sottotitolo' => 'Quadrati di verde a terrazze, sul fianco della discesa',
+            'descrizione' => 'Non è un parco: sono piccoli spiazzi quadrati ricavati a livelli '
+                . 'diversi sul versante, uno sotto l\'altro, collegati da rampe corte. Qualche '
+                . 'albero sulla terra battuta, due panchine rivolte a sud, e un muretto basso che '
+                . 'ti arriva alla vita. Da quaggiù si sente la gente che parla in fondo alla '
+                . 'scalinata senza vederla. Ci si viene per dire una cosa sola e poi andarsene.',
+            'tipo' => 'natura', 'x' => 598, 'y' => 450,
+            'apre' => null, 'chiude' => null, 'ordine' => 84,
+            'guarda' => 'sud', 'veduta' => 'Le panchine guardano i tetti bassi in fondo alla discesa, e oltre quelli la città.',
+        ],
+
+        [
+            'lkey' => 'scaletta', 'dove' => 'alla scaletta di dietro', 'nome' => 'La scaletta di dietro',
+            'sottotitolo' => 'La strada che fanno tutti gli altri',
+            'descrizione' => 'Dietro la palazzina, oltre un sentiero d\'asfalto fra i cespugli, c\'è '
+                . 'una seconda scalinata. Gira a destra invece che a sinistra, è più corta, ha i '
+                . 'lampioni, e ci si arriva in macchina fin quasi in cima. È da qui che scende e '
+                . 'sale il quartiere. La grande scalinata la fa solo chi ha voglia di farla.',
+            'tipo' => 'strada', 'x' => 438, 'y' => 384,
+            'apre' => null, 'chiude' => null, 'ordine' => 86,
+            'guarda' => 'ovest', 'veduta' => 'La città sta in basso, e la sera le sue luci si accendono a scaglioni.',
+        ],
+
         [
             'lkey' => 'casa_hiyama', 'dove' => 'da Hikaru', 'nome' => 'Casa Hiyama',
             'sottotitolo' => 'Rumorosa, e la porta non è mai chiusa',

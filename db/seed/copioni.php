@@ -707,5 +707,88 @@ return [
  ),
 ],
 
+// ─────────────────────────────────────────────────────────────────────────
+[
+ 'ckey' => 'addio',
+ 'titolo' => 'Ai giardini, quando c\'è da dire una cosa',
+ 'occhiello' => 'Il posto dove si viene apposta',
+ 'premessa' => 'Ai giardini pensili non ci si capita: ci si viene. Sono quattro spiazzi '
+     . 'quadrati a terrazze sul fianco della discesa, due panchine rivolte a sud, e da quaggiù '
+     . 'si sente la gente parlare in fondo alla scalinata senza vederla. È il posto dove '
+     . 'Madoka, nel capitolo quarantacinque, dice a Kyosuke che se ne va in America. Chi '
+     . 'convoca qualcuno qui ha già deciso cosa dirgli. Il problema è dirlo.',
+ 'luogo' => 'giardini',
+ 'condizione' => 'sempre',
+ 'min_cast' => 2, 'max_cast' => 4, 'finestra' => 1800,
+ 'scene' => $scene(
+   [
+    'testo' => 'Siete sulla seconda terrazza, quella con il muretto. Non c\'è nessun altro e '
+        . 'non passerà nessuno: è il motivo per cui si viene qui. Uno di voi ha chiesto agli '
+        . 'altri di venire, e adesso che ci siete tutti nessuno comincia. Da sotto arriva il '
+        . 'rumore di una saracinesca che si chiude.',
+    'opzioni' => [
+      ['k' => 'comincia', 'testo' => 'Cominciare tu, senza girarci intorno',
+       'prova' => 'cuore', 'difficolta' => 35,
+       'ok' => 'Lo dici in cinque parole e poi stai zitto. È il modo giusto: le cose difficili '
+           . 'dette in fretta lasciano il tempo di reggere il colpo. Nessuno ti interrompe.',
+       'ko' => 'Cominci, e a metà della seconda frase ti accorgi che stai spiegando il contesto '
+           . 'invece di dire la cosa. Ti fermi. Adesso sanno che c\'è qualcosa e non sanno cosa.',
+       'effetti_ok' => ['affetto_cast' => 5, 'compostezza' => -2],
+       'effetti_ko' => ['malinteso_cast' => 8, 'compostezza' => -2],
+       'peso' => ['cuore' => 4]],
+      ['k' => 'aspetta', 'testo' => 'Aspettare che parli chi vi ha chiamati',
+       'prova' => 'nessuna', 'difficolta' => 0,
+       'ok' => 'Il silenzio dura più di quanto sia comodo. Poi qualcuno si siede sul muretto, e '
+           . 'quando comincia a parlare lo fa guardando i tetti, non voi. Si capisce subito che '
+           . 'ci ha pensato per giorni.',
+       'ko' => '', 'effetti_ok' => ['affetto_cast' => 2], 'effetti_ko' => [],
+       'peso' => ['testa' => 3, 'candore' => -1]],
+      ['k' => 'leggero', 'testo' => 'Buttarla sul ridere, per abbassare la tensione',
+       'prova' => 'dai_suki', 'difficolta' => 45,
+       'ok' => 'Dici una scemenza sul muretto, sulle panchine, su chiunque abbia deciso di '
+           . 'metterle rivolte a sud. Ridono. E quando si smette di ridere si riesce a parlare.',
+       'ko' => 'La battuta cade in mezzo a un silenzio che non la voleva. Qualcuno sorride per '
+           . 'educazione e la cosa diventa più difficile di prima.',
+       'effetti_ok' => ['affetto_cast' => 3, 'compostezza' => 1],
+       'effetti_ko' => ['affetto_cast' => -2, 'compostezza' => -1],
+       'peso' => ['dai_suki' => 4]],
+    ],
+   ],
+   [
+    'testo' => 'Adesso è detta. Non importa quale fosse: qui le cose che si dicono sono sempre '
+        . 'la stessa — che qualcosa sta per finire, o che è già finito e non ve ne eravate '
+        . 'accorti. Il sole è sceso sotto il livello del muretto e comincia a fare freddo. '
+        . 'Nessuno si alza per primo.',
+    'opzioni' => [
+      ['k' => 'resta', 'testo' => 'Restare seduti finché non fa buio',
+       'prova' => 'nessuna', 'difficolta' => 0,
+       'ok' => 'Non si aggiunge altro. Si guardano i tetti, si sente qualcuno che chiama un cane '
+           . 'in fondo alla discesa, e si resta. Fra dieci anni di questo pomeriggio ricorderete '
+           . 'il freddo sul muretto e non le parole.',
+       'ko' => '', 'effetti_ok' => ['affetto_cast' => 6, 'compostezza' => 2], 'effetti_ko' => [],
+       'peso' => ['cuore' => 3, 'candore' => 1]],
+      ['k' => 'convinci', 'testo' => 'Provare a far cambiare idea',
+       'prova' => 'dai_suki', 'difficolta' => 55,
+       'ok' => 'Non cambi niente di quello che succederà, ma trovi la frase giusta, e quella '
+           . 'resta. A volte è tutto quello che si può fare, e non è poco.',
+       'ko' => 'Insisti una volta di troppo. La risposta arriva più dura di quanto fosse voluta, '
+           . 'e adesso oltre alla cosa c\'è pure come ve la siete detta.',
+       'effetti_ok' => ['affetto_cast' => 7],
+       'effetti_ko' => ['affetto_cast' => -5, 'malinteso_cast' => 10, 'compostezza' => -2],
+       'peso' => ['dai_suki' => 3, 'cuore' => 2]],
+      ['k' => 'scendi', 'testo' => 'Alzarti e scendere per primo',
+       'prova' => 'kakko', 'difficolta' => 40,
+       'ok' => 'Ti alzi, dici che si fa tardi, e scendi senza voltarti. È una cosa da vigliacchi '
+           . 'e insieme una gentilezza: gli altri non devono decidere quando finirla.',
+       'ko' => 'Ti alzi e ti accorgi, dal modo in cui ti guardano, che andartene adesso è la cosa '
+           . 'peggiore che potevi fare. Ma ormai sei in piedi.',
+       'effetti_ok' => ['compostezza' => 1],
+       'effetti_ko' => ['affetto_cast' => -6, 'malinteso_cast' => 6],
+       'peso' => ['kakko' => 3, 'cuore' => -2]],
+    ],
+   ],
+ ),
+],
+
     ],
 ];
