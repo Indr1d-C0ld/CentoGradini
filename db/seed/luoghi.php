@@ -182,7 +182,8 @@ return [
         [
             'lkey' => 'casa_hiyama', 'dove' => 'da Hikaru', 'nome' => 'Casa Hiyama',
             'sottotitolo' => 'Rumorosa, e la porta non è mai chiusa',
-            'descrizione' => 'Una casa bassa in fondo alla discesa, con la bicicletta appoggiata al '
+            'descrizione' => 'Una casa d\'angolo in fondo alla discesa, legno e intonaco, con la '
+                . 'siepe potata e la bicicletta appoggiata al '
                 . 'muro e sempre qualcuno che entra o esce. Ci si festeggia tutto: la festa delle '
                 . 'bambole a marzo, il capodanno, i compleanni, e qualunque altra scusa. Chi ci è '
                 . 'stato una volta ci torna, perché nessuno gli ha mai chiesto di annunciarsi.',

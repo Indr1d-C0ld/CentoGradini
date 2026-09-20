@@ -322,15 +322,27 @@ prova('OGNI IMMAGINE DICE CHE COSA E\'', function () {
     vero($gen >= 1, 'e almeno un\'immagine generata');
 });
 
-prova('un luogo senza fotografia non si inventa niente', function () {
-    // `foto()` deve tornare null, non un riquadro rotto, e la scheda ripiega
-    // sull'illustrazione generata.
-    uguale(null, Luoghi::foto('non_esiste'));
-    $senza = null;
-    foreach (array_keys(Luoghi::tutti()) as $k) {
-        if (Luoghi::foto($k) === null) { $senza = $k; break; }
+prova('un luogo senza immagine non si inventa niente', function () {
+    // Dal 20/09/2026 tutti e ventidue i luoghi hanno un'immagine, ma il
+    // ripiego deve restare sano: un luogo che non e' in elenco, o la cui
+    // immagine e' stata tolta a mano, non deve produrre un riquadro rotto.
+    uguale(null, Luoghi::foto('non_esiste'), 'un luogo inventato non ha immagini');
+
+    // E se il file sparisce, `foto()` deve accorgersene e tornare null:
+    // e' il controllo che evita l'immagine rotta in pagina.
+    $f = Luoghi::foto('tempio');
+    vero($f !== null, 'il tempio dovrebbe avere un\'immagine');
+    $percorso = dirname(__DIR__) . '/assets/img/luoghi/' . $f['file'];
+    $salvato  = $percorso . '.viaunattimo';
+    rename($percorso, $salvato);
+    try {
+        // La cache statica dentro foto() tiene il manifesto, non i file: il
+        // controllo su is_file() si rifa' a ogni chiamata.
+        uguale(null, Luoghi::foto('tempio'), 'senza il file non si mostra niente');
+    } finally {
+        rename($salvato, $percorso);
     }
-    vero($senza !== null, 'ci devono essere luoghi senza fotografia: sono la maggioranza');
+    vero(Luoghi::foto('tempio') !== null, 'e rimettendolo torna');
 });
 
 prova('ogni luogo ha un\'illustrazione generata valida', function () {

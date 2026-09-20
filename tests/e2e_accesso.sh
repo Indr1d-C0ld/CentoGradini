@@ -348,8 +348,11 @@ if contiene "${BASE}/luogo/stazione" "Fotografia di"; then
   verde "una fotografia vera porta l'autore"; else rosso "la stazione non attribuisce la fotografia"; fi
 if contiene "${BASE}/luogo/stazione" "CC BY-SA"; then
   verde "e la licenza"; else rosso "manca la licenza sulla fotografia"; fi
-if contiene "${BASE}/luogo/dischi" 'class="illustrazione"'; then
-  verde "un luogo senza immagine ripiega sul disegno"; else rosso "il negozio di dischi non ha ne' foto ne' disegno"; fi
+# Dal 20/09/2026 tutti e ventidue i luoghi hanno un'immagine, quindi non c'e'
+# piu' un luogo su cui provare il ripiego dal vivo: lo copre la prova
+# unitaria, che toglie il file e verifica che la pagina non si rompa.
+if contiene "${BASE}/luogo/dischi" "Immagine generata"; then
+  verde "anche il negozio di dischi ha la sua immagine, dichiarata"; else rosso "il negozio di dischi non ha immagine"; fi
 DEST=$(curl -sS -o /dev/null -w '%{redirect_url}' -b "${BISCOTTI}" "${BASE}/luogo/non_esiste")
 if [[ "${DEST}" == *"/quartiere" ]]; then verde "un luogo inventato riporta al quartiere"; else rosso "/luogo/non_esiste -> '${DEST}'"; fi
 

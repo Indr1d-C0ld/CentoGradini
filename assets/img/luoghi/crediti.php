@@ -128,6 +128,14 @@ return [
         'La palazzina verde di cinque piani in cima alla collina, coi ballatoi e le biciclette '
         . 'sotto. Secondo piano, la porta in fondo.'),
 
+    'casa_hiyama' => $gen('casa_hiyama.jpg',
+        'La casa all\'angolo: legno e intonaco, la siepe potata, il cancelletto basso e la '
+        . 'bicicletta appoggiata al muro. La porta non è mai chiusa a chiave.'),
+
+    'dischi' => $gen('dischi.jpg',
+        'Dentro il negozio: i contenitori pieni di vinili divisi per 邦楽 e 洋楽, i manifesti '
+        . 'degli idol alle pareti, l\'insegna al neon e la gente che sfoglia in silenzio.'),
+
     'casa_ayukawa' => $gen('casa_ayukawa.jpg',
         'Il soggiorno: il divano, i manifesti alle pareti, la chitarra appoggiata, la vetrata '
         . 'sul balcone. Grande, ordinato, e quasi sempre vuoto.'),
