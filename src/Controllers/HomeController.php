@@ -38,9 +38,63 @@ final class HomeController
     }
 
     /** Le fonti e il rispetto per l'opera. Una pagina, non una nota a pie' di pagina. */
+    /**
+     * L'opera originale, con una piccola galleria.
+     *
+     * Le immagini si trovano da sole in `assets/img/opera/`, come le
+     * fotografie del santuario: se ne aggiungono o tolgono senza toccare il
+     * codice, e finche' non ce n'e' nessuna la pagina si apre lo stesso.
+     *
+     * La didascalia si ricava dal **nome del file**, che e' il modo piu'
+     * semplice di darle senza inventare un pannello: `manga-01-la-scalinata.jpg`
+     * diventa «La scalinata», e il prefisso decide l'ordine e la sezione. I
+     * file che cominciano per `manga` finiscono fra le tavole, quelli per
+     * `anime` fra i fotogrammi, gli altri in fondo.
+     *
+     * @return Response
+     */
     public function opera(Request $request): Response
     {
-        return Response::html(view('opera', ['title' => 'L\'opera originale']));
+        return Response::html(view('opera', [
+            'title'    => 'L\'opera originale',
+            'immagini' => self::galleria(dirname(__DIR__, 2) . '/assets/img/opera'),
+        ]));
+    }
+
+    /**
+     * Le immagini di una cartella, ordinate e con la didascalia dedotta dal
+     * nome del file.
+     *
+     * @return list<array{file:string, didascalia:string, gruppo:string}>
+     */
+    private static function galleria(string $dir): array
+    {
+        $out = [];
+        foreach (glob($dir . '/*.{jpg,jpeg,png,webp,gif}', GLOB_BRACE) ?: [] as $f) {
+            $nome   = basename($f);
+            $base   = pathinfo($nome, PATHINFO_FILENAME);
+            $pezzi  = explode('-', $base);
+            $gruppo = match (mb_strtolower($pezzi[0] ?? '')) {
+                'manga' => 'manga',
+                'anime' => 'anime',
+                default => 'altro',
+            };
+            // Si scartano il prefisso di gruppo e l'eventuale numero d'ordine.
+            if ($gruppo !== 'altro') {
+                array_shift($pezzi);
+            }
+            if (isset($pezzi[0]) && ctype_digit($pezzi[0])) {
+                array_shift($pezzi);
+            }
+            $did = trim(str_replace('_', ' ', implode(' ', $pezzi)));
+            $out[] = [
+                'file'       => $nome,
+                'gruppo'     => $gruppo,
+                'didascalia' => $did === '' ? '' : mb_strtoupper(mb_substr($did, 0, 1)) . mb_substr($did, 1),
+            ];
+        }
+        usort($out, static fn (array $a, array $b): int => strcmp($a['file'], $b['file']));
+        return $out;
     }
 
     /**

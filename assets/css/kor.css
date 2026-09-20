@@ -639,3 +639,47 @@ label.in_linea { display: inline-flex; align-items: center; gap: .4rem; }
   font-style: italic;
   margin: .8rem 0;
 }
+
+/* --- Amministrazione ---------------------------------------------------- */
+
+.nav-admin { margin-bottom: .6rem; }
+
+/* Il pallino di chi è collegato: verde se ha dato segni di vita da poco. */
+.pallino {
+  display: inline-block;
+  width: .55rem; height: .55rem;
+  border-radius: 50%;
+  background: var(--bordo);
+}
+.pallino.acceso { background: var(--verde); box-shadow: 0 0 0 2px color-mix(in srgb, var(--verde) 25%, transparent); }
+
+/* Lo stato di un account, a colpo d'occhio. */
+.stato { font-weight: 600; font-size: .85rem; }
+.stato-active    { color: var(--verde); }
+.stato-pending   { color: var(--inchiostro-tenue); }
+.stato-suspended { color: var(--arancio-cupo); }
+.stato-banned    { color: #b3382c; }
+
+/* Nella mappa, una riga con qualcuno dentro si stacca dalle altre. */
+.riga-viva td { background: color-mix(in srgb, var(--arancio) 7%, transparent); }
+
+/* La galleria dell'opera: immagini a griglia, che si adattano alla larghezza. */
+.galleria {
+  display: grid;
+  gap: .9rem;
+  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+  margin: 1rem 0 1.4rem;
+}
+.galleria figure { margin: 0; }
+.galleria img {
+  width: 100%;
+  height: auto;
+  border-radius: var(--raggio);
+  border: 1px solid var(--bordo);
+  display: block;
+}
+.galleria figcaption {
+  font-size: .82rem;
+  color: var(--inchiostro-tenue);
+  padding-top: .35rem;
+}

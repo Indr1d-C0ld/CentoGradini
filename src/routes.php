@@ -91,6 +91,10 @@ $router->get('/calendario', [QuartiereVivoController::class, 'calendario'], ['ac
 $router->get('/admin', [AdminController::class, 'index'], ['active', 'admin']);
 $router->post('/admin/battito', [AdminController::class, 'battito'], ['active', 'admin', 'throttle']);
 $router->post('/admin/config', [AdminController::class, 'config'], ['active', 'admin', 'throttle']);
+$router->get('/admin/utenti', [AdminController::class, 'utenti'], ['active', 'admin']);
+$router->get('/admin/mappa', [AdminController::class, 'mappa'], ['active', 'admin']);
+$router->get('/admin/utente/{id}', [AdminController::class, 'utente'], ['active', 'admin']);
+$router->post('/admin/moderazione', [AdminController::class, 'moderazione'], ['active', 'admin', 'throttle']);
 
 // Le due chiamate che la pagina fa da sola, senza ricaricarsi.
 $router->get('/api/carta', [QuartiereController::class, 'carta'], ['active']);

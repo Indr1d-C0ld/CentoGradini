@@ -581,6 +581,87 @@ DOPO=$(php bin/console.php config:get voci.durata_giorni 2>/dev/null | tr -dc '0
 if [[ "${DOPO}" == "19" ]]; then verde "una manopola si cambia dal pannello"; else rosso "la manopola vale '${DOPO}', attesi 19"; fi
 php bin/console.php config:set voci.durata_giorni "${PRIMA:-21}" >/dev/null 2>&1 || true
 
+# Le tre pagine nuove dell'amministrazione.
+if contiene "${BASE}/admin/utenti" "Gli utenti"; then verde "l'elenco utenti si apre"; else rosso "/admin/utenti"; fi
+if contiene "${BASE}/admin/utenti" "${UTENTE}"; then verde "e ci trova dentro l'utente di prova"; else rosso "l'utente di prova non compare in elenco"; fi
+if contiene "${BASE}/admin/mappa" "La situazione"; then verde "la mappa della situazione si apre"; else rosso "/admin/mappa"; fi
+if contiene "${BASE}/admin/mappa" "luogo per luogo"; then verde "e elenca i luoghi"; else rosso "la mappa non elenca i luoghi"; fi
+
+UID_PROVA=$(php -r '
+  require "src/autoload.php"; require "src/Support/helpers.php";
+  $GLOBALS["__project_root"] = getcwd();
+  App\Core\Config::load(getcwd());
+  $u = App\Core\Database::first("SELECT id FROM users WHERE username = ?", [$argv[1]]);
+  echo $u === null ? 0 : (int) $u["id"];
+' "${UTENTE}")
+if contiene "${BASE}/admin/utente/${UID_PROVA}" "Le connessioni"; then verde "la scheda di un utente si apre"; else rosso "/admin/utente/${UID_PROVA}"; fi
+
+# Un utente inventato non deve dare errore: rimanda all'elenco.
+DEST=$(curl -sS -o /dev/null -w '%{redirect_url}' -b "${BISCOTTI}" "${BASE}/admin/utente/999999")
+if [[ "${DEST}" == *"/admin/utenti" ]]; then verde "un utente inventato riporta all'elenco"; else rosso "utente inventato -> '${DEST}'"; fi
+
+# --- Moderazione -----------------------------------------------------------
+# L'utente di prova E' l'amministratore (lo abbiamo appena promosso), quindi
+# serve un secondo account su cui provare i provvedimenti.
+stato_di() {
+  php -r '
+    require "src/autoload.php"; require "src/Support/helpers.php";
+    $GLOBALS["__project_root"] = getcwd();
+    App\Core\Config::load(getcwd());
+    $u = App\Core\Database::first("SELECT status, nota_admin FROM users WHERE id = ?", [(int) $argv[1]]);
+    echo ($u["status"] ?? "?") . "|" . ($u["nota_admin"] ?? "");
+  ' "$1"
+}
+
+# Un amministratore non deve potersi sospendere da solo: resterebbe chiuso
+# fuori dal proprio pannello, e non c'e' modo di rientrare da web.
+T=$(gettone "${BASE}/admin/utente/${UID_PROVA}")
+curl -sS -o /dev/null -b "${BISCOTTI}" -c "${BISCOTTI}" -d "_token=${T}" \
+  -d "utente=${UID_PROVA}" -d "azione=sospendi" -d "motivo=mi chiudo fuori" "${BASE}/admin/moderazione" >/dev/null
+if [[ "$(stato_di "${UID_PROVA}")" == active* ]]; then
+  verde "un amministratore non puo' sospendere se stesso"
+else rosso "si e' sospeso da solo: $(stato_di "${UID_PROVA}")"; fi
+
+VITTIMA="prova-mod-$$"
+printf 'parolalungabastante\nparolalungabastante\n' \
+  | php bin/console.php user:create "${VITTIMA}" "${VITTIMA}@example.invalid" >/dev/null 2>&1
+UID_VITTIMA=$(php -r '
+  require "src/autoload.php"; require "src/Support/helpers.php";
+  $GLOBALS["__project_root"] = getcwd();
+  App\Core\Config::load(getcwd());
+  $u = App\Core\Database::first("SELECT id FROM users WHERE username = ?", [$argv[1]]);
+  echo $u === null ? 0 : (int) $u["id"];
+' "${VITTIMA}")
+
+if [[ "${UID_VITTIMA}" != "0" ]]; then
+  # Senza motivo non passa: uno stato senza motivo, fra tre mesi, non si sa
+  # piu' come interpretarlo.
+  T=$(gettone "${BASE}/admin/utente/${UID_VITTIMA}")
+  curl -sS -o /dev/null -b "${BISCOTTI}" -c "${BISCOTTI}" -d "_token=${T}" \
+    -d "utente=${UID_VITTIMA}" -d "azione=sospendi" -d "motivo=" "${BASE}/admin/moderazione" >/dev/null
+  if [[ "$(stato_di "${UID_VITTIMA}")" == active* ]]; then
+    verde "sospendere senza motivo non passa"
+  else rosso "sospeso senza motivo: $(stato_di "${UID_VITTIMA}")"; fi
+
+  T=$(gettone "${BASE}/admin/utente/${UID_VITTIMA}")
+  curl -sS -o /dev/null -b "${BISCOTTI}" -c "${BISCOTTI}" -d "_token=${T}" \
+    -d "utente=${UID_VITTIMA}" -d "azione=sospendi" -d "motivo=prova automatica" "${BASE}/admin/moderazione" >/dev/null
+  if [[ "$(stato_di "${UID_VITTIMA}")" == "suspended|prova automatica" ]]; then
+    verde "con un motivo si sospende, e il motivo resta"
+  else rosso "sospensione: $(stato_di "${UID_VITTIMA}")"; fi
+
+  T=$(gettone "${BASE}/admin/utente/${UID_VITTIMA}")
+  curl -sS -o /dev/null -b "${BISCOTTI}" -c "${BISCOTTI}" -d "_token=${T}" \
+    -d "utente=${UID_VITTIMA}" -d "azione=attiva" -d "motivo=" "${BASE}/admin/moderazione" >/dev/null
+  if [[ "$(stato_di "${UID_VITTIMA}")" == active* ]]; then
+    verde "e si riattiva"
+  else rosso "riattivazione: $(stato_di "${UID_VITTIMA}")"; fi
+
+  php bin/console.php user:delete "${VITTIMA}" >/dev/null 2>&1 <<< "SI" || true
+else
+  rosso "non sono riuscito a creare il secondo account di prova"
+fi
+
 # Una chiave inventata non si crea da web: le manopole nascono da una migrazione.
 T=$(gettone "${BASE}/admin")
 curl -sS -o /dev/null -b "${BISCOTTI}" -c "${BISCOTTI}" -d "_token=${T}" \

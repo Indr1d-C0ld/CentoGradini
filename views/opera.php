@@ -1,6 +1,50 @@
 <p class="occhiello">Di chi è questa storia</p>
 <h1>L'opera originale</h1>
 
+<?php
+/** @var list<array{file:string,didascalia:string,gruppo:string}> $immagini */
+$immagini = $immagini ?? [];
+$perGruppo = ['manga' => [], 'anime' => [], 'altro' => []];
+foreach ($immagini as $im) { $perGruppo[$im['gruppo']][] = $im; }
+?>
+<?php foreach ([
+    'manga' => 'Le tavole',
+    'anime' => 'La serie animata',
+    'altro' => 'Altro',
+] as $gruppo => $titolo): ?>
+  <?php if ($perGruppo[$gruppo] === []) { continue; } ?>
+  <h2><?= e($titolo) ?></h2>
+  <div class="galleria">
+    <?php foreach ($perGruppo[$gruppo] as $im): ?>
+      <figure>
+        <img src="<?= e(asset('img/opera/' . $im['file'])) ?>"
+             alt="<?= e($im['didascalia'] !== '' ? $im['didascalia'] : 'Kimagure Orange Road') ?>"
+             loading="lazy">
+        <?php if ($im['didascalia'] !== ''): ?>
+          <figcaption><?= e($im['didascalia']) ?></figcaption>
+        <?php endif; ?>
+      </figure>
+    <?php endforeach; ?>
+  </div>
+<?php endforeach; ?>
+
+<?php if ($immagini !== []): ?>
+  <p class="aiuto crediti-foto">
+    Le immagini sono tavole del manga e fotogrammi della serie animata: i diritti restano di
+    <strong>Izumi Matsumoto</strong>, di Shūeisha e di Studio Pierrot. Sono qui in un omaggio
+    senza scopo di lucro, a scopo di commento e riconoscimento dell'opera, e vengono rimosse
+    su richiesta di chi ne detiene i diritti.
+  </p>
+<?php else: ?>
+  <div class="nota">
+    <strong>Qui ci starebbero delle immagini.</strong> Vanno messe in
+    <code>assets/img/opera/</code>: la pagina le trova da sola, e il nome del file decide
+    sezione, ordine e didascalia. Le istruzioni sono nel file <code>COME-AGGIUNGERE.txt</code>
+    dentro quella cartella.
+  </div>
+<?php endif; ?>
+
+
 <p class="sommario">
   <em>Cento Gradini</em> è un gioco amatoriale, gratuito e senza scopo di lucro, costruito per
   affetto verso un'opera che non ci appartiene. Vale la pena dire con precisione di chi è.
