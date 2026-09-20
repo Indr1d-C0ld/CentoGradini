@@ -338,6 +338,18 @@ if grep -q '"quando"' <<< "${BATT}"; then verde "/api/battito risponde"; else ro
 
 titolo "Spostamento"
 if contiene "${BASE}/luogo/abcb" "ABCB"; then verde "la scheda di un luogo si apre"; else rosso "/luogo/abcb"; fi
+
+# Le immagini dei luoghi sono di due nature, e la pagina deve dirlo. E' la
+# regola piu' importante di tutto il progetto applicata alle figure: non si
+# presenta un'immagine inventata con lo stesso aspetto di una fotografia.
+if contiene "${BASE}/luogo/abcb" "Immagine generata"; then
+  verde "un'immagine generata si dichiara tale"; else rosso "l'ABCB non dichiara l'immagine generata"; fi
+if contiene "${BASE}/luogo/stazione" "Fotografia di"; then
+  verde "una fotografia vera porta l'autore"; else rosso "la stazione non attribuisce la fotografia"; fi
+if contiene "${BASE}/luogo/stazione" "CC BY-SA"; then
+  verde "e la licenza"; else rosso "manca la licenza sulla fotografia"; fi
+if contiene "${BASE}/luogo/dischi" 'class="illustrazione"'; then
+  verde "un luogo senza immagine ripiega sul disegno"; else rosso "il negozio di dischi non ha ne' foto ne' disegno"; fi
 DEST=$(curl -sS -o /dev/null -w '%{redirect_url}' -b "${BISCOTTI}" "${BASE}/luogo/non_esiste")
 if [[ "${DEST}" == *"/quartiere" ]]; then verde "un luogo inventato riporta al quartiere"; else rosso "/luogo/non_esiste -> '${DEST}'"; fi
 

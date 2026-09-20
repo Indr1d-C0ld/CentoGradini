@@ -27,13 +27,19 @@ $luogo = $dati['luogo'];
   <?php if ($foto !== null): ?>
     <figure class="foto-luogo">
       <img src="<?= e(asset('img/luoghi/' . $foto['file'])) ?>"
-           alt="<?= e($foto['didascalia']) ?>" loading="lazy">
+           alt="<?= e((($foto['tipo'] ?? '') === 'generata' ? 'Immagine generata. ' : '')
+                       . $foto['didascalia']) ?>" loading="lazy">
       <figcaption>
         <?= e($foto['didascalia']) ?>
         <span class="aiuto">
-          Foto di <?= e($foto['autore']) ?>,
-          <a href="<?= e($foto['licenza_url']) ?>" rel="license noopener"><?= e($foto['licenza']) ?></a>,
-          da <a href="<?= e($foto['origine']) ?>" rel="noopener">Wikimedia Commons</a>.
+          <?php if (($foto['tipo'] ?? '') === 'fotografia'): ?>
+            Fotografia di <?= e($foto['autore']) ?>,
+            <a href="<?= e($foto['licenza_url']) ?>" rel="license noopener"><?= e($foto['licenza']) ?></a>,
+            da <a href="<?= e($foto['origine']) ?>" rel="noopener">Wikimedia Commons</a>.
+          <?php else: ?>
+            <em>Immagine generata, non una fotografia:</em> questo posto non esiste, e i
+            cartelli che ci si leggono sono nomi del gioco.
+          <?php endif; ?>
         </span>
       </figcaption>
     </figure>

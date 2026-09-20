@@ -275,26 +275,51 @@ prova('ogni veduta e\' una frase intera', function () {
     }
 });
 
-prova('le fotografie ci sono, e portano i loro crediti', function () {
-    // Poche apposta: solo i posti che SONO davvero quel posto. Quello che
-    // conta e' che ognuna porti autore, licenza e origine — sono foto di
-    // altri, con una licenza che vuole l'attribuzione.
-    $conFoto = 0;
-    foreach (Luoghi::tutti() as $k => $l) {
+prova('OGNI IMMAGINE DICE CHE COSA E\'', function () {
+    // E' la prova piu' importante di questo file, e non e' tecnica.
+    //
+    // Ci sono due nature qui dentro: fotografie vere di posti veri, e
+    // immagini generate nello stile della pellicola anni Ottanta. Sono
+    // belle tutte e due, ma documentano cose diverse — anzi, le seconde non
+    // documentano niente: i cartelli che si leggono sono nomi del gioco, non
+    // insegne del mondo. Un progetto che ha passato giorni a separare
+    // «canone» da «ricostruita» non puo' presentarle allo stesso modo.
+    //
+    // Quindi: `tipo` obbligatorio, e chi dice «fotografia» deve portare
+    // autore, licenza e origine.
+    $foto = $gen = 0;
+    foreach (array_keys(Luoghi::tutti()) as $k) {
         $f = Luoghi::foto($k);
         if ($f === null) {
             continue;
         }
-        $conFoto++;
-        foreach (['file', 'autore', 'licenza', 'licenza_url', 'origine', 'didascalia'] as $campo) {
-            vero(trim((string) ($f[$campo] ?? '')) !== '', "{$k}: manca «{$campo}» nei crediti");
+        $tipo = (string) ($f['tipo'] ?? '');
+        vero(in_array($tipo, ['fotografia', 'generata'], true),
+            "{$k}: «tipo» deve dire fotografia o generata, dice «{$tipo}»");
+        foreach (['file', 'didascalia'] as $campo) {
+            vero(trim((string) ($f[$campo] ?? '')) !== '', "{$k}: manca «{$campo}»");
         }
         vero(is_file(dirname(__DIR__) . '/assets/img/luoghi/' . $f['file']),
             "{$k}: il file {$f['file']} non c'e'");
-        vero(str_starts_with((string) $f['licenza_url'], 'https://'),
-            "{$k}: l'indirizzo della licenza deve essere un URL");
+
+        if ($tipo === 'fotografia') {
+            $foto++;
+            foreach (['autore', 'licenza', 'licenza_url', 'origine'] as $campo) {
+                vero(trim((string) ($f[$campo] ?? '')) !== '',
+                    "{$k}: e' una fotografia e manca «{$campo}» — la licenza pretende l'attribuzione");
+            }
+            vero(str_starts_with((string) $f['licenza_url'], 'https://'),
+                "{$k}: l'indirizzo della licenza deve essere un URL");
+        } else {
+            $gen++;
+            // Un'immagine generata non deve millantare un autore: sarebbe
+            // peggio che non averlo.
+            vero(($f['autore'] ?? '') === '' && ($f['licenza'] ?? '') === '',
+                "{$k}: e' generata e si attribuisce un autore o una licenza");
+        }
     }
-    vero($conFoto >= 1, 'almeno una fotografia deve esserci');
+    vero($foto >= 1, 'almeno una fotografia vera deve esserci');
+    vero($gen >= 1, 'e almeno un\'immagine generata');
 });
 
 prova('un luogo senza fotografia non si inventa niente', function () {

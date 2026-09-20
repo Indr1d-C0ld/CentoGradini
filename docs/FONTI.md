@@ -263,6 +263,50 @@ attesta, e distinguere è più importante che riempire.
 
 ---
 
+## 4-quater. Le immagini dei luoghi
+
+Ventidue luoghi, venti con un'immagine, e sono di **due nature diverse**. La distinzione è
+registrata nel campo `tipo` di `assets/img/luoghi/crediti.php`, si vede nella scheda del
+luogo e c'è una prova che la pretende.
+
+### `fotografia` — tre, e sono posti veri
+
+Da Wikimedia Commons, con licenza libera e attribuzione in pagina.
+
+| luogo | cosa ritrae | licenza |
+|:---|:---|:---|
+| `stazione` | Etchū-Nakagawa, la stazione che Matsumoto ha disegnato | CC BY-SA 4.0, Kansai-good |
+| `gradini` | Takaoka dall'alto, col parco Kojō in mezzo al verde | CC BY-SA 3.0, SilverHaze |
+| `commerciale` | Una via commerciale di periferia sotto la pioggia, **1987** — Tokyo, non Takaoka | CC BY 2.0, Phillip Capper |
+
+Della scalinata vera non esiste una fotografia libera: cercata su Commons in tre modi, anche
+in giapponese.
+
+### `generata` — diciassette
+
+Immagini generate nello stile della fotografia su pellicola degli anni Ottanta, fornite
+dall'autore del sito. Sono azzeccate e servono bene il racconto, ma **non documentano
+niente**: i cartelli che vi si leggono — «BAR ABCB», 高陵高等学校, 高岡遊園地 — rendono in
+modo plausibile nomi che nel mondo non esistono, e sono nomi del gioco.
+
+Vanno trattate come `ricostruita`, esattamente come i club o i compleanni dei Kasuga minori:
+**mai citarle come prova di com'era un posto.** Se un giorno saltasse fuori una fotografia
+vera di uno di questi luoghi, va sostituita e promossa a `fotografia`.
+
+Possono stare nella copia pubblica — non c'è un terzo che ne rivendichi i diritti, ed è la
+differenza fra queste e le tavole del manga.
+
+### Perché non bastano le foto d'epoca vere
+
+Cercate, e quasi non esistono con licenza libera. Su Commons le categorie
+`1980s in Japan` e `1980s photographs of Japan` sono **vuote**; `1987 in Japan` ha tre file
+non pertinenti. Su Openverse il materiale d'epoca vero è quasi tutto **NC** o **ND**: l'ND
+vieta perfino il ridimensionamento, l'NC non può stare in un repository pubblico. In tutto,
+tre fotografie del Giappone 1987 pienamente libere, tutte dello stesso fotografo, e una sola
+utile.
+
+---
+
 ## 5. Da verificare leggendo l'opera
 
 Elenco aperto, da chiudere prima di scrivere i seed definitivi (fase F2).
