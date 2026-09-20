@@ -33,6 +33,16 @@ return [
         'didascalia'  => 'La stazione di Etchū-Nakagawa, sulla linea Himi, oggi. È la stazione '
             . 'che Matsumoto ha disegnato: il murale è stato aggiunto molti anni dopo.',
     ],
+    'commerciale' => [
+        'file'        => 'commerciale.jpg',
+        'autore'      => 'Phillip Capper',
+        'licenza'     => 'CC BY 2.0',
+        'licenza_url' => 'https://creativecommons.org/licenses/by/2.0/',
+        'origine'     => 'https://commons.wikimedia.org/wiki/File:Suburban_street_Tokyo_1987.jpg',
+        'didascalia'  => 'Una via commerciale di periferia sotto la pioggia, nel 1987. È Tokyo, '
+            . 'non Takaoka: non è la nostra strada, ma è com\'era una strada come la nostra '
+            . 'nell\'anno in cui il gioco è ambientato.',
+    ],
     'gradini' => [
         'file'        => 'gradini.jpg',
         'autore'      => 'SilverHaze',
