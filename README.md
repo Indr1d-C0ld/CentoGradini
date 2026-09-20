@@ -1,8 +1,18 @@
 # Cento Gradini
 
-Gioco di ruolo multigiocatore persistente nell'universo di **Kimagure Orange Road**
-di Izumi Matsumoto. Progetto amatoriale, senza scopo di lucro, non affiliato agli
-aventi diritto.
+**Un gioco di ruolo da browser, multigiocatore e persistente, ambientato nel
+quartiere di *Kimagure Orange Road*.** Si gioca un ragazzo o una ragazza del
+1987 in una cittadina giapponese di provincia, e il problema non è salvare il
+mondo: è arrivare a fine settimana senza che nessuno abbia capito cosa sai
+fare, e senza aver rovinato l'unica cosa a cui tieni per non aver detto una
+frase al momento giusto.
+
+Il quartiere va avanti anche quando non ci sei. L'orologio scorre, il tempo
+cambia, la gente si sposta, e quello che hai fatto ieri davanti a tre persone
+sta già circolando in una versione che non riconosceresti.
+
+> Progetto amatoriale e senza scopo di lucro, non affiliato né autorizzato.
+> *Kimagure Orange Road* è di **Izumi Matsumoto** e degli aventi diritto.
 
 - Documento di progetto: [`docs/PROGETTO.md`](docs/PROGETTO.md)
 - Registro delle fonti: [`docs/FONTI.md`](docs/FONTI.md)
@@ -14,135 +24,307 @@ aventi diritto.
 > abbiamo scritto noi e non ci autorizza a ridistribuire il lavoro di altri.
 > `docs/FONTI.md` dice da dove viene ogni cosa, cosi' chi vuole puo' risalirci.
 
-## Stato
+---
 
-**Il gioco è finito.** Le otto fasi da F0 a F7 sono fatte e in produzione, con
-315 verifiche su 13 file di prova. Da qui in poi si aggiunge contenuto, non
-impalcatura: al momento **nove copioni di episodi**, **tredici abitanti**
-canonici e **dieci club**.
+## Da dove viene
 
-Il quartiere ha **22 luoghi** e **dieci copioni**.
+Nel 1990, su una BBS americana, qualcuno che si firmava «Totoro Hunter Leto II»
+pubblicò *Whimsical Orange Road: The Role-Playing Game v3.0*: un gioco di ruolo
+amatoriale su *Kimagure Orange Road*, battuto a macchina, con le statistiche dei
+personaggi dichiarate dall'autore stesso «stime azzardate».
 
-**La rilettura dell'opera è completa**: tutti e 156 i riassunti dei capitoli
-sono stati raccolti e spogliati. Cosa ne è uscito sta in
-[`docs/CANONE.md`](docs/CANONE.md) §7-bis — fra le altre cose, che nel manga
-**i club scolastici non esistono** (i nostri dieci sono dichiaratamente una
-ricostruzione), che Kyosuke e Hikaru compiono gli anni lo stesso giorno, e che
-sulla scalinata i due si accordano su novantanove gradini e mezzo.
+Questo progetto è la trasposizione di quel regolamento in un gioco da browser —
+ma riscritta, non ricopiata. Quello che il 1990 aveva azzeccato l'abbiamo tenuto:
+soprattutto **l'idea che i poteri siano un problema e non una risorsa**, che è
+l'unico punto in cui quel gioco coincideva perfettamente con l'opera. Tutto il
+resto è stato rifatto rileggendo il manga: tutti e 156 i capitoli, la FAQ storica
+della serie, le voci giapponesi, due siti di appassionati. Cosa ne è uscito, e
+dove le due cose divergono, sta in [`docs/CANONE.md`](docs/CANONE.md).
 
-**F0 — fondamenta: fatta.** Ci si iscrive, si conferma l'indirizzo, si entra.
+---
 
-**F1 — il mondo: fatta.** Orologio ciclico dell'«eterno 1987» (compressione 1:4),
-calendario scolastico giapponese 1987-88 con feste, vacanze e ventisei giornate
-che valgono un episodio, meteo deterministico tarato sulle medie di Tokyo,
-diciassette luoghi con orari e stagionalità, carta su tela, spostamento con
-tempi di percorrenza, presenze e tracce.
+## Che gioco è
 
-**F2 — il personaggio: fatta.** Modello scolastico canonico (il Kōryō Gakuen ha
-medie e superiori, e l'età non si sceglie: la determina il compleanno tramite la
-coorte), quattro abilità con Cuore, 24 tratti riscritti nel Giappone del 1987,
-otto abilità secondarie, esper e non-esper con schede diverse, 16 poteri con
-nomi canonici e Controllo. Le schede nate in F1 si completano da sole.
+Non si combatte, non si sale di livello, non c'è niente da conquistare. Ci sono
+quattro cose che si accumulano — il **Controllo** sui propri poteri, i **legami**
+con le persone, la **reputazione** nel quartiere e i **ricordi** — e una sola che
+si può perdere davvero: il posto dove vivi.
 
-**F3 — il Segreto: fatta.** È il ciclo centrale: usi un potere, il motore decide
-chi se n'è accorto (vistosità del potere, attenzione del testimone, buio, pioggia,
-il tuo Controllo), tu provi a coprire con una scusa, un diversivo o la faccia di
-bronzo, e chi non si beve la storia si porta dietro un'anomalia. Tre anomalie
-coerenti, un tiro di Intuizione, e quella persona ha capito. Due persone che hanno
-capito e la famiglia trasloca. La valvola è **confidarsi**: dieci persone che sanno
-perché gliel'hai detto tu non spostano un mobile, due che l'hanno capito da sole sì.
+Il gioco sta in piedi su quattro pilastri, e sono intrecciati apposta.
 
-**F4 — le relazioni: fatta.** Legami orientati su due assi — **Affetto** e
-**Fraintendimento** — e dieci gesti, quasi tutti ambigui per costruzione. Un gesto
-fra A e B viene *letto* da chi passa di lì: chi è distratto capisce male e si porta
-a casa un malinteso; chi è innamorato ha capito benissimo, ed è proprio per questo
-che gli brucia. Il fraintendimento **non decade col tempo** — solo un chiarimento
-lo scioglie, costa Cuore e può peggiorare le cose. E c'è la confessione, con due
-prove in fila: riuscire a dirlo, e la risposta. Più il cappello di paglia rosso,
-uno solo per server.
+### 1. Il Segreto
 
-**F5 — gli episodi: fatta.** Un episodio è una storia breve che il quartiere
-apre da sé quando le condizioni ci sono: la stagione giusta, il posto giusto, il
-tempo giusto, o un sospetto già acceso su qualcuno. Chi si trova lì entra nel
-cast. Poi si va a scene, e a ogni scena si sceglie: le scelte muovono legami,
-Compostezza, Copertura e sospetti veri, non punteggi finti. Chi non si fa vivo
-entro la finestra non blocca la storia — un **agente autonomo** sceglie per lui,
-pesando le opzioni sulla sua scheda, così un timido resta timido anche quando a
-giocarlo è il motore. Quello che resta finisce nei **ricordi**, in `/ricordi`.
-Tre copioni per cominciare: i funghi che tolgono la voglia di mentire,
-l'acquazzone sotto la stessa tettoia, e i sospetti in aula.
+Alla creazione si sceglie: **esper o non esper**. Non è un tiro di fortuna, ed
+è una delle decisioni fondanti del progetto — Madoka e Hikaru reggono tutta
+l'opera senza avere un solo potere, e un gioco che li rendesse personaggi di
+serie B tradirebbe il libro.
 
-**F6 — il quartiere vivo: fatta.** È il pezzo che trasforma quattro giocatori
-in un quartiere. Al centro ci sono le **voci**, e la scelta che le tiene in
-piedi è che *il testo non esiste a database*: esistono un fatto — chi, cosa,
-dove, quando — e tante versioni soggettive quante sono le persone che ne hanno
-sentito parlare, ognuna con una **precisione** e un **tono**. La frase si
-ricostruisce al momento di leggerla, e a ogni passaggio di bocca si perde
-qualcosa nell'ordine in cui lo perde la gente: prima il nome — «Kyosuke
-Kasuga» diventa «uno del terzo anno», e da lì può essere chiunque del terzo
-anno — poi il posto, poi il fatto. Il tono non torna mai verso lo zero: si
+Chi sceglie i poteri gioca il Segreto dal lato di chi ce l'ha. Usarli è facile;
+usarli senza che nessuno se ne accorga, no.
+
+Ogni volta che usi un potere il motore decide chi se n'è accorto, e la
+probabilità la muovono cinque cose: la **vistosità** del potere (far sparire una
+persona non è spostare una matita), l'**attenzione** di chi guarda, il **buio**,
+la **pioggia**, e il tuo **Controllo** — che dimezza, ma non annulla mai.
+
+Chi si accorge di qualcosa non capisce subito: si porta a casa un'**anomalia**,
+una riga sul suo taccuino. Tre anomalie coerenti sulla stessa persona, un tiro di
+Intuizione, e quella persona **ha capito**. Due persone che hanno capito, e la
+tua famiglia trasloca — nel manga succede davvero, ed è la sola punizione del
+gioco: non muori, te ne vai.
+
+La valvola di sfogo è **confidarsi**. Dieci persone che sanno perché gliel'hai
+detto tu non spostano un mobile; due che l'hanno scoperto da sole sì. Fidarsi di
+qualcuno è, meccanicamente, il modo di restare.
+
+E se nel posto dove sei c'è qualcuno che sa **spegnere i poteri**, il tuo potere
+può semplicemente non partire. Nel canone lo sa fare un bambino di otto anni, ed
+è il motivo per cui è il più forte della famiglia.
+
+**E dall'altra parte?** Chi non ha poteri non gioca una versione ridotta: gioca
+il lato opposto dello stesso sistema. Ha più punti abilità da distribuire e un
+tratto in più, l'**Intuizione** per collegare le anomalie che ha annotato, il
+**taccuino** dove segnarle, e il peso sociale per muovere le voci meglio di
+chiunque altro. Il non-esper è quello che *può capire*, ed è la ragione per cui
+l'esper ha paura.
+
+### 2. I legami, su due assi
+
+Le relazioni hanno due numeri, e sono cose diverse:
+
+| | |
+|:---|:---|
+| **Affetto** | da −100 a +100. Quanto A tiene a B — e non è quanto B tiene ad A |
+| **Fraintendimento** | da 0 a 100. Quanto A crede di B qualcosa che non è vero |
+
+Il fraintendimento **non nasce dalle bugie**: nasce dal fatto che i gesti hanno
+più di una lettura. Quando fai un gesto verso qualcuno, il motore non aggiorna
+solo il vostro legame — **distribuisce una lettura a ogni presente**. Chi è
+distratto capisce male e se lo porta dietro; chi è innamorato di uno dei due ha
+capito benissimo, ed è proprio per questo che gli brucia. Malinteso e gelosia
+sono due meccaniche distinte, apposta.
+
+E **il fraintendimento non decade col tempo**. Il tempo non aggiusta niente:
+serve una conversazione, che costa Cuore e **può peggiorare le cose**. È l'unica
+regola del gioco che non ammette eccezioni, ed è il motivo per cui il triangolo
+di *Kimagure Orange Road* dura diciotto volumi invece di due.
+
+Poi c'è la confessione, con due prove in fila — riuscire a dirlo, e la risposta —
+e il **cappello di paglia rosso**, che esiste in un esemplare solo per server e
+passa di mano.
+
+### 3. Il quartiere, e le voci
+
+Il quartiere è **ventidue luoghi** con orari, stagionalità e tempi di percorrenza
+veri, disegnati su una carta. Il liceo è chiuso in agosto, la spiaggia esiste
+solo d'estate, il luna park apre alle dieci, e la grande scalinata non la fa
+quasi nessuno — c'è una scaletta più comoda dietro la collina, ed è per questo
+che in cima si riesce sempre a stare da soli.
+
+Ma il vero collante del multigiocatore sono le **voci**, e la scelta che le
+regge è questa: **il testo di una voce non esiste a database**. Esistono un
+fatto — chi, cosa, dove, quando — e tante versioni soggettive quante sono le
+persone che ne hanno sentito parlare, ognuna con una *precisione* e un *tono*.
+La frase si ricostruisce nel momento in cui la leggi, e a ogni passaggio di bocca
+si perde qualcosa nell'ordine in cui lo perde la gente vera:
+
+```
+p=95   Kyosuke Kasuga ha fatto telecinesi davanti a tutti all'ABCB.
+p=70   Kyosuke ha fatto muovere della roba senza toccarla all'ABCB.
+p=45   Uno del terzo anno ha fatto una cosa stranissima in uno di quei
+       posti dove si ritrovano tutti.
+p=8    Uno di quelli del liceo ha fatto una cosa strana, o almeno così dicono.
+```
+
+Il nome se ne va per primo, ed è la perdita che fa più danno: da quel momento
+può essere chiunque del terzo anno. Il tono non torna mai verso lo zero — si
 polarizza, perché è così che funziona una scuola.
 
-Le voci hanno bisogno di gambe, e le gambe sono gli **abitanti**: undici
-personaggi canonici che vivono nel quartiere, ciascuno col suo giro, che il
-calendario scolastico interrompe quando è ora di lezione. Non sono comparse —
-sono righe di `personaggi` come i giocatori, quindi vedono, annotano, ricevono
-gesti, entrano nel cast di un episodio. E i **club** sono il secondo canale,
-l'unico che non passa dalla geografia: due iscritti si parlano anche se non si
-incrociano mai, ed è come il quartiere raggiunge chi gioca poco.
+Le voci hanno bisogno di gambe, e le gambe sono i **tredici abitanti canonici**
+che vivono nel quartiere per conto loro: Kyosuke, Madoka, Hikaru, le gemelle, il
+Master dell'ABCB e gli altri. Non sono comparse — sono personaggi come i
+giocatori, quindi vedono, annotano, ricevono gesti ed entrano nel cast degli
+episodi. Ognuno ha il suo giro, che il calendario scolastico interrompe quando è
+ora di lezione e il club interrompe nel pomeriggio.
 
-Poi i due modi di scrivere agli altri, che sono l'opposto l'uno dell'altro: la
-**bacheca**, pubblica e a scadenza, dove quello che appendi lo legge chiunque
-passi; e i **biglietti**, che non arrivano — si *trovano*, nel posto dove li
-hai lasciati, e se il destinatario non ci passa restano lì. Entrambi si
-firmano con il nome che si vuole. Infine i **quattordici eventi stagionali**,
-che sono del server e non del giocatore: i ciliegi, il festival d'estate al
-tempio, il festival culturale, San Valentino. Non inventano meccaniche —
-alzano la Folla e accelerano le voci, e da lì segue tutto il resto.
+I **dieci club** sono il secondo canale di propagazione, e l'unico che non passa
+dalla geografia: due iscritti si parlano anche se non si incrociano mai. È così
+che il quartiere raggiunge chi gioca poco.
 
-**F7 — la rifinitura: fatta.** Sei cose, e nessuna è decorazione.
+E ci sono i due modi di scrivere agli altri, opposti per costruzione: la
+**bacheca**, pubblica, legata a un luogo e a scadenza — quello che appendi lo
+legge chiunque passi, e fa nascere una voce; e i **biglietti**, che *non
+arrivano*: si lasciano in un posto, e se il destinatario non ci passa restano lì.
+Entrambi si firmano con il nome che si vuole.
 
-L'**album dei ricordi è illustrato**: ogni ricordo ha una sua scena in SVG,
-generata dalle quattro cose che il motore già sa — il luogo, la stagione,
-l'ora e il tempo che faceva. Non è arte, sono silhouette in controluce; ma
-l'albero dei ricordi ha un albero, i Cento Gradini hanno una scalinata, il
-tempio ha un torii, a giugno piove e in primavera cadono i petali. Due
-ricordi nello stesso posto in due stagioni diverse si riconoscono a colpo
-d'occhio, ed è tutto deterministico: stesso ricordo, stessa immagine, sempre.
+### 4. Gli episodi
 
-Il **diario si porta via**, in `/diario`: tutto quello che è successo a un
-personaggio in un file Markdown che si legge anche in un blocco note fra
-vent'anni, senza il gioco e senza il database. Ci va quello che il
-personaggio **sa** — le voci nella versione deformata che gli è arrivata, non
-nella verità del server.
+Un episodio è una storia breve che il quartiere **apre da sé** quando le
+condizioni ci sono: la stagione giusta, il posto giusto, l'acquazzone, una
+ricorrenza del calendario, o un sospetto già acceso su qualcuno. Chi si trova lì
+entra nel cast.
 
-È una **PWA**: si installa, e il service worker tiene in tasca il guscio del
-sito. Non mette in cache le pagine di gioco, mai: il quartiere cambia ogni
-minuto e una pagina salvata è una bugia su dove si trovano gli altri.
+Poi si va a scene, e a ogni scena ciascuno sceglie. Le scelte muovono legami,
+Compostezza, calore e sospetti **veri**, non punteggi finti. Chi non si fa vivo
+entro la finestra non blocca la storia: un **agente autonomo** sceglie per lui
+pesando le opzioni sulla sua scheda, così un timido resta timido anche quando a
+giocarlo è il motore.
 
-**`/admin`** è una pagina sola, apposta — il battito, le code, i numeri che
-crescono, e le manopole del mondo. Le cose serie restano nella console.
+Quello che resta finisce nell'**album dei ricordi**, ognuno con la sua
+illustrazione generata dal luogo, dalla stagione, dall'ora e dal tempo che
+faceva. E si può **portare via**: il diario completo di un personaggio si
+esporta in Markdown, che si legge anche fra vent'anni senza il gioco e senza il
+database.
 
-**`bilancio`** è il comando che risponde alle domande che una prova non sa
-porre: una prova dice «la vistosità morde», questo dice *quanto*. Genera
-centinaia di schede col codice vero, le legge e le butta via, e stampa le
-distribuzioni — e la riga che conta è quante volte la prudenza paga rispetto
-all'imprudenza. Oggi 3,2 volte.
+---
 
-I **suoni** sono due note generate al momento, senza un byte di audio da
-scaricare, e sono **spenti in partenza**: un sito che fa rumore senza che
-glielo si sia chiesto è un sito che si chiude.
+## L'ambientazione
 
-**La sala del maestro**: `/santuario`, in memoria di Izumi Matsumoto.
+### L'«eterno 1987»
 
-La tabella completa delle fasi è in [`docs/PROGETTO.md`](docs/PROGETTO.md), e la
-rilettura dell'opera in [`docs/CANONE.md`](docs/CANONE.md).
+Il calendario è vero — l'anno scolastico giapponese 1987-88, dal 6 aprile al 5
+aprile — ma **non finisce mai**: arrivato in fondo ricomincia. Feste nazionali,
+tre trimestri, il sabato a scuola, il compleanno dell'Imperatore il 29 aprile,
+ventisei giornate che valgono un episodio.
+
+Il tempo di gioco scorre a **1:4**: un'ora reale è quattro ore nel quartiere, un
+giorno reale è quattro giorni. Chi gioca mezz'ora la sera vede passare mezza
+giornata, e chi manca una settimana torna un mese dopo.
+
+Il triangolo Kyosuke/Madoka/Hikaru **non si risolve mai**. È un vincolo di
+progetto, non un limite temporaneo: è il motivo per cui l'opera dura, e un gioco
+persistente che lo sciogliesse si spegnerebbe da solo.
+
+### Il meteo, e le due ore
+
+Il tempo che fa è una **funzione pura** di seme e istante: nessuna riga a
+database, nessuno stato da far avanzare, e due richieste ravvicinate vedono lo
+stesso cielo. Il clima viene dalla data avvolta (giugno è sempre stagione delle
+piogge) ma il rumore dall'istante lineare — *il calendario si ripete, il meteo
+no*.
+
+Lo stesso vale per i **quattordici eventi stagionali**: i ciliegi, la Golden
+Week, il festival d'estate al tempio, il festival culturale, il capodanno, San
+Valentino. Non inventano meccaniche — alzano la gente in giro e accelerano le
+voci, e tutto il resto segue da solo.
+
+### La scuola
+
+Non è decorativa: **la classe determina l'anno di nascita**. In Giappone la
+coorte scolastica si taglia al 2 aprile, quindi chi è nato il 20 marzo sta in
+classe con chi è nato undici mesi prima. L'età non si sceglie: la si deduce dal
+compleanno. Le classi giocabili sono la terza media e le tre superiori.
+
+### Il quartiere è un posto vero
+
+La ricerca ha portato a una scoperta che ha cambiato l'ambientazione: il
+quartiere di *Kimagure Orange Road* **non è Tokyo**. È **Takaoka**, la città in
+cui Izumi Matsumoto è cresciuto. La scalinata è quella del parco Takaoka Kojō,
+l'ABCB è un locale che si chiamava ABAB, la stazione è Etchū-Nakagawa. Chi gioca
+cammina nell'infanzia dell'autore.
+
+Per questo c'è **`/santuario`**: una sala in memoria di Izumi Matsumoto
+(1958-2020), che non è una pagina di crediti. È il motivo per cui questo
+progetto esiste.
+
+---
+
+## Cosa c'è dentro
+
+| | |
+|---:|:---|
+| **22** | luoghi, con **78** collegamenti, orari, stagionalità e vedute |
+| **13** | abitanti canonici che girano per il quartiere da soli |
+| **17** | poteri esper, con vistosità e Controllo |
+| **24** | tratti di personalità, riscritti nel Giappone del 1987 |
+| **10** | gesti fra personaggi, quasi tutti ambigui per costruzione |
+| **10** | club scolastici |
+| **14** | eventi stagionali di server |
+| **10** | copioni di episodi |
+| **49** | manopole di configurazione, cambiabili a caldo |
+| **13** | migrazioni |
+| **56** | rotte |
+| **315** | verifiche su 13 file di prova (12 unitari + 1 end-to-end) |
+
+### Le schermate
+
+`/quartiere` la carta e dove sei · `/luogo/{x}` la scheda di un posto ·
+`/personaggio` la tua scheda · `/legami` il grafo delle relazioni ·
+`/verso/{id}` cosa provi per una persona, e cosa puoi farci ·
+`/taccuino` le anomalie che hai annotato · `/incidente/{id}` coprire un potere
+appena usato · `/voci` quello che ti è arrivato · `/bacheca` e `/biglietti` ·
+`/club` · `/calendario` gli eventi e chi abita qui · `/episodio` quello in corso ·
+`/ricordi` l'album illustrato · `/diario` l'esportazione · `/admin` il cruscotto ·
+`/opera` e `/santuario` le pagine pubbliche.
+
+È anche una **PWA**: si installa, e il service worker tiene in tasca il guscio
+del sito. Non mette mai in cache le pagine di gioco — il quartiere cambia ogni
+minuto, e una pagina salvata è una bugia su dove si trovano gli altri.
+
+---
+
+## Come è fedele all'opera
+
+Ogni dato porta un livello di confidenza dichiarato in
+[`docs/FONTI.md`](docs/FONTI.md): `canone` (attestato nell'opera), `documentato`
+(da fonti secondarie curate), `regolamento1990`, `ricostruita` (nostra). La
+distinzione non è pignoleria: è quello che permette di sapere cosa si può
+cambiare senza tradire niente.
+
+Quattro esempi di cosa ha prodotto la rilettura:
+
+- **Kyosuke non ha la telepatia.** Il regolamento del 1990 gliela dava; il canone
+  è esplicito nel negarla, ed è il motore della storia — se leggesse nel pensiero,
+  il fumetto finirebbe al terzo capitolo.
+- **Manami e Kurumi erano scambiate** nel regolamento del 1990. Manami è la
+  maggiore, con gli occhiali e la testa a posto.
+- **Nel manga i club scolastici non esistono.** Su 156 capitoli le sole occorrenze
+  sono un invito che Madoka declina e un club fondato per scherzo. I nostri dieci
+  club sono dichiaratamente una ricostruzione: servono a una funzione di gioco che
+  l'opera non aveva bisogno di avere.
+- **La collina era al contrario.** Avevamo il liceo in cima alla scalinata; il
+  canone mette lassù la casa dei Kasuga e tutto il resto sotto. C'era persino una
+  prova che difendeva l'errore.
+
+---
+
+## Stato
+
+**Il gioco è finito.** Le otto fasi da F0 a F7 sono fatte e in produzione; la
+tabella completa è in [`docs/PROGETTO.md`](docs/PROGETTO.md) §12. Da qui in poi
+si aggiunge contenuto — copioni, luoghi, tratti — non impalcatura.
+
+La rilettura dell'opera è completa: tutti e 156 i riassunti dei capitoli raccolti
+e spogliati, e le domande aperte quasi tutte chiuse — comprese quelle a cui la
+risposta è «il canone non lo dice», che valgono quanto le altre.
+
+---
 
 ## Stack
 
-PHP 8.4 senza framework, MariaDB, Apache. Front controller unico (`index.php`),
-autoloader PSR-4 scritto a mano, nessun passo di compilazione lato browser.
-Battito da cron ogni minuto + avanzamento pigro su richiesta. Core portato da
+**PHP 8.4 senza framework, MariaDB, Apache.** Front controller unico
+(`index.php` via PATH_INFO), autoloader PSR-4 scritto a mano, JavaScript
+vanilla e Canvas, **nessun passo di compilazione**: si clona, si migra, si
+apre. Circa 16.000 righe di PHP fra `src/`, `db/`, `views/` e `bin/`.
+
+Due principi che tornano dappertutto:
+
+**Il mondo avanza per calcolo, non per stato.** Meteo, eventi stagionali,
+posizione degli abitanti e ora di gioco sono funzioni pure dell'istante: non
+c'è niente da far avanzare, e due richieste ravvicinate vedono lo stesso
+quartiere. Quello che deve essere scritto — movimenti, incidenti, voci — lo
+scrive un **battito** da cron ogni minuto, più un **avanzamento pigro** su
+richiesta web che chiama lo stesso metodo: una strada sola, quindi i due
+percorsi non possono divergere.
+
+**Il generatore casuale è deterministico e ancorato.** Ogni tiro si ancora a
+qualcosa di stabile e irripetibile — l'id di un incidente, la coppia più l'ora
+di gioco — così rilanciare il battito non rimescola niente e insistere su
+un'azione appena fallita non serve. Ci si è arrivati sbagliando due volte: le
+lezioni 11 e 15 qui sotto.
+
+Il core (`Config`, `Database`, `Router`, `Session`, `Csrf`, `View`, `Mailer`,
+`Posta`, `RateLimiter`, `Lock`, `Auth`, `Migrator`, `Seeder`) è portato da
 Atlantik e SubSpazio.
 
 ## Installazione
@@ -169,7 +351,15 @@ php bin/console.php seed       # carica db/seed/*.php
 php bin/console.php mondo:ora  # che ora, che giorno e che tempo fa adesso
 php bin/console.php mondo:anno # una passata sull'anno simulato, per guardarlo
 php bin/console.php mondo:luoghi
+php bin/console.php bilancio --conferma   # rapporto di bilanciamento
 ```
+
+Il **bilancio** risponde alle domande che una prova non sa porre. Una prova
+dice «la vistosità morde»; questo dice *quanto*: genera centinaia di schede
+con il codice vero, le legge, le cancella, e stampa le distribuzioni di
+PF/PP/tratti/poteri, la tabella del farsi notare potere per potere, la folla
+media per luogo, e la riga che conta davvero — quante volte la prudenza paga
+rispetto all'imprudenza.
 
 ## Prove
 
@@ -212,6 +402,8 @@ Poi si copia `config/config.example.php` in `config/config.php` puntando alla po
 ```bash
 php -S 127.0.0.1:8150 -t . index.php
 ```
+
+---
 
 ## Trappole già pagate
 
