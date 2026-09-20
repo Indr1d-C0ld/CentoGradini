@@ -275,6 +275,59 @@ prova('ogni veduta e\' una frase intera', function () {
     }
 });
 
+prova('le fotografie ci sono, e portano i loro crediti', function () {
+    // Poche apposta: solo i posti che SONO davvero quel posto. Quello che
+    // conta e' che ognuna porti autore, licenza e origine — sono foto di
+    // altri, con una licenza che vuole l'attribuzione.
+    $conFoto = 0;
+    foreach (Luoghi::tutti() as $k => $l) {
+        $f = Luoghi::foto($k);
+        if ($f === null) {
+            continue;
+        }
+        $conFoto++;
+        foreach (['file', 'autore', 'licenza', 'licenza_url', 'origine', 'didascalia'] as $campo) {
+            vero(trim((string) ($f[$campo] ?? '')) !== '', "{$k}: manca «{$campo}» nei crediti");
+        }
+        vero(is_file(dirname(__DIR__) . '/assets/img/luoghi/' . $f['file']),
+            "{$k}: il file {$f['file']} non c'e'");
+        vero(str_starts_with((string) $f['licenza_url'], 'https://'),
+            "{$k}: l'indirizzo della licenza deve essere un URL");
+    }
+    vero($conFoto >= 1, 'almeno una fotografia deve esserci');
+});
+
+prova('un luogo senza fotografia non si inventa niente', function () {
+    // `foto()` deve tornare null, non un riquadro rotto, e la scheda ripiega
+    // sull'illustrazione generata.
+    uguale(null, Luoghi::foto('non_esiste'));
+    $senza = null;
+    foreach (array_keys(Luoghi::tutti()) as $k) {
+        if (Luoghi::foto($k) === null) { $senza = $k; break; }
+    }
+    vero($senza !== null, 'ci devono essere luoghi senza fotografia: sono la maggioranza');
+});
+
+prova('ogni luogo ha un\'illustrazione generata valida', function () {
+    // E' il ripiego di tutti i luoghi senza foto, quindi deve reggere per
+    // tutti e ventidue, non solo per quelli che ho guardato.
+    libxml_use_internal_errors(true);
+    $ko = 0;
+    foreach (array_keys(Luoghi::tutti()) as $k) {
+        $svg = App\Game\Illustrazione::perLuogo($k, Orologio::lineare());
+        $d = new DOMDocument();
+        if (!$d->loadXML($svg)) { $ko++; }
+        libxml_clear_errors();
+    }
+    libxml_use_internal_errors(false);
+    uguale(0, $ko, "{$ko} illustrazioni di luogo non sono XML valido");
+
+    // E deve essere stabile: stesso luogo, stesso istante, stessa figura.
+    $t = Orologio::lineare();
+    uguale(App\Game\Illustrazione::perLuogo('tempio', $t),
+           App\Game\Illustrazione::perLuogo('tempio', $t));
+});
+
 prova('le coordinate stanno dentro la carta', function () {
     foreach (Luoghi::tutti() as $k => $l) {
         vero($l['x'] > 30 && $l['x'] < 970, "{$k}: x fuori dai margini");

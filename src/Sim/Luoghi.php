@@ -196,6 +196,37 @@ final class Luoghi
         return $che . $quando;
     }
 
+    /**
+     * La fotografia di un luogo, se ce n'e' una — con chi l'ha scattata.
+     *
+     * Ce ne sono poche apposta: solo i posti che **sono davvero quel posto**,
+     * cioe' i due riscontri reali di Takaoka. Una foto generica di un
+     * passaggio a livello giapponese non e' *il* passaggio a livello, e
+     * spacciarla per tale sarebbe la stessa disonesta' che il progetto evita
+     * dappertutto. Dove non c'e' la foto, la scheda usa l'illustrazione
+     * generata, che non pretende di essere una fotografia.
+     *
+     * @return array{file:string, autore:string, licenza:string, licenza_url:string,
+     *               origine:string, didascalia:string}|null
+     */
+    public static function foto(string $lkey): ?array
+    {
+        static $crediti = null;
+        if ($crediti === null) {
+            $f = ($GLOBALS['__project_root'] ?? dirname(__DIR__, 2)) . '/assets/img/luoghi/crediti.php';
+            $crediti = is_file($f) ? (array) require $f : [];
+        }
+        $c = $crediti[$lkey] ?? null;
+        if ($c === null) {
+            return null;
+        }
+        $percorso = ($GLOBALS['__project_root'] ?? dirname(__DIR__, 2))
+            . '/assets/img/luoghi/' . $c['file'];
+        // Se il file non c'e' piu' — tolto a mano, o mai copiato in
+        // produzione — non si mostra un riquadro rotto.
+        return is_file($percorso) ? $c : null;
+    }
+
     public static function orario(int $minuti): string
     {
         return sprintf('%d:%02d', intdiv($minuti, 60) % 24, $minuti % 60);

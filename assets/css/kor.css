@@ -683,3 +683,23 @@ label.in_linea { display: inline-flex; align-items: center; gap: .4rem; }
   color: var(--inchiostro-tenue);
   padding-top: .35rem;
 }
+
+/* La fotografia di un luogo. Sta in cima alla carta come l'illustrazione di
+   un ricordo, ma porta sempre i crediti: sono foto di altri, con una licenza
+   che vuole l'attribuzione, e l'attribuzione non è un ripensamento. */
+.foto-luogo { margin: 0 0 1rem; }
+.foto-luogo img {
+  display: block;
+  width: calc(100% + 2 * clamp(1.1rem, 3.5vw, 1.8rem));
+  margin: calc(-1 * clamp(1.1rem, 3.5vw, 1.8rem)) calc(-1 * clamp(1.1rem, 3.5vw, 1.8rem)) 0;
+  height: auto;
+  aspect-ratio: 640 / 260;
+  object-fit: cover;
+  border-radius: var(--raggio) var(--raggio) 0 0;
+}
+.foto-luogo figcaption {
+  font-size: .85rem;
+  color: var(--inchiostro-tenue);
+  padding-top: .6rem;
+}
+.foto-luogo figcaption .aiuto { display: block; margin-top: .2rem; }

@@ -95,6 +95,23 @@ final class Illustrazione
         return implode('', array_filter($p));
     }
 
+    /**
+     * L'illustrazione di un **luogo**, non di un ricordo.
+     *
+     * Stessa macchina, seme diverso: si ancora alla chiave del luogo invece
+     * che all'id del ricordo, cosi' lo stesso posto ha sempre la stessa
+     * figura — e cambia solo con la stagione, l'ora e il tempo che fa, che e'
+     * esattamente quello che deve fare.
+     */
+    public static function perLuogo(string $lkey, ?int $gts = null): string
+    {
+        return self::per([
+            'id'    => crc32($lkey) % 100000,
+            'luogo' => $lkey,
+            'gts'   => $gts ?? Orologio::lineare(),
+        ]);
+    }
+
     /** La riga che descrive la figura, per chi non la vede. */
     public static function descrizione(string $lkey, array $cal, array $meteo): string
     {

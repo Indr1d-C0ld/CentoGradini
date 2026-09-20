@@ -22,7 +22,24 @@ $luogo = $dati['luogo'];
   <p class="sommario"><?= e($luogo['sottotitolo']) ?></p>
 <?php endif; ?>
 
+<?php $foto = Luoghi::foto((string) $luogo['lkey']); ?>
 <div class="carta">
+  <?php if ($foto !== null): ?>
+    <figure class="foto-luogo">
+      <img src="<?= e(asset('img/luoghi/' . $foto['file'])) ?>"
+           alt="<?= e($foto['didascalia']) ?>" loading="lazy">
+      <figcaption>
+        <?= e($foto['didascalia']) ?>
+        <span class="aiuto">
+          Foto di <?= e($foto['autore']) ?>,
+          <a href="<?= e($foto['licenza_url']) ?>" rel="license noopener"><?= e($foto['licenza']) ?></a>,
+          da <a href="<?= e($foto['origine']) ?>" rel="noopener">Wikimedia Commons</a>.
+        </span>
+      </figcaption>
+    </figure>
+  <?php else: ?>
+    <?= \App\Game\Illustrazione::perLuogo((string) $luogo['lkey'], $mondo['lineare']) ?>
+  <?php endif; ?>
   <p><?= e($luogo['descrizione']) ?></p>
   <?php $veduta = Luoghi::veduta((string) $luogo['lkey'], $mondo['lineare']); ?>
   <?php if ($veduta !== ''): ?>
