@@ -43,15 +43,59 @@
   }
 
   /* --- Dimensionamento -------------------------------------------------- */
+
+  /* Quanto puo' rimpicciolirsi la carta prima di diventare inutile.
+
+     Il motivo e' aritmetico: le etichette sono disegnate a 15px nel sistema
+     della carta, quindi sotto scala 0,667 scendono sotto i 10px e non si
+     leggono. Su un telefono da 375px la scala sarebbe 0,35 — testo da 5px e
+     luoghi a 33px l'uno dall'altro: illeggibile e impossibile da toccare.
+     Sotto la soglia si smette di rimpicciolire e si lascia scorrere il
+     contenitore: meglio una carta che si trascina di una che non si legge.
+
+     Due numeri e non uno, apposta. LEGGIBILE e' lo spazio sotto il quale
+     conviene trascinare; DISEGNO e' quanto si disegna in quel caso. Con un
+     numero solo, un tablet da 768px — che di spazio utile ne ha 664 — sarebbe
+     finito a trascinare per trentasei pixel guadagnando mezzo pixel di testo:
+     un fastidio vero in cambio di niente.
+
+     A 620 il testo sta a 9,3px: piu' piccolo dei 10 che si vorrebbero, ma
+     leggibile, e vale la pena accettarlo pur di non far trascinare una carta
+     che ci starebbe quasi tutta. Sotto, si trascina. */
+  var LARGHEZZA_LEGGIBILE = 620;
+  var LARGHEZZA_DISEGNO   = 700;
+
+  /* Lo spazio VERO dentro il contenitore: `clientWidth` comprende il margine
+     interno, quindi usarlo cosi' com'e' faceva una carta larga quanto la
+     scatola invece che quanto il suo contenuto — ventisei pixel di troppo.
+     Finche' il contenitore non scorreva la cosa passava inosservata; appena
+     gli si e' dato `overflow-x: auto` e' comparsa una barra di scorrimento
+     anche da monitor, dove non serviva a niente. */
+  function spazioDisponibile() {
+    var p = tela.parentElement;
+    if (!p) { return LARG; }
+    var cs = window.getComputedStyle ? window.getComputedStyle(p) : null;
+    var dentro = cs
+      ? (parseFloat(cs.paddingLeft) || 0) + (parseFloat(cs.paddingRight) || 0)
+      : 0;
+    return Math.max(0, p.clientWidth - dentro);
+  }
+
   function ridimensiona() {
-    var largheDisponibile = tela.parentElement.clientWidth;
+    var disponibile = spazioDisponibile();
+    var larghezza = disponibile >= LARGHEZZA_LEGGIBILE ? disponibile : LARGHEZZA_DISEGNO;
     var dpr = window.devicePixelRatio || 1;
-    scala = largheDisponibile / LARG;
-    tela.style.width = largheDisponibile + 'px';
+    scala = larghezza / LARG;
+    tela.style.width = larghezza + 'px';
     tela.style.height = (ALT * scala) + 'px';
-    tela.width = Math.round(largheDisponibile * dpr);
+    tela.width = Math.round(larghezza * dpr);
     tela.height = Math.round(ALT * scala * dpr);
     ctx.setTransform(dpr * scala, 0, 0, dpr * scala, 0, 0);
+    /* Se la carta e' piu' larga dello spazio, il contenitore lo dichiara:
+       il CSS ci attacca l'ombra che dice «si trascina». */
+    if (tela.parentElement) {
+      tela.parentElement.classList.toggle('si-trascina', larghezza > disponibile + 1);
+    }
     disegna();
   }
 

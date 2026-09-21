@@ -221,6 +221,44 @@ prova('lo script di registrazione non e\' inline', function () {
 });
 
 // =============================================================================
+titolo('Schermi piccoli');
+
+prova('la pagina dichiara la larghezza del dispositivo', function () {
+    // Senza questo meta un telefono finge di essere largo 980px e rimpicciolisce
+    // tutto: e' la prima cosa che rende un sito illeggibile sul telefono.
+    $layout = (string) file_get_contents(dirname(__DIR__) . '/views/layout.php');
+    vero(str_contains($layout, 'name="viewport"'), 'manca il meta viewport');
+    vero(str_contains($layout, 'width=device-width'), 'il viewport non segue il dispositivo');
+});
+
+prova('la carta ha una larghezza sotto cui non scende', function () {
+    // Su un telefono da 375px la carta scalerebbe a 0,35: etichette da 5px e
+    // luoghi a 33px l'uno dall'altro. Le due soglie fanno sì che sotto una
+    // certa misura si smetta di rimpicciolire e si lasci trascinare.
+    $js = (string) file_get_contents(dirname(__DIR__) . '/assets/js/carta.js');
+    vero(str_contains($js, 'LARGHEZZA_LEGGIBILE'), 'manca la soglia di leggibilita\'');
+    vero(str_contains($js, 'LARGHEZZA_DISEGNO'), 'manca la larghezza di disegno');
+
+    // E il conto che le giustifica deve tornare: a quella larghezza le
+    // etichette, disegnate a 15px su una carta da 1000, devono restare sopra
+    // i 9px. Se qualcuno abbassa il numero, questa prova lo ferma.
+    if (preg_match('/LARGHEZZA_DISEGNO\s*=\s*(\d+)/', $js, $m) === 1) {
+        $testo = 15 * ((int) $m[1] / 1000);
+        vero($testo >= 9.0, sprintf('a %dpx le etichette scendono a %.1fpx', (int) $m[1], $testo));
+    } else {
+        vero(false, 'non riesco a leggere la larghezza di disegno');
+    }
+});
+
+prova('il foglio di stile ha una sezione per gli schermi piccoli', function () {
+    $css = (string) file_get_contents(dirname(__DIR__) . '/assets/css/kor.css');
+    vero(str_contains($css, '@media (max-width: 48rem)'), 'manca la media query dei tablet');
+    vero(str_contains($css, '@media (max-width: 34rem)'), 'manca la media query dei telefoni');
+    // La carta deve poter scorrere, o su schermo stretto esce dalla pagina.
+    vero(str_contains($css, '.carta-mappa { overflow-x: auto'), 'la carta non scorre');
+});
+
+// =============================================================================
 titolo('Il bilanciamento');
 
 prova('il rapporto gira e non lascia niente dietro', function () {

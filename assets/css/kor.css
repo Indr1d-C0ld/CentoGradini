@@ -767,3 +767,101 @@ label.in_linea { display: inline-flex; align-items: center; gap: .4rem; }
 .barra-admin a { color: var(--inchiostro-tenue); text-decoration: none; }
 .barra-admin a:hover { color: var(--arancio); text-decoration: underline; }
 .barra-admin strong { color: var(--arancio); }
+
+/* === Schermi piccoli ===================================================== */
+/*
+ * Tutto quello che segue vive dentro una media query: la vista da monitor
+ * non cambia di un pixel. Il criterio non e' «far entrare le cose», che gia'
+ * entravano — il contenitore e' fluido e le tabelle larghe scorrevano gia'
+ * dentro il loro riquadro. Il criterio e' **che si possa leggere e toccare**.
+ */
+
+/* La carta del quartiere non si rimpicciolisce all'infinito: sotto una certa
+   scala le etichette diventano illeggibili (5px su un telefono) e i luoghi
+   finiscono a trenta pixel l'uno dall'altro. Il JavaScript tiene una
+   larghezza minima; qui si lascia scorrere il riquadro. */
+.carta-mappa { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.carta-mappa.si-trascina {
+  /* Un'ombra sul bordo destro dice che c'e' altro, senza scriverlo. */
+  background:
+    linear-gradient(to left, var(--ombra-carta, rgba(0,0,0,.10)), transparent) right / 1.4rem 100% no-repeat;
+}
+
+@media (max-width: 48rem) {
+  /* --- Bersagli tattili ------------------------------------------------
+     I collegamenti in riga («legami · ricordi · taccuino») sono alti 23px e
+     scritti a 11,5px: col pollice si sbaglia bersaglio.
+
+     Il primo tentativo era `padding-block` sull'elemento in linea, che
+     allarga l'area sensibile senza spostare il testo: elegante, ma su un
+     carattere cosi' piccolo arriva solo a 26px, e allargarlo ancora farebbe
+     accavallare le aree di righe diverse. Su schermo stretto conviene
+     `inline-block`: le righe diventano piu' alte, ma il bersaglio c'e'. */
+  .occhiello a,
+  .barra-admin a,
+  .barra-admin strong,
+  .testata nav a,
+  .testata nav button {
+    display: inline-block;
+    padding: .45rem .2rem;
+    min-height: 1.4rem;
+  }
+
+  /* L'interruttore dei suoni era un quadratino da 21px. */
+  .interruttore-suoni { min-width: 2.2rem; min-height: 2.2rem; }
+
+  /* I collegamenti d'azione dentro gli elenchi e gli avvisi: il nome di una
+     persona presente, l'uscita verso un luogo, il «vai a vedere» di un
+     episodio che si e' aperto. Sono bersagli veri, non prosa, e stavano a
+     17px. La prosa dentro i paragrafi la si lascia com'e': allargare ogni
+     collegamento in mezzo a una frase spezzerebbe le righe per niente. */
+  .elenco-persone a,
+  .uscite a,
+  .avviso a { display: inline-block; padding-block: .4rem; }
+
+  /* E un po' d'aria fra una voce e l'altra: a pollice non basta il punto
+     mediano di separazione. */
+  .barra-admin { gap: .2rem .7rem; }
+
+  /* --- Testata più compatta -------------------------------------------
+     A 375px occupava 109px di altezza prima ancora dell'insegna. */
+  .testata { padding-block: .5rem; }
+  .marchio small { display: none; }
+
+  /* --- Moduli ----------------------------------------------------------
+     Campi a tutta larghezza: un campo da 12rem accanto a un bottone, su
+     schermo stretto, diventa una riga che si spezza male. */
+  .leva-valore,
+  .riga-config { flex-direction: column; align-items: stretch; }
+
+  /* I selettori ripetono `[type=...]` apposta. La regola da monitor e'
+     `.leva-valore input[type="number"] { width: 7rem }`, che e' PIU'
+     SPECIFICA di `.leva-valore input`: scritta senza attributo, questa
+     regola perdeva e i campi restavano larghi 112px dentro una colonna a
+     tutta pagina. Stare dentro una media query non aumenta la specificita'. */
+  .leva-valore input[type="number"],
+  .leva-valore input[type="text"],
+  .leva-valore select,
+  .riga-config input[type="text"],
+  .riga-config select { width: 100%; }
+  .riga-config label { width: 100%; }
+
+  /* E i campi sono cose da toccare: 21px non bastano. */
+  input[type="text"], input[type="number"], input[type="email"],
+  input[type="password"], select, textarea { min-height: 2.5rem; font-size: 1rem; }
+
+  /* I bottoni sono cose da premere, non da centrare. */
+  .bottone, button[type="submit"] { min-height: 2.75rem; }
+  .bottone.piccolo { min-height: 2.25rem; }
+}
+
+@media (max-width: 34rem) {
+  /* I numeri delle statistiche: due per riga invece di tre stretti. */
+  .griglia-numeri { grid-template-columns: repeat(auto-fit, minmax(6.5rem, 1fr)); }
+
+  /* Le illustrazioni e le fotografie dei luoghi: su schermo stretto un
+     riquadro 640×260 diventa una striscia di 150px, troppo bassa per
+     vederci qualcosa. Si lascia più alta. */
+  .illustrazione,
+  .foto-luogo img { aspect-ratio: 4 / 3; }
+}
