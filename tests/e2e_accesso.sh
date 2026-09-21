@@ -587,6 +587,16 @@ php bin/console.php user:admin "${UTENTE}" >/dev/null 2>&1 || true
 if contiene "${BASE}/admin" "Amministrazione"; then verde "/admin si apre per un amministratore"; else rosso "/admin non si apre nemmeno da amministratore"; fi
 if contiene "${BASE}/admin" "Le manopole del mondo"; then verde "e mostra le manopole"; else rosso "il pannello e' incompleto"; fi
 
+# Le tre schermate profonde.
+if contiene "${BASE}/admin/statistiche" "Il Segreto"; then verde "le statistiche si aprono"; else rosso "/admin/statistiche"; fi
+if contiene "${BASE}/admin/statistiche" "degli usi viene notato"; then verde "e misurano se il Segreto morde"; else rosso "manca la quota di usi notati"; fi
+if contiene "${BASE}/admin/statistiche" "passaggi medi"; then verde "e se le voci si propagano"; else rosso "mancano le statistiche delle voci"; fi
+if contiene "${BASE}/admin/accessi" "Per indirizzo"; then verde "gli accessi si aprono"; else rosso "/admin/accessi"; fi
+if contiene "${BASE}/admin/accessi" "Ultimi movimenti"; then verde "e mostrano il registro"; else rosso "manca il registro degli accessi"; fi
+if contiene "${BASE}/admin/impostazioni" "Le leve del mondo"; then verde "le leve si aprono"; else rosso "/admin/impostazioni"; fi
+if contiene "${BASE}/admin/impostazioni" "orologio del mondo"; then verde "e sono raggruppate per famiglia"; else rosso "le leve non sono raggruppate"; fi
+if contiene "${BASE}/admin/impostazioni" "voci.durata_giorni"; then verde "e ci sono tutte"; else rosso "manca qualche leva"; fi
+
 # Cambiare una manopola dal pannello deve cambiarla davvero.
 PRIMA=$(php bin/console.php config:get voci.durata_giorni 2>/dev/null | tr -dc '0-9')
 T=$(gettone "${BASE}/admin")

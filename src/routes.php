@@ -95,6 +95,9 @@ $router->get('/admin/utenti', [AdminController::class, 'utenti'], ['active', 'ad
 $router->get('/admin/mappa', [AdminController::class, 'mappa'], ['active', 'admin']);
 $router->get('/admin/utente/{id}', [AdminController::class, 'utente'], ['active', 'admin']);
 $router->post('/admin/moderazione', [AdminController::class, 'moderazione'], ['active', 'admin', 'throttle']);
+$router->get('/admin/statistiche', [AdminController::class, 'statistiche'], ['active', 'admin']);
+$router->get('/admin/accessi', [AdminController::class, 'accessi'], ['active', 'admin']);
+$router->get('/admin/impostazioni', [AdminController::class, 'impostazioni'], ['active', 'admin']);
 
 // Le due chiamate che la pagina fa da sola, senza ricaricarsi.
 $router->get('/api/carta', [QuartiereController::class, 'carta'], ['active']);

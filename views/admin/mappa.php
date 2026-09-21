@@ -11,7 +11,7 @@ use App\Sim\Orologio;
 $giocatori = array_sum(array_map(static fn (array $l): int => count($l['giocatori']), $luoghi));
 $abitanti  = array_sum(array_map(static fn (array $l): int => count($l['abitanti']), $luoghi));
 ?>
-<?= partial('admin_nav', ['qui' => '/admin/mappa']) ?>
+<?= partial('nav_admin', ['qui' => '/admin/mappa']) ?>
 <h1>La situazione</h1>
 <p class="sommario">
   <?= e(Orologio::esteso($gts)) ?>, ora del quartiere.

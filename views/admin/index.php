@@ -14,7 +14,7 @@ use App\Sim\Orologio;
 $ultimo   = $battiti[0] ?? null;
 $ritardo  = $ultimo === null ? null : (time() - strtotime((string) $ultimo['started_at']));
 ?>
-<?= partial('admin_nav', ['qui' => '/admin']) ?>
+<?= partial('nav_admin', ['qui' => '/admin']) ?>
 <h1>Amministrazione</h1>
 
 <?php if ($ritardo === null): ?>

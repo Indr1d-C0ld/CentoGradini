@@ -14,6 +14,7 @@ use App\Game\Eventi;
 use App\Game\Bacheca;
 use App\Game\Mondo;
 use App\Game\Segreto;
+use App\Game\Statistiche;
 use App\Sim\Folla;
 use App\Sim\Luoghi;
 use App\Sim\Calendario;
@@ -300,6 +301,154 @@ final class AdminController
                  WHERE m.personaggio_id = ?', [$pgId]),
         ];
     }
+
+    // --- Le statistiche ----------------------------------------------------------
+
+    public function statistiche(Request $request): Response
+    {
+        return Response::html(view('admin/statistiche', [
+            'title'       => 'Statistiche',
+            'mondo'       => Mondo::adesso(),
+            's_mondo'     => Statistiche::mondo(),
+            'popolazione' => Statistiche::popolazione(),
+            'segreto'     => Statistiche::segreto(),
+            'legami'      => Statistiche::legami(),
+            'voci'        => Statistiche::voci(),
+            'episodi'     => Statistiche::episodi(),
+            'quartiere'   => Statistiche::quartiere(),
+            'macchina'    => Statistiche::macchina(),
+        ]));
+    }
+
+    // --- Gli accessi --------------------------------------------------------------
+
+    /**
+     * Chi entra, da dove, e chi ci prova senza riuscirci.
+     *
+     * Tutto viene da `audit_log`, che registra gia' accessi riusciti,
+     * falliti, iscrizioni, conferme e uscite. Non serviva una tabella nuova:
+     * serviva guardare quella che c'era.
+     *
+     * L'aggregazione per **indirizzo** e' la vista che conta davvero. Un
+     * indirizzo con venti tentativi falliti e zero riusciti su tre account
+     * diversi non e' un utente distratto.
+     */
+    public function accessi(Request $request): Response
+    {
+        $perIndirizzo = Database::all(
+            "SELECT a.ip,
+                    COUNT(*) tentativi,
+                    SUM(a.action = 'auth.login') riusciti,
+                    SUM(a.action = 'auth.login_failed') falliti,
+                    COUNT(DISTINCT a.actor_user_id) account,
+                    MIN(a.created_at) primo,
+                    MAX(a.created_at) ultimo
+             FROM audit_log a
+             WHERE a.ip IS NOT NULL AND a.action IN ('auth.login', 'auth.login_failed', 'auth.register')
+             GROUP BY a.ip
+             ORDER BY falliti DESC, tentativi DESC
+             LIMIT 60"
+        );
+        foreach ($perIndirizzo as &$r) {
+            $r['indirizzo'] = self::leggibile($r['ip']);
+        }
+        unset($r);
+
+        $recenti = Database::all(
+            "SELECT a.action, a.ip, a.created_at, a.meta, u.username
+             FROM audit_log a LEFT JOIN users u ON u.id = a.actor_user_id
+             WHERE a.action LIKE 'auth.%'
+             ORDER BY a.id DESC LIMIT 50"
+        );
+        foreach ($recenti as &$r) {
+            $r['indirizzo'] = self::leggibile($r['ip']);
+        }
+        unset($r);
+
+        return Response::html(view('admin/accessi', [
+            'title'      => 'Accessi e origini',
+            'mondo'      => Mondo::adesso(),
+            'indirizzi'  => $perIndirizzo,
+            'recenti'    => $recenti,
+            'collegati'  => Database::all(
+                'SELECT username, last_seen_at, last_login_at, last_login_ip, status, role
+                 FROM users WHERE last_seen_at >= NOW() - INTERVAL 30 MINUTE
+                 ORDER BY last_seen_at DESC'),
+            'freni'      => Database::all(
+                'SELECT rkey, hits, reset_at FROM rate_limits
+                 WHERE reset_at > NOW() ORDER BY hits DESC LIMIT 20'),
+        ]));
+    }
+
+    /** Un indirizzo binario torna leggibile, o «—» se non c'e'. */
+    private static function leggibile(mixed $ip): string
+    {
+        if ($ip === null || $ip === '') {
+            return '—';
+        }
+        $s = @inet_ntop(is_string($ip) ? $ip : (string) $ip);
+        return $s === false ? '?' : $s;
+    }
+
+    // --- Le leve del mondo ---------------------------------------------------------
+
+    /**
+     * Tutte le manopole, raggruppate per famiglia e con il loro tipo.
+     *
+     * Il cruscotto ne aveva una versione sbrigativa: un menu a tendina con
+     * quarantanove voci e una casella di testo. Funzionava e si leggeva male,
+     * e soprattutto non diceva **che cosa fa** ciascuna manopola — la nota
+     * c'era a database e non la mostrava nessuno. Qui ogni riga ha il suo
+     * campo del tipo giusto, la sua spiegazione, e quando e' stata toccata
+     * l'ultima volta.
+     */
+    public function impostazioni(Request $request): Response
+    {
+        $cerca = trim($request->str('cerca'));
+        $righe = Database::all('SELECT * FROM game_config ORDER BY ckey');
+
+        $famiglie = [];
+        foreach ($righe as $r) {
+            $k = (string) $r['ckey'];
+            if ($cerca !== '' && stripos($k . ' ' . (string) $r['note'], $cerca) === false) {
+                continue;
+            }
+            $famiglie[explode('.', $k)[0]][] = $r;
+        }
+        ksort($famiglie);
+
+        return Response::html(view('admin/impostazioni', [
+            'title'    => 'Le leve del mondo',
+            'mondo'    => Mondo::adesso(),
+            'famiglie' => $famiglie,
+            'cerca'    => $cerca,
+            'quante'   => count($righe),
+            'titoli'   => self::TITOLI_FAMIGLIA,
+        ]));
+    }
+
+    /**
+     * Come si chiama, a parole, ciascuna famiglia di manopole.
+     *
+     * @var array<string, string>
+     */
+    private const TITOLI_FAMIGLIA = [
+        'auth'      => 'Accessi e iscrizioni',
+        'bacheca'   => 'La bacheca',
+        'biglietti' => 'I biglietti',
+        'blocco'    => 'Spegnere i poteri',
+        'clock'     => 'L\'orologio del mondo',
+        'club'      => 'I club',
+        'episodi'   => 'Gli episodi',
+        'legami'    => 'Affetto e fraintendimento',
+        'limits'    => 'I freni',
+        'mail'      => 'La posta',
+        'mondo'     => 'Il quartiere',
+        'pg'        => 'La creazione del personaggio',
+        'segreto'   => 'Il Segreto',
+        'voci'      => 'Le voci',
+        'world'     => 'Il seme del mondo',
+    ];
 
     // --- Raccolta ---------------------------------------------------------------
 

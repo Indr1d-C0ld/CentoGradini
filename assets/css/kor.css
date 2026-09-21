@@ -703,3 +703,41 @@ label.in_linea { display: inline-flex; align-items: center; gap: .4rem; }
   padding-top: .6rem;
 }
 .foto-luogo figcaption .aiuto { display: block; margin-top: .2rem; }
+
+/* Le leve: una riga per manopola, con il nome e la spiegazione a sinistra,
+   il campo a destra. Su schermo stretto si impila. */
+.leva {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: .3rem 1rem;
+  align-items: start;
+  padding: .6rem 0;
+  border-top: 1px solid var(--bordo);
+}
+.leva:first-of-type { border-top: none; }
+.leva-nome code { font-size: .88rem; }
+.leva-nome .aiuto { display: block; margin-top: .1rem; }
+.leva-valore { display: flex; gap: .4rem; align-items: center; }
+.leva-valore input[type="number"] { width: 7rem; }
+.leva-valore input[type="text"]   { width: 12rem; }
+.leva-meta { grid-column: 1 / -1; }
+@media (max-width: 34rem) {
+  .leva { grid-template-columns: 1fr; }
+}
+/* Una riga che merita attenzione nelle tabelle dell'amministrazione. */
+.riga-allarme td { background: color-mix(in srgb, #b3382c 10%, transparent); }
+
+/* Una barretta per leggere una proporzione senza contare le cifre. */
+.barra {
+  display: inline-block;
+  width: 5rem; height: .5rem;
+  background: var(--fondo-cavo);
+  border: 1px solid var(--bordo);
+  border-radius: 999px;
+  overflow: hidden;
+  vertical-align: middle;
+  margin-left: .3rem;
+}
+.barra > span { display: block; height: 100%; background: var(--arancio); }
+.riga-spenta td { opacity: .5; }
+.carta h3 { margin: 1.2rem 0 .4rem; font-size: 1rem; }

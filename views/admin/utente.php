@@ -8,7 +8,7 @@ use App\Game\Scheda;
 use App\Sim\Luoghi;
 use App\Sim\Scuola;
 ?>
-<?= partial('admin_nav', ['qui' => '/admin/utenti']) ?>
+<?= partial('nav_admin', ['qui' => '/admin/utenti']) ?>
 <h1><?= e($u['username']) ?>
   <?php if ((string) $u['role'] === 'admin'): ?><span class="pastiglia">admin</span><?php endif; ?>
 </h1>
