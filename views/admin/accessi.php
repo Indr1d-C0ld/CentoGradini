@@ -12,7 +12,6 @@ $etichetta = static fn (string $a): string => match ($a) {
     default             => $a,
 };
 ?>
-<?= partial('nav_admin', ['qui' => '/admin/accessi']) ?>
 <h1>Accessi e origini</h1>
 <p class="sommario">
   Tutto quello che c'è in questa pagina viene dal registro, che annota già accessi riusciti,

@@ -741,3 +741,29 @@ label.in_linea { display: inline-flex; align-items: center; gap: .4rem; }
 .barra > span { display: block; height: 100%; background: var(--arancio); }
 .riga-spenta td { opacity: .5; }
 .carta h3 { margin: 1.2rem 0 .4rem; font-size: 1rem; }
+
+/* La barra dell'amministrazione: sta sotto la testata e la vede solo chi e'
+   amministratore. Volutamente sobria e diversa dal resto — non deve sembrare
+   navigazione di gioco, e non deve rubare l'occhio mentre si gioca. */
+.barra-admin {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: .1rem .9rem;
+  padding: .35rem clamp(.8rem, 3vw, 1.6rem);
+  background: var(--fondo-cavo);
+  border-bottom: 1px solid var(--bordo);
+  font-size: .85rem;
+}
+.barra-admin-etichetta {
+  font-size: .7rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--su-arancio);
+  background: var(--arancio);
+  border-radius: 999px;
+  padding: .05rem .5rem;
+}
+.barra-admin a { color: var(--inchiostro-tenue); text-decoration: none; }
+.barra-admin a:hover { color: var(--arancio); text-decoration: underline; }
+.barra-admin strong { color: var(--arancio); }

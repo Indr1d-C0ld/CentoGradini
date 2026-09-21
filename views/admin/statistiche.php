@@ -17,7 +17,6 @@ $barra = static function (float $frazione): string {
     return '<span class="barra"><span style="width:' . round($p * 100, 1) . '%"></span></span>';
 };
 ?>
-<?= partial('nav_admin', ['qui' => '/admin/statistiche']) ?>
 <h1>Statistiche</h1>
 <p class="sommario">
   Non sono un cruscotto di vanità: servono a rispondere alle domande che dicono se il gioco

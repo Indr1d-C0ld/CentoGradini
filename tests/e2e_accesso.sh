@@ -582,9 +582,19 @@ if contiene "${BASE}/ricordi" 'Un pomeriggio qualunque'; then verde "e il ricord
 # /admin: prima negato, poi concesso.
 CODICE=$(curl -sS -o /dev/null -w '%{http_code}' -b "${BISCOTTI}" "${BASE}/admin")
 if [[ "${CODICE}" == "403" ]]; then verde "/admin e' chiuso a chi non e' amministratore"; else rosso "/admin da' ${CODICE} a un giocatore normale"; fi
+if contiene "${BASE}/quartiere" 'class="barra-admin"'; then
+  rosso "un giocatore normale vede la barra admin"; else verde "e un giocatore normale non la vede nemmeno"; fi
 
 php bin/console.php user:admin "${UTENTE}" >/dev/null 2>&1 || true
 if contiene "${BASE}/admin" "Amministrazione"; then verde "/admin si apre per un amministratore"; else rosso "/admin non si apre nemmeno da amministratore"; fi
+
+# La barra dell'amministrazione sta nella testata, quindi si raggiunge da
+# qualunque pagina: prima esisteva solo dentro /admin e bisognava sapere
+# l'indirizzo a memoria.
+if contiene "${BASE}/quartiere" 'class="barra-admin"'; then
+  verde "la barra admin c'e' anche mentre si gioca"; else rosso "la barra admin non compare fuori da /admin"; fi
+if contiene "${BASE}/quartiere" "statistiche"; then
+  verde "e porta alle sezioni"; else rosso "la barra admin non elenca le sezioni"; fi
 if contiene "${BASE}/admin" "Le manopole del mondo"; then verde "e mostra le manopole"; else rosso "il pannello e' incompleto"; fi
 
 # Le tre schermate profonde.

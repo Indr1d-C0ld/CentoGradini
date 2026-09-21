@@ -244,6 +244,19 @@ if (!function_exists('auth_check')) {
     }
 }
 
+if (!function_exists('percorso')) {
+    /**
+     * Dove siamo, nella forma che usano le rotte: «/admin/utenti».
+     *
+     * Lo deposita `index.php` da `Request::path()`: non si ricalcola qui,
+     * o sarebbe una seconda copia della stessa logica.
+     */
+    function percorso(): string
+    {
+        return (string) ($GLOBALS['__percorso'] ?? '/');
+    }
+}
+
 if (!function_exists('is_admin')) {
     function is_admin(): bool
     {

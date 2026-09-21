@@ -52,6 +52,10 @@ $titoloPagina = (string) ($title ?? $nomeGioco);
   </nav>
 </header>
 
+
+<?php if (is_admin()): ?>
+  <?= partial('nav_admin') ?>
+<?php endif; ?>
 <main class="contenuto <?= e($larghezza ?? '') ?>">
   <?= partial('flash') ?>
   <?= $content ?>

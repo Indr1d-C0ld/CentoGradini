@@ -72,6 +72,11 @@ $request = new Request(
 );
 $GLOBALS['__base_path']  = $request->basePath();
 $GLOBALS['__url_prefix'] = $request->urlPrefix();
+// Il percorso lo calcola gia' Request, che sa districare PATH_INFO, il
+// prefisso e /index.php. Lo si deposita qui perche' le viste possano sapere
+// dove si trovano — ricalcolarlo in un helper vorrebbe dire una seconda
+// copia di quella logica, e prima o poi le due divergono.
+$GLOBALS['__percorso']   = $request->path();
 
 // --- Instradamento -----------------------------------------------------------
 $router = new Router();

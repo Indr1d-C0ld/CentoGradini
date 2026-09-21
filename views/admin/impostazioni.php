@@ -4,7 +4,6 @@
 /** @var string $cerca */
 /** @var int $quante */
 ?>
-<?= partial('nav_admin', ['qui' => '/admin/impostazioni']) ?>
 <h1>Le leve del mondo</h1>
 <p class="sommario">
   <?= (int) $quante ?> manopole, raggruppate per famiglia. Cambiano il gioco <strong>per

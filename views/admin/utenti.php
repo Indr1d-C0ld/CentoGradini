@@ -17,7 +17,6 @@ $quando = static function (?string $t, int $ora): string {
 };
 $online = static fn (?string $t, int $ora): bool => $t !== null && ($ora - strtotime($t)) < 600;
 ?>
-<?= partial('nav_admin', ['qui' => '/admin/utenti']) ?>
 <h1>Gli utenti</h1>
 <p class="sommario">
   <?= count($utenti) ?> account.
