@@ -5,10 +5,12 @@
 /storage/cache/
 /.claude/
 
-# Le fotografie caricate dai giocatori: sono di persone vere e non entrano in
-# nessun repository, ne' in quello privato. La cartella si tiene (.gitkeep).
+# Le fotografie che i giocatori caricano come faccia del proprio personaggio:
+# sono immagini di persone vere, caricate per giocare e non per finire su un
+# repository. La cartella si tiene, il contenuto no.
 /assets/img/ritratti/*
 !/assets/img/ritratti/.gitkeep
+
 __pycache__/
 
 .DS_Store

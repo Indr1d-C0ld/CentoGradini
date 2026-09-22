@@ -285,11 +285,20 @@ non si accettano. Il nome del file è l'impronta sha256 del risultato, quindi no
 è indovinabile e due fotografie identiche occupano un file solo — con la
 conseguenza che toglierla a uno non la toglie all'altro.
 
-Le fotografie non entrano in nessuno dei due repository e non vengono copiate
-dal deploy: sono immagini di persone vere, stanno solo in produzione, e la copia
-con `--delete` le salterebbe a piè pari invece di cancellarle. Chi amministra
-può correggere il profilo di un giocatore — fotografia e aspetto — dalla scheda
-dell'utente, e ogni modifica fatta a un altro finisce nel registro.
+Le fotografie nascono **solo sull'installazione viva** — le scrive il server web
+quando qualcuno ne carica una — e il deploy in andata le salta apposta, perché
+una copia con `--delete` le cancellerebbe tutte a ogni pubblicazione. Al ritorno
+`deploy/04-fotografie.sh` le ritira e le porta nell'albero di lavoro, perché il
+backup integrale le deve contenere: sono l'unica cosa che i giocatori mettono di
+loro, e un backup che le salta ha un buco esattamente lì. In questa copia
+pubblica non ce ne sono e non ce ne saranno: `.gitignore` le ignora, e lo
+strumento che deriva la copia pubblica dal nostro albero le esclude e si rifiuta
+di procedere se ne trova anche una sola — sono immagini di persone vere,
+caricate per giocare e non per finire su un repository aperto.
+
+Chi amministra può correggere il profilo di un giocatore — fotografia e aspetto
+— dalla scheda dell'utente, e ogni modifica fatta a un altro finisce nel
+registro.
 
 ---
 

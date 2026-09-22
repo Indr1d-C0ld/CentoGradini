@@ -34,7 +34,10 @@ rsync -a --delete "${PROVA[@]}" \
   --itemize-changes \
   "$SORGENTE"/ "$DESTINAZIONE"/
 
-[ ${#PROVA[@]} -gt 0 ] && exit 0
+if [ ${#PROVA[@]} -gt 0 ]; then
+  "$SORGENTE/deploy/04-fotografie.sh" --prova
+  exit 0
+fi
 
 # storage e ritratti sono esclusi dalla copia: esistono solo in produzione e
 # devono restare scrivibili da Apache.
@@ -65,5 +68,11 @@ ORANGEROAD_CONFIG="$CONFIG" php "$DESTINAZIONE/bin/console.php" migrate
 
 echo ">>> semi"
 ORANGEROAD_CONFIG="$CONFIG" php "$DESTINAZIONE/bin/console.php" seed
+
+# In andata le fotografie dei giocatori si saltano; al ritorno si ritirano, se
+# no il backup integrale avrebbe un buco proprio dove sta l'unica cosa che i
+# giocatori mettono di loro. Vedi 04-fotografie.sh.
+echo ">>> fotografie dei giocatori"
+"$SORGENTE/deploy/04-fotografie.sh"
 
 echo ">>> fatto."
