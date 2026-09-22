@@ -798,6 +798,14 @@ if contiene "${BASE}/admin" ">Array<"; then
 else verde "e ne mostra i valori veri, non «Array»"; fi
 if contiene "${BASE}/admin" "world.seed"; then
   verde "col nome della manopola accanto"; else rosso "le manopole non compaiono per nome"; fi
+# La prova gira con la configurazione locale, che tiene il trasporto su «log»:
+# il cruscotto DEVE dirlo. Una posta spenta ha l'aspetto di una posta sana —
+# la coda resta vuota perche' Mailer in modalita' log risponde «riuscito» — ed
+# e' cosi' che le conferme d'iscrizione sono finite in un file per tre giorni
+# mentre chi si era iscritto aspettava.
+if contiene "${BASE}/admin" "La posta non parte"; then
+  verde "e avvisa che con questa configurazione la posta non parte"
+else rosso "il cruscotto non avvisa che il trasporto della posta e' spento"; fi
 
 # Le tre schermate profonde.
 if contiene "${BASE}/admin/statistiche" "Il Segreto"; then verde "le statistiche si aprono"; else rosso "/admin/statistiche"; fi

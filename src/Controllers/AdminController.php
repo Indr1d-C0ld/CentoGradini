@@ -49,6 +49,9 @@ final class AdminController
             'battiti'    => $this->battiti(),
             'posta'      => $this->posta(),
             'config'     => GameConfig::all(),
+            // Il trasporto della posta, non solo la coda: una coda vuota con il
+            // trasporto spento ha esattamente l'aspetto di una posta sana.
+            'trasporto'  => (string) \App\Core\Config::get('mail.transport', 'log'),
         ]));
     }
 

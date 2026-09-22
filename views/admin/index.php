@@ -7,6 +7,7 @@
 /** @var array<string,int> $numeri */
 /** @var list<array<string,mixed>> $battiti */
 /** @var array<string,mixed> $posta */
+/** @var string $trasporto */
 /** @var array<string,mixed> $config */
 use App\Sim\Luoghi;
 use App\Sim\Orologio;
@@ -70,7 +71,22 @@ $ritardo  = $ultimo === null ? null : (time() - strtotime((string) $ultimo['star
     Posta: <?= (int) $posta['in_coda'] ?> in coda,
     <?= (int) $posta['inviate_24h'] ?>/<?= (int) $posta['tetto'] ?> inviate nelle ultime 24 ore,
     <?= (int) $posta['rinunciate'] ?> rinunciate.
+    Trasporto: <strong><?= e($trasporto) ?></strong>.
   </p>
+  <?php if ($trasporto !== 'smtp'): ?>
+    <?php /* Senza questo avviso una posta spenta ha l'aspetto di una posta sana:
+             la coda resta vuota perche' `Mailer::send()` in modalita' «log»
+             scrive il messaggio e risponde «riuscito». E' cosi' che per tre
+             giorni le conferme d'iscrizione sono finite in un file invece che
+             a destinazione, mentre chi si era iscritto aspettava. */ ?>
+    <div class="avviso attenzione">
+      <strong>La posta non parte.</strong>
+      Il trasporto è <code><?= e($trasporto) ?></code>: i messaggi vengono scritti in
+      <code>storage/logs/</code> e basta, e la coda resta vuota come se fossero partiti.
+      <strong>Nessuno può completare l'iscrizione</strong>, perché la conferma non arriva.
+      Si sistema in <code>mail.transport</code> del file di configurazione, non da qui.
+    </div>
+  <?php endif; ?>
 </div>
 
 <div class="carta">
