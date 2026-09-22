@@ -81,10 +81,10 @@ $ritardo  = $ultimo === null ? null : (time() - strtotime((string) $ultimo['star
     <tbody>
     <?php foreach ($battiti as $b): ?>
       <tr>
-        <td><?= e(substr((string) $b['started_at'], 5, 14)) ?></td>
-        <td><?= (int) $b['ok'] === 1 ? 'ok' : '<strong>errore</strong>' ?></td>
-        <td><?= (int) $b['duration_ms'] ?></td>
-        <td class="minuto">
+        <td data-etichetta="quando"><?= e(substr((string) $b['started_at'], 5, 14)) ?></td>
+        <td data-etichetta="esito"><?= (int) $b['ok'] === 1 ? 'ok' : '<strong>errore</strong>' ?></td>
+        <td data-etichetta="ms"><?= (int) $b['duration_ms'] ?></td>
+        <td class="minuto" data-etichetta="cosa ha fatto">
           <?php
             $t = json_decode((string) ($b['tasks'] ?? '{}'), true);
             $pezzi = [];
@@ -126,7 +126,7 @@ $ritardo  = $ultimo === null ? null : (time() - strtotime((string) $ultimo['star
     <thead><tr><th>chiave</th><th>valore</th></tr></thead>
     <tbody>
     <?php foreach ($config as $k => $v): ?>
-      <tr><td class="minuto"><?= e($k) ?></td><td><?= e((string) $v) ?></td></tr>
+      <tr><td class="minuto" data-etichetta="chiave"><?= e($k) ?></td><td data-etichetta="valore"><?= e((string) $v) ?></td></tr>
     <?php endforeach; ?>
     </tbody>
   </table>

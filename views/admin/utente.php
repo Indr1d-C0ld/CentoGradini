@@ -181,9 +181,9 @@ use App\Sim\Scuola;
     <tbody>
     <?php foreach ($registro as $r): ?>
       <tr>
-        <td class="minuto"><?= e(substr((string) $r['created_at'], 5, 14)) ?></td>
-        <td class="minuto"><?= e($r['action']) ?></td>
-        <td class="aiuto"><?= e(mb_strimwidth((string) ($r['meta'] ?? ''), 0, 80, '…')) ?></td>
+        <td class="minuto" data-etichetta="quando"><?= e(substr((string) $r['created_at'], 5, 14)) ?></td>
+        <td class="minuto" data-etichetta="cosa"><?= e($r['action']) ?></td>
+        <td class="aiuto" data-etichetta="dettagli"><?= e(mb_strimwidth((string) ($r['meta'] ?? ''), 0, 80, '…')) ?></td>
       </tr>
     <?php endforeach; ?>
     </tbody>

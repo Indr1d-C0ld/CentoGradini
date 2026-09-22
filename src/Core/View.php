@@ -61,15 +61,24 @@ final class View
      * Quanto è larga la colonna.
      *
      * Il corpo del sito è tarato sulla lettura: quarantadue rem sono la misura
-     * di riga che si legge senza fatica. La carta del quartiere però è un
-     * disegno, non un testo, e stretta in quella colonna i nomi dei diciassette
-     * luoghi si accavallano. Le pagine con una carta prendono la colonna larga;
-     * tutte le altre no, perché allargare per abitudine peggiora la lettura
+     * di riga che si legge senza fatica. Due tipi di pagina non sono prosa e
+     * in quella colonna stanno strette:
+     *
+     *  * la carta del quartiere, che è un disegno — a 42rem i nomi dei
+     *    ventidue luoghi si accavallano;
+     *  * tutto il pannello di amministrazione, che è fatto di tabelle a sei o
+     *    sette colonne. Misurato: l'elenco degli utenti chiede 673 pixel, e in
+     *    colonna da 42rem gliene restano 548. Il risultato era una barra di
+     *    scorrimento orizzontale dentro il riquadro, cioè dati nascosti dietro
+     *    un gesto che nessuno fa.
+     *
+     * Tutte le altre no, perché allargare per abitudine peggiora la lettura
      * dappertutto.
      */
     private static function larghezza(string $vista): string
     {
-        return ltrim($vista, '/') === 'gioco/quartiere' ? 'largo' : '';
+        $v = ltrim($vista, '/');
+        return ($v === 'gioco/quartiere' || str_starts_with($v, 'admin/')) ? 'largo' : '';
     }
 
 

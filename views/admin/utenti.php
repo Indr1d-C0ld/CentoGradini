@@ -44,14 +44,14 @@ $online = static fn (?string $t, int $ora): bool => $t !== null && ($ora - strto
   <tbody>
   <?php foreach ($utenti as $u): ?>
     <tr>
-      <td><?= $online($u['last_seen_at'], $ora) ? '<span class="pallino acceso" title="collegato"></span>'
+      <td data-etichetta="collegato"><?= $online($u['last_seen_at'], $ora) ? '<span class="pallino acceso" title="collegato"></span>'
                                                 : '<span class="pallino"></span>' ?></td>
-      <td>
+      <td data-etichetta="utente">
         <a href="<?= e(url('/admin/utente/' . (int) $u['id'])) ?>"><strong><?= e($u['username']) ?></strong></a>
         <?php if ((string) $u['role'] === 'admin'): ?><span class="pastiglia">admin</span><?php endif; ?>
         <br><span class="aiuto minuto"><?= e($u['email']) ?></span>
       </td>
-      <td>
+      <td data-etichetta="stato">
         <span class="stato stato-<?= e($u['status']) ?>"><?= e(match ((string) $u['status']) {
             'active' => 'attivo', 'pending' => 'da confermare',
             'suspended' => 'sospeso', 'banned' => 'bandito', default => (string) $u['status'],
@@ -60,7 +60,7 @@ $online = static fn (?string $t, int $ora): bool => $t !== null && ($ora - strto
           <br><span class="aiuto"><?= e(mb_strimwidth((string) $u['nota_admin'], 0, 44, '…')) ?></span>
         <?php endif; ?>
       </td>
-      <td>
+      <td data-etichetta="personaggio">
         <?php if ($u['pg_id'] === null): ?>
           <span class="aiuto">nessuno</span>
         <?php else: ?>
@@ -73,9 +73,9 @@ $online = static fn (?string $t, int $ora): bool => $t !== null && ($ora - strto
           </span>
         <?php endif; ?>
       </td>
-      <td><?= $u['luogo'] === null ? '<span class="aiuto">—</span>' : e(Luoghi::nome((string) $u['luogo'])) ?></td>
-      <td class="minuto"><?= e($quando($u['last_login_at'], $ora)) ?></td>
-      <td class="minuto"><?= e($quando($u['last_seen_at'], $ora)) ?></td>
+      <td data-etichetta="dove"><?= $u['luogo'] === null ? '<span class="aiuto">—</span>' : e(Luoghi::nome((string) $u['luogo'])) ?></td>
+      <td class="minuto" data-etichetta="ultimo accesso"><?= e($quando($u['last_login_at'], $ora)) ?></td>
+      <td class="minuto" data-etichetta="visto"><?= e($quando($u['last_seen_at'], $ora)) ?></td>
     </tr>
   <?php endforeach; ?>
   </tbody>

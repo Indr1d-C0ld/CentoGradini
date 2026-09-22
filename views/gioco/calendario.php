@@ -55,11 +55,11 @@ $mesi = [1 => 'gennaio', 'febbraio', 'marzo', 'aprile', 'maggio', 'giugno',
     <tbody>
     <?php foreach ($tutti as $e): ?>
       <tr>
-        <td><?= (int) $e['giorno'] ?> <?= e($mesi[(int) $e['mese']] ?? '') ?><?php
+        <td data-etichetta="quando"><?= (int) $e['giorno'] ?> <?= e($mesi[(int) $e['mese']] ?? '') ?><?php
           if ((int) $e['durata'] > 1): ?> <span class="aiuto">· <?= (int) $e['durata'] ?> giorni</span><?php
           endif; ?></td>
-        <td><?= e($e['nome']) ?></td>
-        <td><?= (string) $e['luogo'] === ''
+        <td data-etichetta="cosa"><?= e($e['nome']) ?></td>
+        <td data-etichetta="dove"><?= (string) $e['luogo'] === ''
               ? '<span class="aiuto">ovunque</span>'
               : e(Luoghi::nome((string) $e['luogo'])) ?></td>
       </tr>

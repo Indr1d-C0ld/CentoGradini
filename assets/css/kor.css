@@ -895,6 +895,60 @@ label.in_linea { display: inline-flex; align-items: center; gap: .4rem; }
 }
 
 @media (max-width: 48rem) {
+  /* --- Tabelle: le righe si impilano invece di scorrere ------------------
+     Sotto questa misura nessuna larghezza salva una tabella da sette colonne:
+     su un telefono da 375px restano circa 250 pixel utili, e l'elenco degli
+     utenti ne chiede 673. La barra di scorrimento orizzontale dentro il
+     riquadro non e' una soluzione — e' un modo di nascondere meta' dei dati
+     dietro un gesto che nessuno fa.
+
+     Quindi ogni riga diventa una scheda e ogni cella una coppia
+     «etichetta: valore». L'intestazione sparisce perche' si e' trasferita
+     dentro le celle, nell'attributo `data-etichetta`; una cella che non ce
+     l'ha occupa tutta la larghezza, ed e' il caso giusto per le colonne il
+     cui contenuto si spiega da solo. */
+  .tabella-scorre { overflow-x: visible; }
+  .tabella-scorre .tabella,
+  .tabella-scorre .tabella tbody,
+  .tabella-scorre .tabella tr,
+  .tabella-scorre .tabella td { display: block; width: auto; }
+  .tabella-scorre .tabella thead { display: none; }
+
+  .tabella-scorre .tabella tr {
+    border: 1px solid var(--bordo);
+    border-radius: var(--raggio);
+    padding: .5rem .7rem;
+    margin-bottom: .7rem;
+    background: var(--fondo-carta);
+  }
+  .tabella-scorre .tabella tr:last-child { margin-bottom: 0; }
+
+  .tabella-scorre .tabella td {
+    border-bottom: 1px solid var(--bordo);
+    padding: .38rem 0;
+  }
+  .tabella-scorre .tabella tr td:last-child { border-bottom: none; }
+
+  /* La cella con l'etichetta si divide in due: nome della colonna a sinistra,
+     valore a destra. `minmax(0, 1fr)` e non `1fr`: un indirizzo e-mail lungo
+     senza spazi, in una colonna implicita, sfonderebbe la scheda e ci
+     riporterebbe la barra di scorrimento da cui stiamo scappando. */
+  .tabella-scorre .tabella td[data-etichetta] {
+    display: grid;
+    grid-template-columns: 6.5rem minmax(0, 1fr);
+    gap: .6rem;
+    align-items: baseline;
+  }
+  .tabella-scorre .tabella td[data-etichetta]::before {
+    content: attr(data-etichetta);
+    font-size: .82rem;
+    font-weight: 600;
+    color: var(--inchiostro-tenue);
+  }
+  /* Una cella vuota, impilata, sarebbe una riga bianca con due punti e basta. */
+  .tabella-scorre .tabella td:empty { display: none; }
+  .tabella-scorre .tabella td > * { min-width: 0; overflow-wrap: anywhere; }
+
   /* --- Bersagli tattili ------------------------------------------------
      I collegamenti in riga («legami · ricordi · taccuino») sono alti 23px e
      scritti a 11,5px: col pollice si sbaglia bersaglio.

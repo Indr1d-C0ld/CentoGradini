@@ -83,11 +83,11 @@ $abitanti  = array_sum(array_map(static fn (array $l): int => count($l['abitanti
     <tbody>
     <?php foreach ($luoghi as $l): ?>
       <tr id="luogo-<?= e($l['lkey']) ?>" class="<?= $l['giocatori'] !== [] ? 'riga-viva' : '' ?>">
-        <td>
+        <td data-etichetta="luogo">
           <?= e($l['nome']) ?>
           <?php if (!$l['aperto']): ?><span class="aiuto">chiuso</span><?php endif; ?>
         </td>
-        <td>
+        <td data-etichetta="giocatori">
           <?php if ($l['giocatori'] === []): ?><span class="aiuto">—</span><?php endif; ?>
           <?php foreach ($l['giocatori'] as $p): $faccia = \App\Game\Ritratto::di($p); ?>
             <span class="chi-qui">
@@ -105,15 +105,15 @@ $abitanti  = array_sum(array_map(static fn (array $l): int => count($l['abitanti
             </span>
           <?php endforeach; ?>
         </td>
-        <td class="aiuto">
+        <td class="aiuto" data-etichetta="abitanti">
           <?= $l['abitanti'] === [] ? '—'
               : e(implode(', ', array_map(static fn (array $p): string => (string) $p['nome'], $l['abitanti']))) ?>
         </td>
-        <td><?= (int) $l['folla'] ?></td>
-        <td><?= (int) $l['calore'] > 0
+        <td data-etichetta="folla"><?= (int) $l['folla'] ?></td>
+        <td data-etichetta="calore"><?= (int) $l['calore'] > 0
               ? '<strong>' . (int) $l['calore'] . '</strong>'
               : '<span class="aiuto">0</span>' ?></td>
-        <td><?= (int) $l['avvisi'] > 0 ? (int) $l['avvisi'] : '<span class="aiuto">—</span>' ?></td>
+        <td data-etichetta="bacheca"><?= (int) $l['avvisi'] > 0 ? (int) $l['avvisi'] : '<span class="aiuto">—</span>' ?></td>
       </tr>
     <?php endforeach; ?>
     </tbody>
@@ -134,11 +134,11 @@ $abitanti  = array_sum(array_map(static fn (array $l): int => count($l['abitanti
     <tbody>
     <?php foreach ($voci as $v): ?>
       <tr>
-        <td class="minuto"><?= e(Orologio::esteso((int) $v['gts'])) ?></td>
-        <td><?= e($v['tipo']) ?></td>
-        <td><?= e(Luoghi::nome((string) $v['luogo'])) ?></td>
-        <td><?= (int) $v['quanti'] ?></td>
-        <td><?= (int) $v['passaggi'] ?><?= (int) $v['passaggi'] >= 3
+        <td class="minuto" data-etichetta="nata"><?= e(Orologio::esteso((int) $v['gts'])) ?></td>
+        <td data-etichetta="tipo"><?= e($v['tipo']) ?></td>
+        <td data-etichetta="dove"><?= e(Luoghi::nome((string) $v['luogo'])) ?></td>
+        <td data-etichetta="la sanno"><?= (int) $v['quanti'] ?></td>
+        <td data-etichetta="passaggi"><?= (int) $v['passaggi'] ?><?= (int) $v['passaggi'] >= 3
               ? ' <span class="aiuto">pettegolezzo</span>' : '' ?></td>
       </tr>
     <?php endforeach; ?>

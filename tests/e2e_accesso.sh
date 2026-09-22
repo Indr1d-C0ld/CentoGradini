@@ -812,6 +812,22 @@ php bin/console.php config:set voci.durata_giorni "${PRIMA:-21}" >/dev/null 2>&1
 # Le tre pagine nuove dell'amministrazione.
 if contiene "${BASE}/admin/utenti" "Gli utenti"; then verde "l'elenco utenti si apre"; else rosso "/admin/utenti"; fi
 if contiene "${BASE}/admin/utenti" "${UTENTE}"; then verde "e ci trova dentro l'utente di prova"; else rosso "l'utente di prova non compare in elenco"; fi
+# Le tabelle del pannello sono da sei o sette colonne: in colonna da lettura
+# (42rem) sbordano, e il riquadro ci mette una barra di scorrimento
+# orizzontale — cioe' nasconde meta' dei dati dietro un gesto che nessuno fa.
+# Misurato: l'elenco utenti chiede 673 pixel e ne aveva 548.
+if contiene "${BASE}/admin/utenti" 'class="contenuto largo"'; then
+  verde "il pannello usa la colonna larga"
+else rosso "/admin/utenti sta ancora nella colonna da lettura"; fi
+if contiene "${BASE}/admin/utenti" 'data-etichetta="personaggio"'; then
+  verde "e le celle portano l'etichetta della colonna, per quando si impilano"
+else rosso "le celle non hanno data-etichetta: impilate sarebbero mute"; fi
+if contiene "${BASE}/quartiere" 'class="contenuto largo"'; then
+  verde "la carta del quartiere ha ancora la sua"
+else rosso "la pagina del quartiere ha perso la colonna larga"; fi
+if contiene "${BASE}/personaggio" 'class="contenuto "'; then
+  verde "e le pagine di lettura restano strette"
+else rosso "una pagina di lettura si e' allargata"; fi
 if contiene "${BASE}/admin/mappa" "La situazione"; then verde "la mappa della situazione si apre"; else rosso "/admin/mappa"; fi
 if contiene "${BASE}/admin/mappa" "luogo per luogo"; then verde "e elenca i luoghi"; else rosso "la mappa non elenca i luoghi"; fi
 if contiene "${BASE}/admin/mappa" 'data-api="[^"]*admin/api/carta"'; then

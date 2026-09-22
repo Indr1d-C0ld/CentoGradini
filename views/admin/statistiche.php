@@ -107,9 +107,9 @@ $barra = static function (float $frazione): string {
       <tbody>
       <?php foreach ($segreto['per_potere'] as $p): ?>
         <tr>
-          <td><?= e((string) ($p['nome'] ?? $p['pkey'])) ?></td>
-          <td><?= (int) $p['n'] ?></td>
-          <td><?= (int) $p['notati'] ?></td>
+          <td data-etichetta="potere"><?= e((string) ($p['nome'] ?? $p['pkey'])) ?></td>
+          <td data-etichetta="usi"><?= (int) $p['n'] ?></td>
+          <td data-etichetta="notati"><?= (int) $p['notati'] ?></td>
           <td><?= $barra((int) $p['n'] > 0 ? (int) $p['notati'] / (int) $p['n'] : 0) ?></td>
         </tr>
       <?php endforeach; ?>
@@ -150,10 +150,10 @@ $barra = static function (float $frazione): string {
       <tbody>
       <?php foreach ($legami['gesti'] as $g): ?>
         <tr>
-          <td><?= e((string) ($g['nome'] ?? $g['gkey'])) ?></td>
-          <td><?= (int) $g['n'] ?></td>
-          <td><?= (int) $g['riusciti'] ?></td>
-          <td><?= (int) $g['visti'] ?></td>
+          <td data-etichetta="gesto"><?= e((string) ($g['nome'] ?? $g['gkey'])) ?></td>
+          <td data-etichetta="fatti"><?= (int) $g['n'] ?></td>
+          <td data-etichetta="riusciti"><?= (int) $g['riusciti'] ?></td>
+          <td data-etichetta="visti da"><?= (int) $g['visti'] ?></td>
         </tr>
       <?php endforeach; ?>
       </tbody>
@@ -183,7 +183,7 @@ $barra = static function (float $frazione): string {
       <thead><tr><th>tipo</th><th>fatti</th><th>versioni</th></tr></thead>
       <tbody>
       <?php foreach ($voci['per_tipo'] as $t): ?>
-        <tr><td><?= e($t['tipo']) ?></td><td><?= (int) $t['fatti'] ?></td><td><?= (int) $t['versioni'] ?></td></tr>
+        <tr><td data-etichetta="tipo"><?= e($t['tipo']) ?></td><td data-etichetta="fatti"><?= (int) $t['fatti'] ?></td><td data-etichetta="versioni"><?= (int) $t['versioni'] ?></td></tr>
       <?php endforeach; ?>
       </tbody>
     </table>
@@ -231,11 +231,11 @@ $barra = static function (float $frazione): string {
     <?php $max = max(1, (int) ($quartiere['luoghi'][0]['visite'] ?? 1)); ?>
     <?php foreach ($quartiere['luoghi'] as $l): ?>
       <tr class="<?= (int) $l['visite'] === 0 ? 'riga-spenta' : '' ?>">
-        <td><?= e($l['nome']) ?> <?= $barra((int) $l['visite'] / $max) ?></td>
-        <td><?= (int) $l['visite'] ?></td>
-        <td><?= (int) $l['persone'] ?></td>
-        <td><?= (int) $l['ora'] > 0 ? '<strong>' . (int) $l['ora'] . '</strong>' : '—' ?></td>
-        <td><?= (int) $l['folla'] ?></td>
+        <td data-etichetta="luogo"><?= e($l['nome']) ?> <?= $barra((int) $l['visite'] / $max) ?></td>
+        <td data-etichetta="visite"><?= (int) $l['visite'] ?></td>
+        <td data-etichetta="persone"><?= (int) $l['persone'] ?></td>
+        <td data-etichetta="adesso"><?= (int) $l['ora'] > 0 ? '<strong>' . (int) $l['ora'] . '</strong>' : '—' ?></td>
+        <td data-etichetta="folla"><?= (int) $l['folla'] ?></td>
       </tr>
     <?php endforeach; ?>
     </tbody>

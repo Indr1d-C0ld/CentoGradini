@@ -28,15 +28,15 @@ $aspettano = array_sum(array_map(static fn (array $f): int => (int) $f['da_legge
     <tbody>
     <?php foreach ($fili as $f): ?>
       <tr class="<?= (int) $f['da_leggere'] > 0 ? 'riga-viva' : '' ?>">
-        <td>
+        <td data-etichetta="giocatore">
           <a href="<?= e(url('/admin/comunicazioni/' . (int) $f['user_id'])) ?>"><?=
             e((string) $f['username']) ?></a>
           <?php if ((string) $f['status'] !== 'active'): ?>
             <span class="stato stato-<?= e((string) $f['status']) ?>"><?= e((string) $f['status']) ?></span>
           <?php endif; ?>
         </td>
-        <td><?= (int) $f['quanti'] ?></td>
-        <td class="minuto"><?= e(substr((string) $f['ultimo_at'], 0, 16)) ?></td>
+        <td data-etichetta="messaggi"><?= (int) $f['quanti'] ?></td>
+        <td class="minuto" data-etichetta="ultimo"><?= e(substr((string) $f['ultimo_at'], 0, 16)) ?></td>
         <td>
           <?php if ((int) $f['da_leggere'] > 0): ?>
             <span class="pastiglia"><?= (int) $f['da_leggere'] ?> da leggere</span>

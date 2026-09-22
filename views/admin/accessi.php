@@ -54,19 +54,19 @@ $etichetta = static fn (string $a): string => match ($a) {
     <?php foreach ($indirizzi as $r): ?>
       <?php $sospetto = (int) $r['falliti'] >= 5 && (int) $r['riusciti'] === 0; ?>
       <tr class="<?= $sospetto ? 'riga-allarme' : '' ?>">
-        <td class="minuto"><?= e($r['indirizzo']) ?></td>
-        <td><?= (int) $r['tentativi'] ?></td>
-        <td><?= (int) $r['riusciti'] ?></td>
-        <td><?= (int) $r['falliti'] > 0
+        <td class="minuto" data-etichetta="indirizzo"><?= e($r['indirizzo']) ?></td>
+        <td data-etichetta="tentativi"><?= (int) $r['tentativi'] ?></td>
+        <td data-etichetta="riusciti"><?= (int) $r['riusciti'] ?></td>
+        <td data-etichetta="falliti"><?= (int) $r['falliti'] > 0
               ? '<strong>' . (int) $r['falliti'] . '</strong>'
               : '<span class="aiuto">0</span>' ?></td>
-        <td><?= (int) $r['account'] ?></td>
-        <td class="minuto"><?= e(substr((string) $r['primo'], 5, 11)) ?></td>
-        <td class="minuto"><?= e(substr((string) $r['ultimo'], 5, 11)) ?></td>
+        <td data-etichetta="account"><?= (int) $r['account'] ?></td>
+        <td class="minuto" data-etichetta="primo"><?= e(substr((string) $r['primo'], 5, 11)) ?></td>
+        <td class="minuto" data-etichetta="ultimo"><?= e(substr((string) $r['ultimo'], 5, 11)) ?></td>
       </tr>
     <?php endforeach; ?>
     <?php if ($indirizzi === []): ?>
-      <tr><td colspan="7" class="aiuto">Nessun accesso registrato.</td></tr>
+      <tr><td colspan="7" class="aiuto" data-etichetta="indirizzo">Nessun accesso registrato.</td></tr>
     <?php endif; ?>
     </tbody>
   </table>
@@ -97,15 +97,15 @@ $etichetta = static fn (string $a): string => match ($a) {
     <tbody>
     <?php foreach ($recenti as $r): ?>
       <tr>
-        <td class="minuto"><?= e(substr((string) $r['created_at'], 5, 14)) ?></td>
-        <td><?= e($etichetta((string) $r['action'])) ?></td>
-        <td><?= $r['username'] === null
+        <td class="minuto" data-etichetta="quando"><?= e(substr((string) $r['created_at'], 5, 14)) ?></td>
+        <td data-etichetta="cosa"><?= e($etichetta((string) $r['action'])) ?></td>
+        <td data-etichetta="chi"><?= $r['username'] === null
               ? '<span class="aiuto">—</span>' : e((string) $r['username']) ?></td>
-        <td class="minuto"><?= e($r['indirizzo']) ?></td>
+        <td class="minuto" data-etichetta="da dove"><?= e($r['indirizzo']) ?></td>
       </tr>
     <?php endforeach; ?>
     <?php if ($recenti === []): ?>
-      <tr><td colspan="4" class="aiuto">Il registro è vuoto.</td></tr>
+      <tr><td colspan="4" class="aiuto" data-etichetta="quando">Il registro è vuoto.</td></tr>
     <?php endif; ?>
     </tbody>
   </table>

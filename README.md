@@ -244,7 +244,7 @@ progetto esiste.
 | **49** | manopole di configurazione, cambiabili a caldo |
 | **16** | migrazioni |
 | **75** | rotte |
-| **402** | verifiche su 15 file di prova (14 unitari + 1 end-to-end) |
+| **406** | verifiche su 15 file di prova (14 unitari + 1 end-to-end) |
 
 ### Le schermate
 
@@ -595,6 +595,21 @@ Annotate qui perché non si ripetano.
    ritagliare da solo) e l'unica traccia sta nella console del browser. Il
    controllo che adesso lo copre guarda l'intestazione, perché è l'unico punto
    ispezionabile senza un browser.
+
+18. **Una barra di scorrimento dentro un riquadro è un dato nascosto, non una
+   soluzione.** Le tabelle del pannello sbordavano e scorrevano in orizzontale, e
+   sembrava un problema delle tabelle. Non lo era: il pannello ereditava la
+   colonna tarata sulla **lettura** — 42rem, la misura di riga che si legge
+   senza fatica — mentre è fatto di tabelle da sei o sette colonne. Misurato
+   invece che stimato: l'elenco degli utenti chiede 673 pixel e ne aveva 548.
+   Allargata la colonna per le sole pagine del pannello, il problema sparisce a
+   monte. Sotto i 768 pixel però nessuna larghezza salva una tabella da sette
+   colonne — su un telefono restano circa 250 pixel utili — e lì l'unica
+   risposta onesta è cambiare forma: ogni riga diventa una scheda e ogni cella
+   una coppia «etichetta: valore», con l'intestazione che si trasferisce nelle
+   celle via `data-etichetta`. Regola generale: quando un contenuto non ci sta,
+   prima si guarda **perché il contenitore è largo così**, e solo dopo si tocca
+   il contenuto.
 
 ## Licenza e diritti
 
