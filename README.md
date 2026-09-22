@@ -241,7 +241,7 @@ progetto esiste.
 | **10** | club scolastici |
 | **14** | eventi stagionali di server |
 | **10** | copioni di episodi |
-| **49** | manopole di configurazione, cambiabili a caldo |
+| **50** | manopole di configurazione, cambiabili a caldo |
 | **16** | migrazioni |
 | **75** | rotte |
 | **406** | verifiche su 15 file di prova (14 unitari + 1 end-to-end) |
@@ -256,8 +256,14 @@ progetto esiste.
 `/taccuino` le anomalie che hai annotato · `/incidente/{id}` coprire un potere
 appena usato · `/voci` quello che ti è arrivato · `/bacheca` e `/biglietti` ·
 `/club` · `/calendario` gli eventi e chi abita qui · `/episodio` quello in corso ·
-`/ricordi` l'album illustrato · `/diario` l'esportazione · `/admin` il cruscotto ·
+`/ricordi` l'album illustrato · `/diario` l'esportazione ·
 `/opera` e `/santuario` le pagine pubbliche.
+
+Il pannello, per chi amministra: `/admin` il cruscotto · `/admin/utenti` e
+`/admin/utente/{id}` gli account, i personaggi e la moderazione ·
+`/admin/mappa` la carta con le presenze · `/admin/statistiche` ·
+`/admin/comunicazioni` i fili con i giocatori · `/admin/fotografie` il muro delle
+facce · `/admin/accessi` le provenienze · `/admin/impostazioni` le cinquanta leve.
 
 È anche una **PWA**: si installa, e il service worker tiene in tasca il guscio
 del sito. Non mette mai in cache le pagine di gioco — il quartiere cambia ogni
@@ -361,8 +367,11 @@ Quattro esempi di cosa ha prodotto la rilettura:
 ## Stato
 
 **Il gioco è finito.** Le otto fasi da F0 a F7 sono fatte e in produzione; la
-tabella completa è in [`docs/PROGETTO.md`](docs/PROGETTO.md) §12. Da qui in poi
-si aggiunge contenuto — copioni, luoghi, tratti — non impalcatura.
+tabella completa è in [`docs/PROGETTO.md`](docs/PROGETTO.md) §12, con l'elenco
+di quello che è arrivato dopo — le immagini dei luoghi, il pannello in
+profondità, l'uso da telefono, la fotografia del personaggio e le
+comunicazioni. Dopo F7 si aggiunge dove serve, ma il motore del mondo — tempo,
+meteo, Segreto, legami, episodi, voci — è quello e non cambia.
 
 La rilettura dell'opera è completa: tutti e 156 i riassunti dei capitoli raccolti
 e spogliati, e le domande aperte quasi tutte chiuse — comprese quelle a cui la

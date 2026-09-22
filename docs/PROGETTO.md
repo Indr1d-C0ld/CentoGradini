@@ -483,7 +483,7 @@ Dopo F7 si aggiunge contenuto e comodità, non impalcatura. In ordine di arrivo:
   distinte una per una in `assets/img/luoghi/crediti.php` — nessuna delle due cosa si
   spaccia per l'altra).
 - **`/admin` in profondità**: utenti, moderazione con motivo obbligatorio, accessi e
-  provenienze, 49 manopole raggruppate per famiglia, mappa della situazione, statistiche.
+  provenienze, 50 manopole raggruppate per famiglia, mappa della situazione, statistiche.
 - **Uso da telefono e da tablet**, senza toccare la vista da monitor: la carta si
   ridimensiona sullo spazio disponibile e si trascina solo quando serve davvero.
 - **La fotografia del personaggio** (migrazione `0015`): caricamento con ritaglio e
