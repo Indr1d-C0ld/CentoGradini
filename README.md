@@ -548,6 +548,23 @@ Annotate qui perché non si ripetano.
    loro finivano sullo stesso valore, e la prova tornava a fallire per lo stesso
    identico motivo.
 
+17. **Una prova che non passa dagli header dell'applicazione non prova
+   l'applicazione.** Il riquadro di ritaglio era stato verificato in un browser
+   vero, con tanto di trascinamento e numeri misurati: funzionava. In produzione
+   non funzionava affatto — il riquadro non compariva e restava solo «non riesco
+   a mostrarti l'anteprima». La causa era la CSP: `img-src 'self' data:` senza
+   `blob:`, e l'anteprima si costruisce con `URL.createObjectURL()`, che produce
+   esattamente un URL `blob:`. La prova l'aveva mancata perché serviva una
+   pagina statica dal server incorporato, che non passa da `Response::send()` e
+   quindi non porta addosso nessuna delle intestazioni vere. La regola: quando
+   si verifica un pezzo di interfaccia fuori dall'applicazione, **si riproduce
+   anche il contorno** — intestazioni comprese — o si accetta che la verifica
+   copra il codice e non il prodotto. Il guasto era peraltro invisibile dal
+   server: la pagina torna 200, il modulo continua a funzionare (il server sa
+   ritagliare da solo) e l'unica traccia sta nella console del browser. Il
+   controllo che adesso lo copre guarda l'intestazione, perché è l'unico punto
+   ispezionabile senza un browser.
+
 ## Licenza e diritti
 
 Il codice di Cento Gradini è distribuito sotto **GNU General Public License v3.0

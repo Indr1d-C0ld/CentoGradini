@@ -55,11 +55,21 @@ final class Response
             http_response_code($this->status);
 
             // Header di sicurezza di base.
+            //
+            // `blob:` fra le sorgenti delle immagini non e' una concessione
+            // generica: un URL blob: lo puo' fabbricare solo uno script della
+            // pagina, da dati che la pagina ha gia' in mano, e non apre nessuna
+            // porta verso l'esterno. Serve al riquadro di ritaglio, che mostra
+            // l'anteprima del file scelto con `URL.createObjectURL()` prima
+            // ancora di mandarlo al server. Senza, il browser blocca
+            // l'immagine, il riquadro non compare e il giocatore legge soltanto
+            // "non riesco a mostrarti l'anteprima" — che e' vero e non spiega
+            // niente.
             $defaults = [
                 'X-Content-Type-Options' => 'nosniff',
                 'X-Frame-Options'        => 'SAMEORIGIN',
                 'Referrer-Policy'        => 'same-origin',
-                'Content-Security-Policy' => "default-src 'self'; img-src 'self' data:; "
+                'Content-Security-Policy' => "default-src 'self'; img-src 'self' data: blob:; "
                     . "style-src 'self' 'unsafe-inline'; script-src 'self'; base-uri 'self'; "
                     . "form-action 'self'; frame-ancestors 'self'",
             ];

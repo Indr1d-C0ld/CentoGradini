@@ -601,6 +601,19 @@ if contiene "${BASE}/personaggio/profilo" 'name="lato"'; then
   verde "e i campi del ritaglio ci sono anche senza JavaScript"
 else rosso "mancano i campi nascosti del ritaglio"; fi
 
+# Il riquadro mostra l'anteprima con `URL.createObjectURL()`, che produce un
+# URL `blob:`. Se la CSP non lo ammette il browser blocca l'immagine e non lo
+# dice a nessuno tranne che alla console: la pagina torna 200, il modulo
+# funziona lo stesso, e il giocatore vede soltanto il messaggio di ripiego con
+# il riquadro che non compare mai. Dal server un guasto cosi' e' invisibile —
+# per questo si guarda l'intestazione, che e' l'unico punto in cui il
+# problema e' ispezionabile senza un browser vero.
+CSP=$(curl -sS -o /dev/null -D- -b "${BISCOTTI}" "${BASE}/personaggio/profilo" \
+      | grep -i '^content-security-policy:')
+if grep -qiE "img-src[^;]*blob:" <<< "${CSP}"; then
+  verde "la CSP lascia passare l'anteprima del riquadro (img-src ... blob:)"
+else rosso "la CSP blocca l'anteprima del riquadro: img-src senza blob:"; fi
+
 # Si carica un file vero, con un multipart vero: e' l'unico modo di provare
 # insieme is_uploaded_file, GD e la scrittura su disco. Un finto POST di soli
 # campi passerebbe accanto a tutte e tre le cose.
