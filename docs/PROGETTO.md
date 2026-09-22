@@ -489,6 +489,14 @@ Dopo F7 si aggiunge contenuto e comodità, non impalcatura. In ordine di arrivo:
 - **La fotografia del personaggio** (migrazione `0015`): caricamento con ritaglio e
   centratura manuale, riscrittura in WebP a 320 pixel, nome del file uguale all'impronta
   del contenuto, e la stessa rotta per l'amministratore sul profilo di un giocatore.
+- **La faccia gira per il quartiere**: compare fra i presenti di un luogo, nei legami e su
+  `/chi/{id}`, il profilo di una persona — che si apre solo su chi è qui adesso o su chi si
+  è già incontrato, perché una rubrica di tutti gli abitanti racconterebbe un altro mondo.
+- **Il muro delle fotografie** (`/admin/fotografie`) e la **carta dell'amministrazione**, che
+  è l'unica a distinguere i giocatori dagli abitanti mossi dal motore.
+- **Le comunicazioni** (migrazione `0016`): filo diretto fra la gestione e un giocatore, nei
+  due sensi, con avviso per posta che non ripete il messaggio. Non è finzione e non si
+  traveste da tale — vedi la nota in testa a `src/Game/Comunicazioni.php`.
 
 ---
 

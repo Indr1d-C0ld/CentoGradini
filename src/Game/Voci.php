@@ -396,10 +396,10 @@ final class Voci
             return 'in giro';
         }
         if ($p >= self::SFOCATO) {
-            // La forma locativa e' un dato del luogo (colonna «dove»), non il
-            // nome: «Il parco» diventa «al parco», e non «a Il parco».
-            $dove = trim((string) ($l['dove'] ?? ''));
-            return $dove !== '' ? $dove : 'a ' . Luoghi::nome($lkey);
+            // La forma locativa e' un dato del luogo, non il nome: «Il parco»
+            // diventa «al parco», e non «a Il parco». La regola sta in
+            // Luoghi::dove(), una volta sola: serve anche altrove.
+            return Luoghi::dove($lkey);
         }
         return match ((string) $l['tipo']) {
             'scuola'  => 'a scuola',

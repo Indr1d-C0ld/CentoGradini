@@ -51,11 +51,29 @@ final class Legami
             : ['affetto' => (int) $r['affetto'], 'fraintendimento' => (int) $r['fraintendimento'], 'esiste' => true];
     }
 
+    /**
+     * Si sono mai incontrati?
+     *
+     * Basta un legame in UNA delle due direzioni: chi ha ricevuto un gesto ha
+     * una riga anche se non ne ha mai fatto uno, e sarebbe strano dirgli che
+     * non conosce la persona che gli ha appena parlato. Serve a decidere chi
+     * puo' guardare il profilo di chi — in questo quartiere si conosce solo
+     * la gente che si e' incontrata, e la rubrica non esiste.
+     */
+    public static function conosce(int $da, int $a): bool
+    {
+        $r = Database::first(
+            'SELECT 1 AS c FROM legami WHERE (da_id = ? AND a_id = ?) OR (da_id = ? AND a_id = ?) LIMIT 1',
+            [$da, $a, $a, $da]
+        );
+        return $r !== null;
+    }
+
     /** Quello che questo personaggio prova per gli altri. @return list<array<string,mixed>> */
     public static function miei(int $pgId): array
     {
         $righe = Database::all(
-            'SELECT l.*, p.nome, p.cognome, p.sezione, p.anno, p.stato
+            'SELECT l.*, p.nome, p.cognome, p.sezione, p.anno, p.stato, p.aspetto, p.ritratto_file
              FROM legami l JOIN personaggi p ON p.id = l.a_id
              WHERE l.da_id = ?
              ORDER BY ABS(l.affetto) DESC, l.fraintendimento DESC',

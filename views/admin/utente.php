@@ -119,6 +119,25 @@ use App\Sim\Scuola;
 <?php endif; ?>
 
 <div class="carta">
+  <h2>Scrivi a <?= e((string) $u['username']) ?></h2>
+  <p class="aiuto">
+    Gli arriva <strong>in gioco</strong>, alla voce «Comunicazioni», e può rispondere da lì.
+    Non passa per i biglietti e non si traveste da finzione: è la gestione che parla, e si
+    vede. <a href="<?= e(url('/admin/comunicazioni/' . (int) $u['id'])) ?>">Tutto il filo →</a>
+  </p>
+  <form method="post" action="<?= e(url('/admin/comunicazioni')) ?>">
+    <?= csrf_field() ?>
+    <input type="hidden" name="utente" value="<?= (int) $u['id'] ?>">
+    <div class="campo">
+      <label for="testo">Messaggio</label>
+      <textarea id="testo" name="testo" rows="4"
+                maxlength="<?= \App\Game\Comunicazioni::MAX ?>"></textarea>
+    </div>
+    <div class="bottoni"><button class="bottone secondario piccolo" type="submit">Manda</button></div>
+  </form>
+</div>
+
+<div class="carta">
   <h2>Moderazione</h2>
   <p class="aiuto">
     Ogni provvedimento vuole un motivo scritto, e non per burocrazia: uno stato senza motivo,

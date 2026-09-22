@@ -42,6 +42,9 @@ $soglia = GameConfig::int('legami.soglia_confessione', 45);
     <?php if ((string) ($altro['aspetto'] ?? '') !== ''): ?>
       <p class="occhiello" style="margin:.35rem 0 0"><em><?= e((string) $altro['aspetto']) ?></em></p>
     <?php endif; ?>
+    <p class="occhiello" style="margin:.35rem 0 0">
+      <a href="<?= e(url('/chi/' . (int) $altro['id'])) ?>">il suo profilo</a>
+    </p>
   </div>
 </div>
 

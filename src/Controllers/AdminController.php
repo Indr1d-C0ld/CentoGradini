@@ -160,6 +160,31 @@ final class AdminController
     }
 
     /**
+     * Tutte le fotografie caricate, in una schermata sola.
+     *
+     * Moderare una fotografia alla volta aprendo la scheda di ogni utente non
+     * e' moderare: e' sperare di inciampare in quella sbagliata. Qui si
+     * guardano tutte insieme — che e' l'unico modo in cui l'occhio nota quella
+     * che non c'entra niente — e si toglie da qui.
+     */
+    public function fotografie(Request $request): Response
+    {
+        return Response::html(view('admin/fotografie', [
+            'title' => 'Le fotografie',
+            'mondo' => Mondo::adesso(),
+            'righe' => Database::all(
+                "SELECT p.id, p.nome, p.cognome, p.user_id, p.ritratto_file, p.ritratto_at,
+                        p.stato, p.png, u.username, u.status,
+                        (SELECT COUNT(*) FROM personaggi q WHERE q.ritratto_file = p.ritratto_file)
+                          AS condivisa
+                 FROM personaggi p LEFT JOIN users u ON u.id = p.user_id
+                 WHERE p.ritratto_file IS NOT NULL
+                 ORDER BY p.ritratto_at DESC"
+            ),
+        ]));
+    }
+
+    /**
      * Le azioni di moderazione.
      *
      * Ognuna vuole un motivo scritto, e non per burocrazia: uno stato senza
@@ -221,6 +246,18 @@ final class AdminController
      * momento, e dove». Mostra tutti e ventidue i luoghi anche quando sono
      * vuoti, perche' un quartiere vuoto e' esso stesso un'informazione.
      */
+    /**
+     * I dati della carta per l'amministrazione.
+     *
+     * E' la stessa carta del giocatore, con una differenza sola: i giocatori
+     * si distinguono dagli abitanti mossi dal motore. E' un dato che sulla
+     * carta del giocatore non deve comparire mai.
+     */
+    public function carta(Request $request): Response
+    {
+        return Response::json(Mondo::carta(null, true));
+    }
+
     public function mappa(Request $request): Response
     {
         $gts   = Orologio::lineare();
@@ -228,7 +265,8 @@ final class AdminController
 
         foreach (Luoghi::tutti() as $lkey => $l) {
             $presenti = Database::all(
-                'SELECT id, nome, cognome, png, esper, stato FROM personaggi
+                'SELECT id, user_id, nome, cognome, png, esper, stato, ritratto_file
+                 FROM personaggi
                  WHERE luogo = ? AND verso IS NULL AND stato = ? ORDER BY png IS NOT NULL, id',
                 [$lkey, 'attivo']
             );

@@ -152,6 +152,16 @@ final class ProfiloController
         if ($request->int('personaggio') <= 0) {
             return redirect('/personaggio/profilo');
         }
+        // Chi arriva dal muro delle fotografie vuole tornare al muro: dice da
+        // dove viene con `torna`. Il valore non si prende sulla fiducia — un
+        // indirizzo scelto da chi manda il modulo e' un rimbalzo verso
+        // qualunque sito — quindi si accetta solo un percorso interno, senza
+        // schema, senza doppia sbarra e senza coda.
+        $torna = $request->str('torna');
+        if ($torna !== '' && preg_match('#^/[A-Za-z0-9/_-]{0,64}$#', $torna) === 1
+            && !str_contains($torna, '//')) {
+            return redirect($torna);
+        }
         return redirect($pg['user_id'] === null
             ? '/admin/utenti'
             : '/admin/utente/' . (int) $pg['user_id']);

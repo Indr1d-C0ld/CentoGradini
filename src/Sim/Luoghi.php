@@ -62,6 +62,24 @@ final class Luoghi
         return (string) (self::uno($lkey)['nome'] ?? $lkey);
     }
 
+    /**
+     * Dove, in forma locativa: «al parco», non «a Il parco».
+     *
+     * E' un dato del luogo (colonna `dove`) e non una regola grammaticale,
+     * perche' l'italiano non ne ha una che tenga: «al parco», «all'ABCB»,
+     * «in stazione», «sui gradini». Il ripiego mette `a` davanti al nome — si
+     * vede che e' un ripiego, ed e' il segnale che a quel luogo manca il dato.
+     */
+    public static function dove(string $lkey): string
+    {
+        $l = self::uno($lkey);
+        if ($l === null) {
+            return 'in giro';
+        }
+        $dove = trim((string) ($l['dove'] ?? ''));
+        return $dove !== '' ? $dove : 'a ' . self::nome($lkey);
+    }
+
     /** @return array<string,list<array{a:string,minuti:int,mezzo:string}>> */
     public static function archi(): array
     {

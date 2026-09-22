@@ -7,6 +7,7 @@ use App\Controllers\HomeController;
 use App\Controllers\ProfiloController;
 use App\Controllers\QuartiereController;
 use App\Controllers\AdminController;
+use App\Controllers\ComunicazioniController;
 use App\Controllers\EpisodiController;
 use App\Controllers\QuartiereVivoController;
 use App\Controllers\LegamiController;
@@ -65,6 +66,7 @@ $router->post('/taccuino/collega', [SegretoController::class, 'collega'], ['acti
 
 // --- I legami ----------------------------------------------------------------------
 $router->get('/legami', [LegamiController::class, 'elenco'], ['active']);
+$router->get('/chi/{id}', [LegamiController::class, 'profilo'], ['active']);
 $router->get('/verso/{id}', [LegamiController::class, 'verso'], ['active']);
 $router->post('/gesto', [LegamiController::class, 'gesto'], ['active', 'throttle']);
 $router->post('/chiarisci', [LegamiController::class, 'chiarisci'], ['active', 'throttle']);
@@ -96,12 +98,23 @@ $router->get('/club/{ckey}', [QuartiereVivoController::class, 'unClub'], ['activ
 
 $router->get('/calendario', [QuartiereVivoController::class, 'calendario'], ['active']);
 
+// --- Le comunicazioni con la gestione ----------------------------------------
+// Non sono finzione e non stanno fra i biglietti: e' la gestione che parla, e
+// a schermo si vede che e' un'altra cosa.
+$router->get('/comunicazioni', [ComunicazioniController::class, 'mie'], ['auth']);
+$router->post('/comunicazioni', [ComunicazioniController::class, 'rispondi'], ['auth', 'throttle']);
+
 // --- F7: amministrazione -----------------------------------------------------
 $router->get('/admin', [AdminController::class, 'index'], ['active', 'admin']);
 $router->post('/admin/battito', [AdminController::class, 'battito'], ['active', 'admin', 'throttle']);
 $router->post('/admin/config', [AdminController::class, 'config'], ['active', 'admin', 'throttle']);
 $router->get('/admin/utenti', [AdminController::class, 'utenti'], ['active', 'admin']);
+$router->get('/admin/fotografie', [AdminController::class, 'fotografie'], ['active', 'admin']);
+$router->get('/admin/comunicazioni', [ComunicazioniController::class, 'elenco'], ['active', 'admin']);
+$router->post('/admin/comunicazioni', [ComunicazioniController::class, 'scrivi'], ['active', 'admin', 'throttle']);
+$router->get('/admin/comunicazioni/{id}', [ComunicazioniController::class, 'filo'], ['active', 'admin']);
 $router->get('/admin/mappa', [AdminController::class, 'mappa'], ['active', 'admin']);
+$router->get('/admin/api/carta', [AdminController::class, 'carta'], ['active', 'admin']);
 $router->get('/admin/utente/{id}', [AdminController::class, 'utente'], ['active', 'admin']);
 $router->post('/admin/moderazione', [AdminController::class, 'moderazione'], ['active', 'admin', 'throttle']);
 $router->get('/admin/statistiche', [AdminController::class, 'statistiche'], ['active', 'admin']);

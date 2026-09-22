@@ -5,6 +5,7 @@
  * @var list<array<string,mixed>> $legami
  * @var array<string,mixed>|null $oggetto
  */
+use App\Game\Ritratto;
 use App\Sim\Scuola;
 ?>
 
@@ -37,14 +38,27 @@ use App\Sim\Scuola;
 <?php foreach ($legami as $l): ?>
 <div class="carta">
   <div class="riga-scelta" style="border:0;padding:0">
-    <div>
-      <h2 style="margin:0">
-        <?= e($l['cognome'] . ' ' . $l['nome']) ?>
-        <?php if ((string) $l['stato'] !== 'attivo'): ?>
-          <span class="tenue">— se n'è andato dal quartiere</span>
+    <div class="riga-fotografia">
+      <?php $faccia = Ritratto::di($l); ?>
+      <?php if ($faccia !== null): ?>
+        <img class="fotografia fotografia--media" src="<?= e(asset($faccia)) ?>" alt=""
+             width="80" height="80" loading="lazy">
+      <?php else: ?>
+        <div class="fotografia fotografia--media fotografia--vuota" aria-hidden="true"><?=
+          e(mb_strtoupper(mb_substr((string) $l['nome'], 0, 1))) ?></div>
+      <?php endif; ?>
+      <div>
+        <h2 style="margin:0">
+          <a href="<?= e(url('/chi/' . (int) $l['a_id'])) ?>"><?= e($l['cognome'] . ' ' . $l['nome']) ?></a>
+          <?php if ((string) $l['stato'] !== 'attivo'): ?>
+            <span class="tenue">— se n'è andato dal quartiere</span>
+          <?php endif; ?>
+        </h2>
+        <span class="tenue"><?= e(Scuola::nomeClasse((string) $l['sezione'], (int) $l['anno'])) ?></span>
+        <?php if ((string) ($l['aspetto'] ?? '') !== ''): ?>
+          <br><span class="tenue"><em><?= e((string) $l['aspetto']) ?></em></span>
         <?php endif; ?>
-      </h2>
-      <span class="tenue"><?= e(Scuola::nomeClasse((string) $l['sezione'], (int) $l['anno'])) ?></span>
+      </div>
     </div>
     <div style="text-align:right">
       <b class="<?= (int) $l['affetto'] < 0 ? 'rischio-alto' : '' ?>" style="font-size:1.2rem">

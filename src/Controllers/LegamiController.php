@@ -9,6 +9,7 @@ use App\Core\Database;
 use App\Core\Request;
 use App\Core\Response;
 use App\Core\Session;
+use App\Game\Club;
 use App\Game\Legami;
 use App\Game\Mondo;
 use App\Game\Personaggio;
@@ -24,6 +25,51 @@ final class LegamiController
         }
         $pg = Personaggio::perUtente($id);
         return ($pg === null || Personaggio::daCompletare($pg)) ? null : $pg;
+    }
+
+    /**
+     * Il profilo di un'altra persona: la faccia, e quel poco che si sa.
+     *
+     * Non e' una rubrica: si apre solo su chi si e' incontrato almeno una
+     * volta, o su chi si trova qui adesso. In questo quartiere la gente la si
+     * conosce stando negli stessi posti, e un elenco di tutti gli abitanti
+     * consultabile dal divano di casa racconterebbe un mondo diverso.
+     *
+     * Quello che si vede e' quello che si vedrebbe guardando una persona: la
+     * faccia, come si veste, in che classe sta, che club frequenta. I poteri
+     * no, le abilita' nemmeno — quelle non si leggono in faccia a nessuno.
+     */
+    public function profilo(Request $request, string $id): Response
+    {
+        $pg = $this->mio();
+        if ($pg === null) {
+            return redirect('/quartiere');
+        }
+        $altro = Database::first('SELECT * FROM personaggi WHERE id = ?', [(int) $id]);
+        if ($altro === null || (int) $altro['id'] === (int) $pg['id']) {
+            Session::flash('error', 'Non conosci nessuno con quel nome.');
+            return redirect('/legami');
+        }
+
+        // Qui adesso, oppure gia' incontrato: altrimenti e' uno sconosciuto, e
+        // di uno sconosciuto non si sa nemmeno che esiste.
+        $qui = (string) $altro['luogo'] === (string) $pg['luogo']
+            && $altro['verso'] === null
+            && (string) $altro['stato'] === 'attivo';
+        if (!$qui && !Legami::conosce((int) $pg['id'], (int) $altro['id'])) {
+            Session::flash('error', 'Non conosci nessuno con quel nome.');
+            return redirect('/legami');
+        }
+
+        return Response::html(view('gioco/chi', [
+            'title' => $altro['cognome'] . ' ' . $altro['nome'],
+            'pg'    => $pg,
+            'altro' => $altro,
+            'mondo' => Mondo::adesso(),
+            'qui'   => $qui,
+            'club'  => Club::di((int) $altro['id']),
+            'mio'   => Legami::fra((int) $pg['id'], (int) $altro['id']),
+        ]));
     }
 
     public function elenco(Request $request): Response

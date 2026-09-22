@@ -40,6 +40,9 @@ $titoloPagina = (string) ($title ?? $nomeGioco);
   <nav>
     <?php if (auth_check()): ?>
       <a href="<?= e(url('/quartiere')) ?>">Il quartiere</a>
+      <?php $nuove = \App\Game\Comunicazioni::nonLetti((int) (auth_user()['id'] ?? 0)); ?>
+      <a href="<?= e(url('/comunicazioni')) ?>">Comunicazioni<?php
+        if ($nuove > 0): ?> <span class="pastiglia"><?= $nuove ?></span><?php endif; ?></a>
       <span class="tenue"><?= e((string) (auth_user()['username'] ?? '')) ?></span>
       <form method="post" action="<?= e(url('/esci')) ?>" style="display:inline">
         <?= csrf_field() ?>

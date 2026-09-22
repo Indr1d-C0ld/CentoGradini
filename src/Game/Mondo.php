@@ -126,19 +126,28 @@ final class Mondo
      *
      * @return array<string,mixed>
      */
-    public static function carta(?array $pg = null): array
+    public static function carta(?array $pg = null, bool $distingui = false): array
     {
         $m = self::adesso();
         $qui = $pg === null ? null : (string) $pg['luogo'];
 
         // Quante persone in ciascun luogo: la carta deve far vedere dov'e' la
         // gente, altrimenti e' una piantina e non un mondo abitato.
+        //
+        // `$distingui` separa i giocatori dagli abitanti del quartiere, e si
+        // accende SOLO per la carta dell'amministrazione. Su quella del
+        // giocatore sarebbe un'informazione fuori dal mondo: dire quali dei
+        // presenti sono persone vere e quali li muove il motore e' esattamente
+        // cio' che il gioco tiene indistinto, ed e' un dato che non si puo'
+        // togliere una volta dato.
         $teste = [];
+        $veri  = [];
         foreach (Database::all(
-            "SELECT luogo, COUNT(*) AS n FROM personaggi
+            "SELECT luogo, COUNT(*) AS n, SUM(png IS NULL) AS g FROM personaggi
              WHERE verso IS NULL AND stato = 'attivo' GROUP BY luogo"
         ) as $r) {
             $teste[(string) $r['luogo']] = (int) $r['n'];
+            $veri[(string) $r['luogo']]  = (int) $r['g'];
         }
 
         $nodi = [];
@@ -156,6 +165,9 @@ final class Mondo
                 'gente'   => $teste[$lkey] ?? 0,
                 'qui'     => $lkey === $qui,
             ];
+            if ($distingui) {
+                $nodi[count($nodi) - 1]['giocatori'] = $veri[$lkey] ?? 0;
+            }
         }
 
         // Un solo tratto per coppia: la carta disegna strade, non frecce.

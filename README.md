@@ -242,15 +242,16 @@ progetto esiste.
 | **14** | eventi stagionali di server |
 | **10** | copioni di episodi |
 | **49** | manopole di configurazione, cambiabili a caldo |
-| **15** | migrazioni |
-| **67** | rotte |
-| **377** | verifiche su 14 file di prova (13 unitari + 1 end-to-end) |
+| **16** | migrazioni |
+| **75** | rotte |
+| **402** | verifiche su 15 file di prova (14 unitari + 1 end-to-end) |
 
 ### Le schermate
 
 `/quartiere` la carta e dove sei · `/luogo/{x}` la scheda di un posto ·
 `/personaggio` la tua scheda · `/personaggio/profilo` la fotografia e l'aspetto ·
-`/legami` il grafo delle relazioni ·
+`/chi/{id}` il profilo di una persona che conosci · `/legami` il grafo delle relazioni ·
+`/comunicazioni` il filo diretto con la gestione ·
 `/verso/{id}` cosa provi per una persona, e cosa puoi farci ·
 `/taccuino` le anomalie che hai annotato · `/incidente/{id}` coprire un potere
 appena usato · `/voci` quello che ti è arrivato · `/bacheca` e `/biglietti` ·
@@ -285,6 +286,15 @@ non si accettano. Il nome del file è l'impronta sha256 del risultato, quindi no
 è indovinabile e due fotografie identiche occupano un file solo — con la
 conseguenza che toglierla a uno non la toglie all'altro.
 
+La faccia non resta sulla propria scheda: compare nell'elenco di **chi c'è adesso** in un
+luogo, sulla pagina di chi si incontra, nell'elenco dei **legami**, e su `/chi/{id}` — il
+profilo di una persona. Quel profilo non è una rubrica: si apre solo su chi è **qui adesso**
+oppure su chi si è **già incontrato** almeno una volta. Un elenco di tutti gli abitanti
+consultabile dal divano di casa racconterebbe un quartiere diverso da questo, dove la gente
+la si conosce stando negli stessi posti. E mostra quello che si vedrebbe guardando una
+persona — faccia, vestito, classe, club — non le abilità e non i poteri: quelli non si
+leggono in faccia a nessuno.
+
 Le fotografie nascono **solo sull'installazione viva** — le scrive il server web
 quando qualcuno ne carica una — e il deploy in andata le salta apposta, perché
 una copia con `--delete` le cancellerebbe tutte a ogni pubblicazione. Al ritorno
@@ -298,7 +308,28 @@ caricate per giocare e non per finire su un repository aperto.
 
 Chi amministra può correggere il profilo di un giocatore — fotografia e aspetto
 — dalla scheda dell'utente, e ogni modifica fatta a un altro finisce nel
-registro.
+registro. Il muro `/admin/fotografie` le raccoglie tutte in una
+schermata: moderarle una alla volta aprendo la scheda di ogni utente non è moderare, è
+sperare di inciampare in quella sbagliata.
+
+### Le comunicazioni
+
+`/comunicazioni` è il filo diretto fra **la gestione e un giocatore**, nei due sensi.
+Non passa per i biglietti e non si traveste da finzione, e a schermo si vede che è un'altra
+cosa: un avvertimento di moderazione travestito da biglietto lasciato sui gradini sarebbe una
+bugia raccontata proprio nel momento in cui serve essere creduti. Va in tutte e due le
+direzioni perché un canale a senso unico obbliga chi ha un problema a scrivere un'e-mail e
+aspettare, e quasi nessuno lo fa: il risultato pratico sarebbe che i problemi non arrivano.
+
+Quando la gestione scrive, al giocatore parte anche un'e-mail — che **non ripete il messaggio
+per intero**: letto nella posta, fuori contesto e senza poter rispondere, un avvertimento
+prende quasi sempre peggio di com'era inteso. Nel pannello i fili in attesa di risposta stanno
+in cima: in ordine di data sembrerebbero tutti uguali, e la domanda di tre giorni fa finirebbe
+in fondo proprio perché è vecchia.
+
+`/admin/mappa` disegna la carta del quartiere con le presenze, ed è **l'unica carta in cui i
+giocatori si distinguono dagli abitanti** mossi dal motore: su quella del giocatore sarebbe
+un'informazione fuori dal mondo, e una volta data non si può più togliere.
 
 ---
 

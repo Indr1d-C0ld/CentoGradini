@@ -677,6 +677,101 @@ if [[ -n "${FILE}" && ! -f "${RADICE}/assets/img/ritratti/${FILE}" ]]; then
 else rosso "il file e' rimasto sul disco"; fi
 rm -f "${FOTO}"
 
+# --- Il profilo di un'altra persona ------------------------------------------
+titolo "Chi sono gli altri"
+
+# Chi si trova qui adesso si puo' guardare. Chi non si e' mai incontrato no:
+# non e' una rubrica, e un elenco di tutti gli abitanti consultabile dal
+# divano racconterebbe un quartiere diverso da questo.
+# Il personaggio di prova puo' benissimo essere solo dove si trova: per
+# provare il profilo di un altro bisogna che un altro ci sia. Si sposta li' un
+# abitante del quartiere — il motore lo rimettera' al suo giro da solo.
+php -r '
+  require "src/autoload.php"; require "src/Support/helpers.php";
+  $GLOBALS["__project_root"] = getcwd();
+  App\Core\Config::load(getcwd());
+  $io = App\Core\Database::first("SELECT id, luogo FROM personaggi WHERE nome = ?", [$argv[1]]);
+  if ($io === null) { exit; }
+  $png = App\Core\Database::first("SELECT id FROM personaggi WHERE png IS NOT NULL LIMIT 1");
+  if ($png === null) { exit; }
+  App\Core\Database::run(
+    "UPDATE personaggi SET luogo = ?, verso = NULL, arrivato_gts = ? WHERE id = ?",
+    [$io["luogo"], App\Sim\Orologio::lineare(), (int) $png["id"]]);
+' "${PGNOME}" >/dev/null 2>&1 || true
+
+VICINO=$(php -r '
+  require "src/autoload.php"; require "src/Support/helpers.php";
+  $GLOBALS["__project_root"] = getcwd();
+  App\Core\Config::load(getcwd());
+  $io = App\Core\Database::first("SELECT id, luogo FROM personaggi WHERE nome = ?", [$argv[1]]);
+  if ($io === null) { echo 0; exit; }
+  $a = App\Core\Database::first(
+    "SELECT id FROM personaggi WHERE luogo = ? AND id <> ? AND verso IS NULL AND stato = ? LIMIT 1",
+    [$io["luogo"], (int) $io["id"], "attivo"]);
+  echo $a === null ? 0 : (int) $a["id"];
+' "${PGNOME}")
+
+if [[ "${VICINO}" != "0" ]]; then
+  if contiene "${BASE}/chi/${VICINO}" "Cosa provi"; then
+    verde "il profilo di chi e' qui adesso si apre"
+  else rosso "/chi/${VICINO} non si apre per una persona presente"; fi
+  if contiene "${BASE}/chi/${VICINO}" "cosa puoi fare"; then
+    verde "e porta alla pagina dei gesti"
+  else rosso "il profilo non rimanda ai gesti"; fi
+else
+  rosso "non ho trovato nessuno nello stesso luogo su cui provare il profilo"
+fi
+
+# Uno sconosciuto, lontano e mai incontrato: non si apre.
+LONTANO=$(php -r '
+  require "src/autoload.php"; require "src/Support/helpers.php";
+  $GLOBALS["__project_root"] = getcwd();
+  App\Core\Config::load(getcwd());
+  $io = App\Core\Database::first("SELECT id, luogo FROM personaggi WHERE nome = ?", [$argv[1]]);
+  if ($io === null) { echo 0; exit; }
+  $a = App\Core\Database::first(
+    "SELECT p.id FROM personaggi p
+      WHERE p.luogo <> ? AND p.id <> ?
+        AND NOT EXISTS (SELECT 1 FROM legami l
+                        WHERE (l.da_id = p.id AND l.a_id = ?) OR (l.da_id = ? AND l.a_id = p.id))
+      LIMIT 1",
+    [$io["luogo"], (int) $io["id"], (int) $io["id"], (int) $io["id"]]);
+  echo $a === null ? 0 : (int) $a["id"];
+' "${PGNOME}")
+
+if [[ "${LONTANO}" != "0" ]]; then
+  DEST=$(curl -sS -o /dev/null -w '%{redirect_url}' -b "${BISCOTTI}" "${BASE}/chi/${LONTANO}")
+  if [[ "${DEST}" == *"/legami" ]]; then
+    verde "il profilo di uno sconosciuto non si apre"
+  else rosso "uno sconosciuto si apre lo stesso: '${DEST}'"; fi
+else
+  rosso "non ho trovato uno sconosciuto su cui provare il divieto"
+fi
+
+# La carta del giocatore NON deve dire chi e' mosso dal motore e chi no.
+if curl -sS -b "${BISCOTTI}" "${BASE}/api/carta" | grep -q '"giocatori"'; then
+  rosso "la carta del giocatore distingue i giocatori dagli abitanti"
+else verde "la carta del giocatore non distingue giocatori e abitanti"; fi
+
+# --- Le comunicazioni, lato giocatore ----------------------------------------
+titolo "Le comunicazioni"
+
+if contiene "${BASE}/comunicazioni" "la gestione del gioco"; then
+  verde "la pagina delle comunicazioni dice chi sta parlando"
+else rosso "/comunicazioni non si apre o non si presenta"; fi
+
+CODICE=$(curl -sS -o /dev/null -w '%{http_code}' -b "${BISCOTTI}" "${BASE}/admin/comunicazioni")
+if [[ "${CODICE}" == "403" ]]; then
+  verde "e un giocatore non vede i fili degli altri"
+else rosso "/admin/comunicazioni da' ${CODICE} a un giocatore normale"; fi
+
+T=$(gettone "${BASE}/comunicazioni")
+curl -sS -o /dev/null -b "${BISCOTTI}" -c "${BISCOTTI}" -d "_token=${T}" \
+  -d "testo=Una domanda dalla prova automatica." "${BASE}/comunicazioni" >/dev/null
+if contiene "${BASE}/comunicazioni" "Una domanda dalla prova automatica"; then
+  verde "il giocatore scrive e si rilegge"
+else rosso "il messaggio del giocatore non compare nel filo"; fi
+
 # /admin: prima negato, poi concesso.
 CODICE=$(curl -sS -o /dev/null -w '%{http_code}' -b "${BISCOTTI}" "${BASE}/admin")
 if [[ "${CODICE}" == "403" ]]; then verde "/admin e' chiuso a chi non e' amministratore"; else rosso "/admin da' ${CODICE} a un giocatore normale"; fi
@@ -719,6 +814,13 @@ if contiene "${BASE}/admin/utenti" "Gli utenti"; then verde "l'elenco utenti si 
 if contiene "${BASE}/admin/utenti" "${UTENTE}"; then verde "e ci trova dentro l'utente di prova"; else rosso "l'utente di prova non compare in elenco"; fi
 if contiene "${BASE}/admin/mappa" "La situazione"; then verde "la mappa della situazione si apre"; else rosso "/admin/mappa"; fi
 if contiene "${BASE}/admin/mappa" "luogo per luogo"; then verde "e elenca i luoghi"; else rosso "la mappa non elenca i luoghi"; fi
+if contiene "${BASE}/admin/mappa" 'data-api="[^"]*admin/api/carta"'; then
+  verde "e adesso ha anche la carta disegnata"; else rosso "manca la tela sulla mappa admin"; fi
+# La carta dell'amministrazione e' l'unica che puo' dire chi e' giocatore.
+if curl -sS -b "${BISCOTTI}" "${BASE}/admin/api/carta" | grep -q '"giocatori"'; then
+  verde "la carta admin distingue i giocatori dagli abitanti"
+else rosso "la carta admin non distingue giocatori e abitanti"; fi
+
 
 UID_PROVA=$(php -r '
   require "src/autoload.php"; require "src/Support/helpers.php";
@@ -759,6 +861,14 @@ FILE_ADMIN=$(ritratto_di "${PGNOME}")
 if [[ -n "${FILE_ADMIN}" ]]; then verde "un amministratore puo' cambiare la fotografia di un giocatore"
 else rosso "l'amministratore non e' riuscito a mettere la fotografia"; fi
 
+# Il muro si guarda ADESSO, che la fotografia c'e': fra poco l'amministratore
+# la toglie, ed e' un'altra prova.
+if contiene "${BASE}/admin/fotografie" "Le fotografie"; then
+  verde "il muro delle fotografie si apre"; else rosso "/admin/fotografie"; fi
+if contiene "${BASE}/admin/fotografie" "img/ritratti/${FILE_ADMIN}"; then
+  verde "e ci trova dentro quella appena caricata"
+else rosso "la fotografia caricata non compare sul muro"; fi
+
 T=$(gettone "${BASE}/admin/utente/${UID_PROVA}")
 curl -sS -o /dev/null -b "${BISCOTTI}" -c "${BISCOTTI}" \
   -d "_token=${T}" -d "personaggio=${PGID}" -d "aspetto=Uno che nessuno nota mai" \
@@ -792,6 +902,18 @@ else
   verde "e quello che fa sul proprio personaggio non sporca il registro"
 fi
 rm -f "${FOTO}"
+
+# La gestione risponde nello stesso filo, e il giocatore lo rilegge.
+T=$(gettone "${BASE}/admin/comunicazioni/${UID_PROVA}")
+curl -sS -o /dev/null -b "${BISCOTTI}" -c "${BISCOTTI}" -d "_token=${T}" \
+  -d "utente=${UID_PROVA}" -d "testo=Risposta dalla gestione." "${BASE}/admin/comunicazioni" >/dev/null
+if contiene "${BASE}/admin/comunicazioni/${UID_PROVA}" "Risposta dalla gestione"; then
+  verde "la gestione risponde nel filo"; else rosso "la risposta non compare nel filo"; fi
+if contiene "${BASE}/comunicazioni" "Risposta dalla gestione"; then
+  verde "e il giocatore la trova dalla sua parte"
+else rosso "il giocatore non vede la risposta"; fi
+if contiene "${BASE}/admin/comunicazioni" "${UTENTE}"; then
+  verde "il filo compare nell'elenco dei fili"; else rosso "l'elenco dei fili non lo mostra"; fi
 
 # Un utente inventato non deve dare errore: rimanda all'elenco.
 DEST=$(curl -sS -o /dev/null -w '%{redirect_url}' -b "${BISCOTTI}" "${BASE}/admin/utente/999999")

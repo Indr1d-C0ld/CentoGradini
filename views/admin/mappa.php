@@ -20,6 +20,18 @@ $abitanti  = array_sum(array_map(static fn (array $l): int => count($l['abitanti
   I luoghi vuoti restano in elenco: un quartiere vuoto è esso stesso un'informazione.
 </p>
 
+<div class="carta carta-mappa">
+  <canvas id="mappa" width="1000" height="700" role="img"
+          aria-label="Carta del quartiere con le presenze"
+          data-api="<?= e(url('/admin/api/carta')) ?>"
+          data-luogo="#luogo-"></canvas>
+  <p class="aiuto legenda">
+    Tocca un luogo per saltare alla sua riga qui sotto. I pallini arancioni sono
+    <strong>giocatori</strong>, quelli spenti gli abitanti del quartiere: è l'unica carta in
+    cui i due si distinguono, e per questo non esiste fuori da qui.
+  </p>
+</div>
+
 <?php if ($pericolo !== []): ?>
   <div class="avviso attenzione">
     <strong>Chi rischia il trasloco.</strong>
@@ -70,16 +82,27 @@ $abitanti  = array_sum(array_map(static fn (array $l): int => count($l['abitanti
     </tr></thead>
     <tbody>
     <?php foreach ($luoghi as $l): ?>
-      <tr class="<?= $l['giocatori'] !== [] ? 'riga-viva' : '' ?>">
+      <tr id="luogo-<?= e($l['lkey']) ?>" class="<?= $l['giocatori'] !== [] ? 'riga-viva' : '' ?>">
         <td>
           <?= e($l['nome']) ?>
           <?php if (!$l['aperto']): ?><span class="aiuto">chiuso</span><?php endif; ?>
         </td>
         <td>
           <?php if ($l['giocatori'] === []): ?><span class="aiuto">—</span><?php endif; ?>
-          <?php foreach ($l['giocatori'] as $p): ?>
-            <strong><?= e($p['nome'] . ' ' . $p['cognome']) ?></strong><?php
-              if ((int) $p['esper'] === 1): ?><span class="aiuto">·e</span><?php endif; ?>
+          <?php foreach ($l['giocatori'] as $p): $faccia = \App\Game\Ritratto::di($p); ?>
+            <span class="chi-qui">
+              <?php if ($faccia !== null): ?>
+                <img class="fotografia fotografia--piccola" src="<?= e(asset($faccia)) ?>" alt=""
+                     width="34" height="34" loading="lazy">
+              <?php endif; ?>
+              <?php if ($p['user_id'] !== null): ?>
+                <a href="<?= e(url('/admin/utente/' . (int) $p['user_id'])) ?>"><strong><?=
+                  e($p['nome'] . ' ' . $p['cognome']) ?></strong></a>
+              <?php else: ?>
+                <strong><?= e($p['nome'] . ' ' . $p['cognome']) ?></strong>
+              <?php endif; ?>
+              <?php if ((int) $p['esper'] === 1): ?><span class="aiuto">·e</span><?php endif; ?>
+            </span>
           <?php endforeach; ?>
         </td>
         <td class="aiuto">
@@ -124,3 +147,5 @@ $abitanti  = array_sum(array_map(static fn (array $l): int => count($l['abitanti
   </div>
 </div>
 <?php endif; ?>
+
+<script src="<?= e(asset('js/carta.js')) ?>" defer></script>

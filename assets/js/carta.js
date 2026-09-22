@@ -169,14 +169,24 @@
       if (!n.qui) { ctx.stroke(); }
 
       /* Le altre persone: un pallino per testa, in cerchio attorno al luogo.
-         Oltre le sei si smette di contarle e si scrive il numero. */
+         Oltre le sei si smette di contarle e si scrive il numero.
+
+         Se il server manda anche `giocatori` — lo fa solo per la carta
+         dell'amministrazione — i primi pallini sono i giocatori, in arancione,
+         e gli altri gli abitanti del quartiere, in tono spento. Sulla carta
+         del giocatore quel campo non arriva e i pallini restano tutti uguali,
+         che e' come deve essere: li' chi e' mosso dal motore e chi no non si
+         distingue, ed e' una cosa che non si puo' piu' nascondere una volta
+         mostrata. */
       if (n.gente > 0 && !n.qui) {
         var quanti = Math.min(n.gente, 6);
+        var veri = (n.giocatori === undefined) ? quanti
+                 : Math.min(n.giocatori, quanti);
         for (var i = 0; i < quanti; i++) {
           var ang = -Math.PI / 2 + (i * Math.PI * 2) / Math.max(3, quanti);
           ctx.beginPath();
           ctx.arc(n.x + Math.cos(ang) * (r + 7), n.y + Math.sin(ang) * (r + 7), 2.6, 0, Math.PI * 2);
-          ctx.fillStyle = tavolozza.arancio;
+          ctx.fillStyle = (i < veri) ? tavolozza.arancio : tavolozza.tenue;
           ctx.fill();
         }
       }
@@ -227,7 +237,12 @@
   });
   tela.addEventListener('click', function (ev) {
     var n = nodoVicino(ev);
-    if (n) { window.location.href = tela.dataset.luogo + n.k; }
+    if (!n) { return; }
+    /* `data-luogo` e' un prefisso, non un indirizzo: la carta del giocatore ci
+       mette l'indirizzo del luogo, quella dell'amministrazione un'ancora alla
+       riga della tabella sotto. Cosi' la stessa tela serve due pagine che
+       vogliono due cose diverse da un clic. */
+    window.location.href = tela.dataset.luogo + n.k;
   });
 
   /* --- Caricamento ----------------------------------------------------------- */

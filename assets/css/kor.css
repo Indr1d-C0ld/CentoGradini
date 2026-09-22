@@ -689,6 +689,40 @@ label.in_linea { display: inline-flex; align-items: center; gap: .4rem; }
    riga e non si lascia stringere. */
 .elenco-persone .fotografia { align-self: center; flex: 0 0 auto; }
 
+/* Nella tabella della situazione ogni giocatore e' faccia + nome, e i due non
+   si devono separare a fine riga. */
+.chi-qui { display: inline-flex; align-items: center; gap: .35rem; margin-right: .6rem; }
+
+/* Il muro delle fotografie: si guardano tutte insieme, quindi devono starci
+   tutte insieme. Le schede si stringono da sole fin dove la faccia resta
+   riconoscibile. */
+.muro-fotografie {
+  display: grid; gap: 1rem; margin: 1.4rem 0;
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+}
+.muro-fotografie figure { margin: 0; text-align: center; }
+.muro-fotografie .fotografia { width: 100%; max-width: 10rem; margin: 0 auto; }
+.muro-fotografie figcaption { margin: .6rem 0 .5rem; font-size: .88rem; line-height: 1.45; }
+
+/* --- Il filo delle comunicazioni ------------------------------------------ */
+
+/* Deliberatamente NON somiglia al quartiere: niente carta ingiallita, niente
+   corsivo, niente insegna. Qui parla la gestione, e un messaggio di
+   moderazione che sembra finzione è una bugia detta proprio nel momento in cui
+   serve essere creduti. */
+.filo { display: flex; flex-direction: column; gap: .9rem; }
+.filo-riga {
+  border: 1px solid var(--bordo); border-radius: var(--raggio);
+  padding: .7rem .85rem; max-width: 40rem;
+}
+.filo-mio   { background: var(--fondo-cavo); align-self: flex-end; }
+.filo-altro { background: var(--fondo-carta); border-left: 3px solid var(--arancio); }
+.filo-chi   { margin: 0 0 .35rem; font-size: .85rem; }
+.filo-testo { margin: 0; white-space: normal; }
+@media (max-width: 34rem) {
+  .filo-riga { max-width: 100%; }
+}
+
 /* Il riquadro di centratura: dentro ci si trascina l'immagine.
    `touch-action: none` è quello che permette il trascinamento col dito senza
    che il telefono interpreti il gesto come uno scorrimento della pagina. */
