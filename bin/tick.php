@@ -80,6 +80,12 @@ try {
     // voce attraversa la mappa invece di restare dov'e' nata.
     $abitanti = $fase('abitanti', static fn (): int => Abitanti::muovi(), 0);
 
+    // Gli incidenti che nessuno ha chiuso valgono come «non ho fatto niente»:
+    // il silenzio e' una risposta, e il testimone si tiene l'anomalia. Va
+    // DOPO gli abitanti e PRIMA delle voci: l'anomalia appena nata deve poter
+    // entrare nel giro delle chiacchiere dello stesso battito.
+    $incidenti = $fase('incidenti', static fn (): int => Segreto::incidentiScaduti(), 0);
+
     // Il quartiere chiacchiera: chi e' nello stesso posto si racconta le
     // cose, e le voci si deformano passando di bocca in bocca.
     $ciarle = $fase('voci', static fn (): array => Voci::giro(),
@@ -112,6 +118,7 @@ try {
                 'scene_chiuse' => $scene,
                 'episodi_nuovi'=> $nuovi,
                 'abitanti'     => $abitanti,
+                'incidenti_scaduti' => $incidenti,
                 'voci'         => $ciarle,
                 'voci_potate'  => $vociPotate,
                 'avvisi_potati'=> $avvisi,

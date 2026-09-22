@@ -409,6 +409,70 @@ final class Segreto
         ) !== null;
     }
 
+    /**
+     * Gli incidenti che nessuno ha chiuso.
+     *
+     * Il diagramma di progetto (PROGETTO.md §7) mette **«non fare niente»** fra
+     * le quattro vie dopo un incidente aperto, e la fa confluire nello stesso
+     * esito delle altre: chi non copre lascia al testimone un'anomalia. Nel
+     * codice quella via c'era — `copri($pg, $id, 'niente')` — ma era una
+     * SCELTA. Chi chiudeva il browser invece di sceglierla non pagava niente:
+     * l'incidente restava «aperto» per sempre e nessuna anomalia nasceva.
+     *
+     * Il risultato era il contrario di quello che il gioco vuole insegnare —
+     * dichiarare «non faccio niente» costava, andarsene no — e in un gioco
+     * persistente una strategia dominante del genere la trova il primo
+     * giocatore attento e la insegna a tutti gli altri.
+     *
+     * Quindi il tempo decide al posto di chi non decide: passati
+     * `segreto.incidente_scade_minuti` minuti di gioco, l'incidente vale come
+     * «non ho fatto niente». Non e' una punizione aggiuntiva, e' la stessa
+     * regola applicata anche a chi non risponde: in quartiere si resta davanti
+     * alla persona che ha visto, e il silenzio e' una risposta.
+     *
+     * @return int quanti incidenti sono stati chiusi dal tempo
+     */
+    public static function incidentiScaduti(?int $gts = null): int
+    {
+        $gts   = $gts ?? Orologio::lineare();
+        $soglia = max(1, GameConfig::int('segreto.incidente_scade_minuti', 60)) * 60;
+
+        $aperti = Database::all(
+            "SELECT * FROM incidenti WHERE stato = 'aperto' AND gts <= ?",
+            [$gts - $soglia]
+        );
+        $chiusi = 0;
+        foreach ($aperti as $inc) {
+            // Lo stesso lucchetto di copri(): se il giocatore sta scegliendo
+            // proprio adesso, decide lui e non l'orologio.
+            $fatto = Lock::con('copri:' . (int) $inc['id'], function () use ($inc): bool {
+                $fresco = Database::first('SELECT stato FROM incidenti WHERE id = ?', [(int) $inc['id']]);
+                if ($fresco === null || (string) $fresco['stato'] !== 'aperto') {
+                    return false;
+                }
+                foreach (Database::all(
+                    'SELECT personaggio_id FROM incidente_testimoni
+                     WHERE incidente_id = ? AND notato = 1 AND coperto = 0',
+                    [(int) $inc['id']]
+                ) as $t) {
+                    self::segnaAnomalia(
+                        (int) $t['personaggio_id'], (int) $inc['attore_id'], (int) $inc['id'],
+                        (string) $inc['pkey'], (string) $inc['luogo'], (int) $inc['gts']
+                    );
+                }
+                Database::run(
+                    "UPDATE incidenti SET stato = 'sfuggito', copertura = NULL WHERE id = ?",
+                    [(int) $inc['id']]
+                );
+                return true;
+            }, false);
+            if ($fatto === true) {
+                $chiusi++;
+            }
+        }
+        return $chiusi;
+    }
+
     // --- Le anomalie -----------------------------------------------------------
 
     private static function segnaAnomalia(

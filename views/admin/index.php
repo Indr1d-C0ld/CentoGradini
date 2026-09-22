@@ -113,7 +113,7 @@ $ritardo  = $ultimo === null ? null : (time() - strtotime((string) $ultimo['star
     <label>Chiave
       <select name="chiave">
         <?php foreach ($config as $k => $v): ?>
-          <option value="<?= e($k) ?>"><?= e($k) ?> — <?= e((string) $v) ?></option>
+          <option value="<?= e($k) ?>"><?= e($k) ?> — <?= e((string) $v['value']) ?></option>
         <?php endforeach; ?>
       </select>
     </label>
@@ -125,8 +125,16 @@ $ritardo  = $ultimo === null ? null : (time() - strtotime((string) $ultimo['star
   <table class="tabella">
     <thead><tr><th>chiave</th><th>valore</th></tr></thead>
     <tbody>
+    <?php /* GameConfig::all() da' ['chiave' => ['value' => …, 'type' => …]], non uno
+             scalare: trattarlo come tale stampava «Array» in tutte e cinquanta le
+             righe e riempiva il log di avvisi. La pagina rispondeva 200, quindi
+             nessuna prova se n'e' accorta finche' non si e' guardato il log. */ ?>
     <?php foreach ($config as $k => $v): ?>
-      <tr><td class="minuto" data-etichetta="chiave"><?= e($k) ?></td><td data-etichetta="valore"><?= e((string) $v) ?></td></tr>
+      <tr>
+        <td class="minuto" data-etichetta="chiave"><?= e($k) ?></td>
+        <td data-etichetta="valore"><?= e((string) $v['value']) ?>
+          <span class="aiuto"><?= e((string) $v['type']) ?></span></td>
+      </tr>
     <?php endforeach; ?>
     </tbody>
   </table>

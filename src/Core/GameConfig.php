@@ -54,12 +54,25 @@ final class GameConfig
         return (bool) self::get($key, $default);
     }
 
-    public static function set(string $key, string $value, string $type = 'string', ?string $note = null): void
+    /**
+     * Cambia il valore di una manopola.
+     *
+     * **Il tipo non si tocca se non lo si dice.** Prima il parametro aveva
+     * come difetto `'string'` e la query lo riscriveva sempre: chiunque
+     * chiamasse `set()` senza conoscere il tipo — `bin/console.php config:set`
+     * col terzo argomento omesso, una prova che rimette a posto un valore —
+     * declassava la manopola a stringa in silenzio. Il valore continuava a
+     * funzionare, perche' `int()` e `bool()` lo convertono comunque; a rompersi
+     * era la pagina delle leve, che sceglie il controllo da mostrare guardando
+     * il tipo, e da quel momento offriva una casella di testo dove serviva una
+     * spunta. Un guasto che non si vede finche' non si va a cercarlo.
+     */
+    public static function set(string $key, string $value, ?string $type = null, ?string $note = null): void
     {
         Database::run(
-            'INSERT INTO game_config (ckey, cvalue, ctype, note) VALUES (?, ?, ?, ?)
-             ON DUPLICATE KEY UPDATE cvalue = VALUES(cvalue), ctype = VALUES(ctype)',
-            [$key, $value, $type, $note]
+            'INSERT INTO game_config (ckey, cvalue, ctype, note) VALUES (?, ?, COALESCE(?, \'string\'), ?)
+             ON DUPLICATE KEY UPDATE cvalue = VALUES(cvalue), ctype = COALESCE(?, ctype)',
+            [$key, $value, $type, $note, $type]
         );
         self::$cache = null;
     }

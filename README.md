@@ -241,10 +241,10 @@ progetto esiste.
 | **10** | club scolastici |
 | **14** | eventi stagionali di server |
 | **10** | copioni di episodi |
-| **50** | manopole di configurazione, cambiabili a caldo |
-| **16** | migrazioni |
+| **49** | manopole di configurazione, tutte lette da qualcuno |
+| **17** | migrazioni |
 | **75** | rotte |
-| **406** | verifiche su 15 file di prova (14 unitari + 1 end-to-end) |
+| **415** | verifiche su 16 file di prova (15 unitari + 1 end-to-end) |
 
 ### Le schermate
 
@@ -263,7 +263,7 @@ Il pannello, per chi amministra: `/admin` il cruscotto · `/admin/utenti` e
 `/admin/utente/{id}` gli account, i personaggi e la moderazione ·
 `/admin/mappa` la carta con le presenze · `/admin/statistiche` ·
 `/admin/comunicazioni` i fili con i giocatori · `/admin/fotografie` il muro delle
-facce · `/admin/accessi` le provenienze · `/admin/impostazioni` le cinquanta leve.
+facce · `/admin/accessi` le provenienze · `/admin/impostazioni` le quarantanove leve.
 
 È anche una **PWA**: si installa, e il service worker tiene in tasca il guscio
 del sito. Non mette mai in cache le pagine di gioco — il quartiere cambia ogni
@@ -619,6 +619,36 @@ Annotate qui perché non si ripetano.
    celle via `data-etichetta`. Regola generale: quando un contenuto non ci sta,
    prima si guarda **perché il contenitore è largo così**, e solo dopo si tocca
    il contenuto.
+
+19. **Un guasto che risponde 200 non lo trova nessuna prova che guardi solo il
+   codice di stato.** Un audit di settembre ha trovato quattro cose che
+   giravano da giorni senza che niente le segnalasse, e tutte e quattro avevano
+   la stessa forma: nessuna eccezione, nessun errore, la pagina si apriva. Il
+   cruscotto stampava «Array» al posto di tutti e cinquanta i valori delle
+   manopole (e cento avvisi per visita, nel log che nessuno leggeva);
+   `GameConfig::set()` declassava a stringa il tipo di ogni manopola toccata da
+   riga di comando; una manopola letta dal codice non era in tabella e quindi
+   non era regolabile, mentre tre in tabella non le leggeva nessuno — leve
+   collegate a niente, che è peggio di leve assenti. Le tre cose che le hanno
+   fatte saltare fuori: **esercitare ogni rotta con `error_reporting=E_ALL` e
+   leggere il log**, non solo il codice HTTP; **confrontare il codice con i
+   dati** (quali chiavi legge il codice, quali stanno in tabella, e l'insieme
+   simmetrico delle differenze); e **far girare il mondo a vuoto per una
+   settimana simulata**, che è l'unico modo di vedere se un motore produce
+   qualcosa o gira a vuoto — le prove unitarie passano identiche nei due casi.
+
+20. **Non decidere non può costare meno che decidere.** Il diagramma del Segreto
+   mette «non fare niente» fra le quattro risposte a un incidente, e chi la
+   sceglie lascia un'anomalia a ogni testimone. Nel codice quella via c'era, ma
+   solo come **scelta**: chi chiudeva il browser invece di sceglierla non pagava
+   nulla, perché l'incidente restava aperto per sempre e nessuno lo chiudeva
+   mai. Dichiarare «non faccio niente» costava, andarsene no — l'opposto di
+   quello che il gioco vuole insegnare, e in un gioco persistente una strategia
+   dominante del genere la trova il primo giocatore attento e la insegna a tutti
+   gli altri. Adesso il tempo decide al posto di chi non decide. La regola
+   generale: ogni ramo di una scelta di gioco deve avere un esito, **compreso
+   il ramo di chi non risponde** — ed è quello che si dimentica, perché non ha
+   un bottone.
 
 ## Licenza e diritti
 

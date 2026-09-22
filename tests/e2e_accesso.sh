@@ -789,6 +789,15 @@ if contiene "${BASE}/quartiere" 'class="barra-admin"'; then
 if contiene "${BASE}/quartiere" "statistiche"; then
   verde "e porta alle sezioni"; else rosso "la barra admin non elenca le sezioni"; fi
 if contiene "${BASE}/admin" "Le manopole del mondo"; then verde "e mostra le manopole"; else rosso "il pannello e' incompleto"; fi
+# Mostrarle non basta: mostrava il titolo della sezione e dentro «Array» in
+# tutte e cinquanta le righe, perche' GameConfig::all() restituisce
+# ['chiave' => ['value' => …, 'type' => …]] e la vista lo trattava da scalare.
+# La pagina rispondeva 200 e nessuna prova se ne accorgeva.
+if contiene "${BASE}/admin" ">Array<"; then
+  rosso "il cruscotto stampa «Array» al posto dei valori delle manopole"
+else verde "e ne mostra i valori veri, non «Array»"; fi
+if contiene "${BASE}/admin" "world.seed"; then
+  verde "col nome della manopola accanto"; else rosso "le manopole non compaiono per nome"; fi
 
 # Le tre schermate profonde.
 if contiene "${BASE}/admin/statistiche" "Il Segreto"; then verde "le statistiche si aprono"; else rosso "/admin/statistiche"; fi

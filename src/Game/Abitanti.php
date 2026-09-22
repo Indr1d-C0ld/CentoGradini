@@ -241,9 +241,16 @@ final class Abitanti
         // metteva gente dentro il luna park alle sette di mattina: gli orari
         // sono dati del luogo, e l'abitudine non li scavalca. Se non e'
         // aperto niente, si torna a casa.
+        // Il resto di una divisione con dividendo negativo, in PHP, e'
+        // negativo — e un indice negativo su una lista non esiste. Oggi $i e'
+        // sempre positivo perche' l'istante di gioco cresce dall'epoca in
+        // avanti, ma basta un orologio di sistema indietro rispetto all'epoca
+        // registrata (una macchina nuova, un ripristino) per mandarlo sotto
+        // zero, e allora il giro degli abitanti si riempie di avvisi invece di
+        // ripiegare sulla prima tappa. Si normalizza qui, una volta.
         $quante = count($tappe);
         for ($k = 0; $k < $quante; $k++) {
-            $forse = $tappe[($i + $k) % $quante];
+            $forse = $tappe[(($i + $k) % $quante + $quante) % $quante];
             if (Luoghi::accessibile($forse, $gts)[0]) {
                 return $forse;
             }
