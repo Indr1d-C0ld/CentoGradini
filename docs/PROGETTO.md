@@ -477,6 +477,19 @@ Stessa impalcatura di [SubSpazio] e [Atlantik], che su questa macchina è collau
 | **F6** ✔ | Multigiocatore pieno: le **voci** con precisione e tono che si degradano di bocca in bocca, 11 **abitanti canonici** che girano per il quartiere da soli, 10 **club** come secondo canale di propagazione, **bacheca** e **biglietti**, 14 **eventi stagionali** di server | **Fatta.** Il quartiere è pieno di gente che non hai mai incontrato ma di cui hai sentito parlare |
 | **F7** ✔ | Rifinitura: album dei ricordi **illustrato** (SVG generato da luogo, stagione, ora e meteo), **esportazione del diario** in Markdown, **PWA** con service worker, **`/admin`**, comando **`bilancio`**, suoni opt-in generati con WebAudio | **Fatta.** Il gioco è finito |
 
+Dopo F7 si aggiunge contenuto e comodità, non impalcatura. In ordine di arrivo:
+
+- **22 fotografie dei luoghi** (3 fotografie vere sotto CC BY-SA, 19 immagini generate,
+  distinte una per una in `assets/img/luoghi/crediti.php` — nessuna delle due cosa si
+  spaccia per l'altra).
+- **`/admin` in profondità**: utenti, moderazione con motivo obbligatorio, accessi e
+  provenienze, 49 manopole raggruppate per famiglia, mappa della situazione, statistiche.
+- **Uso da telefono e da tablet**, senza toccare la vista da monitor: la carta si
+  ridimensiona sullo spazio disponibile e si trascina solo quando serve davvero.
+- **La fotografia del personaggio** (migrazione `0015`): caricamento con ritaglio e
+  centratura manuale, riscrittura in WebP a 320 pixel, nome del file uguale all'impronta
+  del contenuto, e la stessa rotta per l'amministratore sul profilo di un giocatore.
+
 ---
 
 ## 12-bis. La sala dedicata a Izumi Matsumoto

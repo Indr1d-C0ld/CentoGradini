@@ -6,6 +6,7 @@
  * @var list<array<string,mixed>> $poteri
  */
 use App\Game\Personaggio;
+use App\Game\Ritratto;
 use App\Game\Scheda;
 use App\Sim\Orologio;
 use App\Sim\Scuola;
@@ -17,13 +18,34 @@ $alCompleanno = Scuola::giorniAlCompleanno((int) $pg['nato_mese'], (int) $pg['na
 <?= partial('insegna', ['mondo' => $mondo]) ?>
 
 <p class="occhiello"><a href="<?= e(url('/quartiere')) ?>">← il quartiere</a></p>
-<h1><?= e(Personaggio::nomeCompleto($pg)) ?></h1>
-<p class="sommario">
-  <?= e(Scuola::nomeClasse((string) $pg['sezione'], (int) $pg['anno'])) ?>
-  <span class="tenue">(<?= e(Scuola::siglaClasse((string) $pg['sezione'], (int) $pg['anno'])) ?>)</span>
-  · <?= $eta ?> anni
-  · <?= (bool) $pg['esper'] ? 'della stirpe' : 'nessun potere' ?>
-</p>
+
+<?php $faccia = Ritratto::di($pg); ?>
+<div class="riga-fotografia">
+  <?php if ($faccia !== null): ?>
+    <img class="fotografia fotografia--media" src="<?= e(asset($faccia)) ?>"
+         alt="La tua fotografia" width="80" height="80">
+  <?php else: ?>
+    <div class="fotografia fotografia--media fotografia--vuota" aria-hidden="true"><?=
+      e(mb_strtoupper(mb_substr((string) $pg['nome'], 0, 1))) ?></div>
+  <?php endif; ?>
+  <div>
+    <h1 style="margin:0"><?= e(Personaggio::nomeCompleto($pg)) ?></h1>
+    <p class="sommario" style="margin:.2rem 0 0">
+      <?= e(Scuola::nomeClasse((string) $pg['sezione'], (int) $pg['anno'])) ?>
+      <span class="tenue">(<?= e(Scuola::siglaClasse((string) $pg['sezione'], (int) $pg['anno'])) ?>)</span>
+      · <?= $eta ?> anni
+      · <?= (bool) $pg['esper'] ? 'della stirpe' : 'nessun potere' ?>
+    </p>
+    <p class="occhiello" style="margin:.35rem 0 0">
+      <a href="<?= e(url('/personaggio/profilo')) ?>"><?=
+        $faccia === null ? 'metti una fotografia' : 'cambia la fotografia' ?></a>
+    </p>
+  </div>
+</div>
+
+<?php if ((string) ($pg['aspetto'] ?? '') !== ''): ?>
+  <p class="sommario"><em><?= e((string) $pg['aspetto']) ?></em></p>
+<?php endif; ?>
 
 <?php if ($alCompleanno === 0): ?>
   <div class="evento-oggi"><b>Oggi è il tuo compleanno.</b>

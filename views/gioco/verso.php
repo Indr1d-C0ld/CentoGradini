@@ -9,6 +9,7 @@
  * @var array<string,mixed>|null $oggetto
  */
 use App\Game\Legami;
+use App\Game\Ritratto;
 use App\Game\Scheda;
 use App\Game\Segreto;
 use App\Sim\Scuola;
@@ -20,13 +21,29 @@ $soglia = GameConfig::int('legami.soglia_confessione', 45);
 <?= partial('insegna', ['mondo' => $mondo]) ?>
 
 <p class="occhiello"><a href="<?= e(url('/quartiere')) ?>">← il quartiere</a></p>
-<h1><?= e($altro['cognome'] . ' ' . $altro['nome']) ?></h1>
-<p class="sommario">
-  <?= e(Scuola::nomeClasse((string) $altro['sezione'], (int) $altro['anno'])) ?>
-  <?php if (Segreto::sa((int) $pg['id'], (int) $altro['id'])): ?>
-    · <em>sa il tuo segreto</em>
+
+<?php $faccia = Ritratto::di($altro); ?>
+<div class="riga-fotografia">
+  <?php if ($faccia !== null): ?>
+    <img class="fotografia fotografia--media" src="<?= e(asset($faccia)) ?>"
+         alt="" width="80" height="80">
+  <?php else: ?>
+    <div class="fotografia fotografia--media fotografia--vuota" aria-hidden="true"><?=
+      e(mb_strtoupper(mb_substr((string) $altro['nome'], 0, 1))) ?></div>
   <?php endif; ?>
-</p>
+  <div>
+    <h1 style="margin:0"><?= e($altro['cognome'] . ' ' . $altro['nome']) ?></h1>
+    <p class="sommario" style="margin:.2rem 0 0">
+      <?= e(Scuola::nomeClasse((string) $altro['sezione'], (int) $altro['anno'])) ?>
+      <?php if (Segreto::sa((int) $pg['id'], (int) $altro['id'])): ?>
+        · <em>sa il tuo segreto</em>
+      <?php endif; ?>
+    </p>
+    <?php if ((string) ($altro['aspetto'] ?? '') !== ''): ?>
+      <p class="occhiello" style="margin:.35rem 0 0"><em><?= e((string) $altro['aspetto']) ?></em></p>
+    <?php endif; ?>
+  </div>
+</div>
 
 <div class="carta">
   <p class="occhiello">Come stanno le cose</p>

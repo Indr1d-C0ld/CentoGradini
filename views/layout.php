@@ -27,6 +27,7 @@ $titoloPagina = (string) ($title ?? $nomeGioco);
 <meta name="apple-mobile-web-app-title" content="Cento Gradini">
 <script src="<?= e(asset('js/pwa.js')) ?>" data-sw="<?= e(url('/sw.js')) ?>" defer></script>
 <script src="<?= e(asset('js/suoni.js')) ?>" defer></script>
+<script src="<?= e(asset('js/ritaglio.js')) ?>" defer></script>
 </head>
 <body<?= $ambiente !== '' ? ' data-ambiente="' . e($ambiente) . '"' : '' ?>>
 

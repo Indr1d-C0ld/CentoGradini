@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Controllers\AuthController;
 use App\Controllers\HomeController;
+use App\Controllers\ProfiloController;
 use App\Controllers\QuartiereController;
 use App\Controllers\AdminController;
 use App\Controllers\EpisodiController;
@@ -40,6 +41,14 @@ $router->post('/personaggio/nuovo', [QuartiereController::class, 'crea'], ['acti
 $router->get('/personaggio/abilita', [QuartiereController::class, 'mostraAbilita'], ['active']);
 $router->post('/personaggio/abilita', [QuartiereController::class, 'salvaAbilita'], ['active', 'throttle']);
 $router->get('/personaggio', [QuartiereController::class, 'scheda'], ['active']);
+
+// La faccia e l'aspetto. Le stesse rotte le usa l'amministratore su un altro
+// personaggio, passando `personaggio=<id>`: il diritto di farlo lo controlla
+// ProfiloController::bersaglio(), una volta sola per tutte e quattro.
+$router->get('/personaggio/profilo', [ProfiloController::class, 'mostra'], ['active']);
+$router->post('/personaggio/profilo/foto', [ProfiloController::class, 'carica'], ['active', 'throttle']);
+$router->post('/personaggio/profilo/foto/togli', [ProfiloController::class, 'togli'], ['active', 'throttle']);
+$router->post('/personaggio/profilo/aspetto', [ProfiloController::class, 'aspetto'], ['active', 'throttle']);
 
 // --- Il quartiere ----------------------------------------------------------------
 $router->get('/quartiere', [QuartiereController::class, 'index'], ['active']);

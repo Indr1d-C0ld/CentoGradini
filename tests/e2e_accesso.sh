@@ -579,6 +579,91 @@ php -r '
 if contiene "${BASE}/ricordi" 'class="illustrazione"'; then verde "l'album e' illustrato"; else rosso "manca l'illustrazione nell'album"; fi
 if contiene "${BASE}/ricordi" 'Un pomeriggio qualunque'; then verde "e il ricordo c'e'"; else rosso "il ricordo non compare"; fi
 
+# --- La fotografia del personaggio -------------------------------------------
+# Questa parte gira mentre l'utente di prova e' ancora un giocatore normale:
+# serve a dimostrare che senza i galloni non si tocca la faccia di un altro.
+titolo "La fotografia"
+
+ritratto_di() {
+  php -r '
+    require "src/autoload.php"; require "src/Support/helpers.php";
+    $GLOBALS["__project_root"] = getcwd();
+    App\Core\Config::load(getcwd());
+    $p = App\Core\Database::first("SELECT ritratto_file FROM personaggi WHERE nome = ?", [$argv[1]]);
+    echo (string) ($p["ritratto_file"] ?? "");
+  ' "$1"
+}
+
+if contiene "${BASE}/personaggio/profilo" 'data-ritaglio'; then
+  verde "la pagina del profilo offre il riquadro di ritaglio"
+else rosso "/personaggio/profilo non ha il riquadro"; fi
+if contiene "${BASE}/personaggio/profilo" 'name="lato"'; then
+  verde "e i campi del ritaglio ci sono anche senza JavaScript"
+else rosso "mancano i campi nascosti del ritaglio"; fi
+
+# Si carica un file vero, con un multipart vero: e' l'unico modo di provare
+# insieme is_uploaded_file, GD e la scrittura su disco. Un finto POST di soli
+# campi passerebbe accanto a tutte e tre le cose.
+FOTO="$(mktemp)".png
+php -r '
+  $im = imagecreatetruecolor(600, 400);
+  imagefilledrectangle($im, 0, 0, 299, 399, imagecolorallocate($im, 210, 40, 40));
+  imagefilledrectangle($im, 300, 0, 599, 399, imagecolorallocate($im, 40, 40, 210));
+  imagepng($im, $argv[1]);
+' "${FOTO}"
+
+T=$(gettone "${BASE}/personaggio/profilo")
+curl -sS -o /dev/null -b "${BISCOTTI}" -c "${BISCOTTI}" \
+  -F "_token=${T}" -F "foto=@${FOTO};type=image/png" \
+  -F "sx=200" -F "sy=0" -F "lato=400" "${BASE}/personaggio/profilo/foto" >/dev/null
+FILE=$(ritratto_di "${PGNOME}")
+if [[ -n "${FILE}" ]]; then verde "la fotografia risulta assegnata al personaggio"
+else rosso "dopo il caricamento il personaggio e' ancora senza fotografia"; fi
+if [[ -n "${FILE}" && -f "${RADICE}/assets/img/ritratti/${FILE}" ]]; then
+  verde "e il file sta dove ci si aspetta"
+else rosso "il file ${FILE:-?} non c'e' in assets/img/ritratti/"; fi
+if [[ -n "${FILE}" ]] && php -r '
+    $m = getimagesize($argv[1]);
+    exit($m !== false && $m[0] === 320 && $m[1] === 320 && $m[2] === IMAGETYPE_WEBP ? 0 : 1);
+  ' "${RADICE}/assets/img/ritratti/${FILE}"; then
+  verde "quello che si serve e' un WebP di 320 pixel, non il file caricato"
+else rosso "il file servito non e' stato riscritto come ci aspettavamo"; fi
+if contiene "${BASE}/personaggio" "img/ritratti/${FILE}"; then
+  verde "e compare sulla scheda"
+else rosso "la fotografia non compare sulla scheda"; fi
+
+# Il pezzo che conta: un giocatore normale non modifica il profilo di un
+# altro. Il gettone e' valido apposta — se fosse sbagliato il rifiuto
+# arriverebbe dal CSRF e questa prova direbbe il falso.
+ALTRO=$(php -r '
+  require "src/autoload.php"; require "src/Support/helpers.php";
+  $GLOBALS["__project_root"] = getcwd();
+  App\Core\Config::load(getcwd());
+  $p = App\Core\Database::first("SELECT id FROM personaggi WHERE nome <> ? LIMIT 1", [$argv[1]]);
+  echo $p === null ? 0 : (int) $p["id"];
+' "${PGNOME}")
+if [[ "${ALTRO}" != "0" ]]; then
+  T=$(gettone "${BASE}/personaggio/profilo")
+  CODICE=$(curl -sS -o /dev/null -w '%{http_code}' -b "${BISCOTTI}" -c "${BISCOTTI}" \
+    -d "_token=${T}" -d "personaggio=${ALTRO}" "${BASE}/personaggio/profilo/foto/togli")
+  if [[ "${CODICE}" == "403" ]]; then
+    verde "un giocatore non tocca il profilo di un altro"
+  else rosso "il profilo di un altro risponde ${CODICE} a un giocatore normale"; fi
+else
+  rosso "non ho trovato un secondo personaggio su cui provare il divieto"
+fi
+
+# E la si toglie: sparisce dalla riga e sparisce dal disco.
+T=$(gettone "${BASE}/personaggio/profilo")
+curl -sS -o /dev/null -b "${BISCOTTI}" -c "${BISCOTTI}" \
+  -d "_token=${T}" "${BASE}/personaggio/profilo/foto/togli" >/dev/null
+if [[ -z "$(ritratto_di "${PGNOME}")" ]]; then verde "togliere la fotografia svuota la riga"
+else rosso "la fotografia risulta ancora assegnata"; fi
+if [[ -n "${FILE}" && ! -f "${RADICE}/assets/img/ritratti/${FILE}" ]]; then
+  verde "e porta via anche il file, che non serviva piu' a nessuno"
+else rosso "il file e' rimasto sul disco"; fi
+rm -f "${FOTO}"
+
 # /admin: prima negato, poi concesso.
 CODICE=$(curl -sS -o /dev/null -w '%{http_code}' -b "${BISCOTTI}" "${BASE}/admin")
 if [[ "${CODICE}" == "403" ]]; then verde "/admin e' chiuso a chi non e' amministratore"; else rosso "/admin da' ${CODICE} a un giocatore normale"; fi
@@ -630,6 +715,70 @@ UID_PROVA=$(php -r '
   echo $u === null ? 0 : (int) $u["id"];
 ' "${UTENTE}")
 if contiene "${BASE}/admin/utente/${UID_PROVA}" "Le connessioni"; then verde "la scheda di un utente si apre"; else rosso "/admin/utente/${UID_PROVA}"; fi
+
+# Il profilo di un giocatore si modifica da qui: e' la meta' che il divieto di
+# poco fa non poteva provare — che con i galloni la stessa rotta funziona.
+PGID=$(php -r '
+  require "src/autoload.php"; require "src/Support/helpers.php";
+  $GLOBALS["__project_root"] = getcwd();
+  App\Core\Config::load(getcwd());
+  $p = App\Core\Database::first("SELECT id FROM personaggi WHERE nome = ?", [$argv[1]]);
+  echo $p === null ? 0 : (int) $p["id"];
+' "${PGNOME}")
+if contiene "${BASE}/admin/utente/${UID_PROVA}" "data-ritaglio"; then
+  verde "e offre il riquadro per correggere la fotografia"
+else rosso "la scheda dell'utente non ha il riquadro"; fi
+if contiene "${BASE}/admin/utente/${UID_PROVA}" "name=\"personaggio\" value=\"${PGID}\""; then
+  verde "puntato sul personaggio giusto"
+else rosso "il riquadro admin non porta il numero del personaggio"; fi
+
+FOTO="$(mktemp)".png
+php -r '
+  $im = imagecreatetruecolor(500, 500);
+  imagefilledrectangle($im, 0, 0, 499, 499, imagecolorallocate($im, 90, 160, 120));
+  imagepng($im, $argv[1]);
+' "${FOTO}"
+T=$(gettone "${BASE}/admin/utente/${UID_PROVA}")
+curl -sS -o /dev/null -b "${BISCOTTI}" -c "${BISCOTTI}" \
+  -F "_token=${T}" -F "personaggio=${PGID}" -F "foto=@${FOTO};type=image/png" \
+  -F "sx=0" -F "sy=0" -F "lato=500" "${BASE}/personaggio/profilo/foto" >/dev/null
+FILE_ADMIN=$(ritratto_di "${PGNOME}")
+if [[ -n "${FILE_ADMIN}" ]]; then verde "un amministratore puo' cambiare la fotografia di un giocatore"
+else rosso "l'amministratore non e' riuscito a mettere la fotografia"; fi
+
+T=$(gettone "${BASE}/admin/utente/${UID_PROVA}")
+curl -sS -o /dev/null -b "${BISCOTTI}" -c "${BISCOTTI}" \
+  -d "_token=${T}" -d "personaggio=${PGID}" -d "aspetto=Uno che nessuno nota mai" \
+  "${BASE}/personaggio/profilo/aspetto" >/dev/null
+if php -r '
+    require "src/autoload.php"; require "src/Support/helpers.php";
+    $GLOBALS["__project_root"] = getcwd();
+    App\Core\Config::load(getcwd());
+    $p = App\Core\Database::first("SELECT aspetto FROM personaggi WHERE id = ?", [(int) $argv[1]]);
+    exit(($p["aspetto"] ?? "") === "Uno che nessuno nota mai" ? 0 : 1);
+  ' "${PGID}"; then
+  verde "e puo' correggere anche com'e' fatto"
+else rosso "l'aspetto non e' stato scritto"; fi
+
+T=$(gettone "${BASE}/admin/utente/${UID_PROVA}")
+curl -sS -o /dev/null -b "${BISCOTTI}" -c "${BISCOTTI}" \
+  -d "_token=${T}" -d "personaggio=${PGID}" "${BASE}/personaggio/profilo/foto/togli" >/dev/null
+if [[ -z "$(ritratto_di "${PGNOME}")" ]]; then verde "e puo' togliere la fotografia di un giocatore"
+else rosso "l'amministratore non e' riuscito a togliere la fotografia"; fi
+if php -r '
+    require "src/autoload.php"; require "src/Support/helpers.php";
+    $GLOBALS["__project_root"] = getcwd();
+    App\Core\Config::load(getcwd());
+    $n = App\Core\Database::first(
+      "SELECT COUNT(*) n FROM audit_log WHERE action LIKE ? AND target_id = ?",
+      ["admin.profilo.%", (int) $argv[1]]);
+    exit(((int) ($n["n"] ?? 0)) > 0 ? 0 : 1);
+  ' "${UID_PROVA}"; then
+  rosso "nel registro c'e' una riga per quello che l'admin ha fatto a SE STESSO"
+else
+  verde "e quello che fa sul proprio personaggio non sporca il registro"
+fi
+rm -f "${FOTO}"
 
 # Un utente inventato non deve dare errore: rimanda all'elenco.
 DEST=$(curl -sS -o /dev/null -w '%{redirect_url}' -b "${BISCOTTI}" "${BASE}/admin/utente/999999")

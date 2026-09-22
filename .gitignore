@@ -4,6 +4,11 @@
 /storage/*.lock
 /storage/cache/
 /.claude/
+
+# Le fotografie caricate dai giocatori: sono di persone vere e non entrano in
+# nessun repository, ne' in quello privato. La cartella si tiene (.gitkeep).
+/assets/img/ritratti/*
+!/assets/img/ritratti/.gitkeep
 __pycache__/
 
 .DS_Store

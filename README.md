@@ -242,14 +242,15 @@ progetto esiste.
 | **14** | eventi stagionali di server |
 | **10** | copioni di episodi |
 | **49** | manopole di configurazione, cambiabili a caldo |
-| **13** | migrazioni |
-| **56** | rotte |
-| **315** | verifiche su 13 file di prova (12 unitari + 1 end-to-end) |
+| **15** | migrazioni |
+| **67** | rotte |
+| **377** | verifiche su 14 file di prova (13 unitari + 1 end-to-end) |
 
 ### Le schermate
 
 `/quartiere` la carta e dove sei · `/luogo/{x}` la scheda di un posto ·
-`/personaggio` la tua scheda · `/legami` il grafo delle relazioni ·
+`/personaggio` la tua scheda · `/personaggio/profilo` la fotografia e l'aspetto ·
+`/legami` il grafo delle relazioni ·
 `/verso/{id}` cosa provi per una persona, e cosa puoi farci ·
 `/taccuino` le anomalie che hai annotato · `/incidente/{id}` coprire un potere
 appena usato · `/voci` quello che ti è arrivato · `/bacheca` e `/biglietti` ·
@@ -260,6 +261,35 @@ appena usato · `/voci` quello che ti è arrivato · `/bacheca` e `/biglietti` �
 È anche una **PWA**: si installa, e il service worker tiene in tasca il guscio
 del sito. Non mette mai in cache le pagine di gioco — il quartiere cambia ogni
 minuto, e una pagina salvata è una bugia su dove si trovano gli altri.
+
+### La faccia
+
+Ogni personaggio può avere una **fotografia**, che il giocatore carica e centra
+da sé: si sceglie un file, lo si trascina dentro un quadrato e si stringe finché
+l'inquadratura è quella giusta. Compare sulla scheda, sulla pagina di chi si
+incontra e nell'elenco di chi c'è in un posto.
+
+Il riquadro manda al server il **rettangolo di ritaglio in pixel dell'immagine
+originale**, non «zoom e spostamento»: quei due numeri significherebbero
+qualcosa solo conoscendo la misura del riquadro sullo schermo di chi carica, e
+il server non la conosce e non deve fidarsene. Un rettangolo lo sa verificare da
+solo, e infatti lo riporta dentro i bordi qualunque cosa arrivi. Senza
+JavaScript il modulo funziona lo stesso: il ritaglio resta a zero e il server
+centra sul lato corto, un po' più in alto del centro geometrico — in un ritratto
+la testa sta in alto, e tagliare dal centro decapita.
+
+**Quello che si carica non è quello che si serve.** Il file portato da casa non
+arriva mai al disco: viene riaperto con GD, ritagliato, riscalato a 320 pixel e
+riscritto in WebP. Il tipo si decide guardando i byte, non l'estensione; gli SVG
+non si accettano. Il nome del file è l'impronta sha256 del risultato, quindi non
+è indovinabile e due fotografie identiche occupano un file solo — con la
+conseguenza che toglierla a uno non la toglie all'altro.
+
+Le fotografie non entrano in nessuno dei due repository e non vengono copiate
+dal deploy: sono immagini di persone vere, stanno solo in produzione, e la copia
+con `--delete` le salterebbe a piè pari invece di cancellarle. Chi amministra
+può correggere il profilo di un giocatore — fotografia e aspetto — dalla scheda
+dell'utente, e ogni modifica fatta a un altro finisce nel registro.
 
 ---
 
@@ -495,6 +525,19 @@ Annotate qui perché non si ripetano.
    distribuzione** — media, scarto, e margine di tre scarti — invece di sceglierla
    perché sembra ragionevole. È la stessa trappola del punto 13, un piano più in
    là: lì era lo stato condiviso, qui è il tempo condiviso.
+
+16. **Un'impronta è l'impronta del risultato, non della sorgente.** Due prove
+   della fotografia fallivano dicendo che immagini diverse producevano lo stesso
+   file: erano 900×600 e 500×500, e sembrava un difetto della deduplicazione. Non
+   lo era. Il quadrato centrale di un'immagine metà rossa e metà blu è sempre la
+   stessa metà rossa e metà blu, e dopo il ritaglio e la riscalatura le due
+   uscite erano identiche **byte per byte** — quindi stessa impronta, giustamente
+   un file solo. Sbagliava il materiale di prova, non il codice. La regola:
+   quando si prova qualcosa che ha di mezzo una trasformazione, il materiale va
+   reso distinto **dopo** la trasformazione, non prima. Con un corollario
+   imbarazzante: la prima correzione limitava le tinte con un `max()`, due di
+   loro finivano sullo stesso valore, e la prova tornava a fallire per lo stesso
+   identico motivo.
 
 ## Licenza e diritti
 

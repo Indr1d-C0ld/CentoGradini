@@ -91,6 +91,31 @@ use App\Sim\Scuola;
     <p><strong>Club:</strong> <?= e(implode(' · ', array_column($dettagli['club'], 'nome'))) ?></p>
   <?php endif; ?>
 </div>
+
+<div class="carta">
+  <h2>Il profilo</h2>
+  <p class="aiuto">
+    Le due cose che il giocatore scrive di suo pugno. Si correggono da qui — di solito perché
+    qualcuno ha segnalato una fotografia che non c'entra niente con una scuola giapponese del
+    1987. Ogni modifica fatta a un altro finisce nel registro qui sotto.
+  </p>
+  <?= partial('ritaglio', [
+      'pg'       => $pg,
+      'ritratto' => \App\Game\Ritratto::di($pg),
+      'altrui'   => true,
+  ]) ?>
+
+  <form method="post" action="<?= e(url('/personaggio/profilo/aspetto')) ?>" style="margin-top:1.2rem">
+    <?= csrf_field() ?>
+    <input type="hidden" name="personaggio" value="<?= (int) $pg['id'] ?>">
+    <div class="campo">
+      <label for="aspetto">Com'è fatto</label>
+      <input type="text" id="aspetto" name="aspetto" maxlength="255"
+             value="<?= e((string) ($pg['aspetto'] ?? '')) ?>">
+    </div>
+    <div class="bottoni"><button class="bottone secondario piccolo" type="submit">Salva l'aspetto</button></div>
+  </form>
+</div>
 <?php endif; ?>
 
 <div class="carta">

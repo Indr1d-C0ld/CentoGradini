@@ -1,0 +1,5 @@
+Qui finiscono le fotografie che i giocatori caricano come faccia del proprio
+personaggio. Non sono incluse e non lo saranno mai: sono immagini di persone
+vere, caricate per un gioco e non per essere pubblicate su un repository.
+
+La cartella deve esistere e deve essere scrivibile dal processo del server web.

@@ -68,8 +68,12 @@ $luogo = $dati['luogo'];
   <div class="carta">
     <p class="occhiello">Chi c'è adesso</p>
     <ul class="elenco-persone">
-      <?php foreach ($dati['presenti'] as $p): ?>
+      <?php foreach ($dati['presenti'] as $p): $faccia = \App\Game\Ritratto::di($p); ?>
         <li>
+          <?php if ($faccia !== null): ?>
+            <img class="fotografia fotografia--piccola" src="<?= e(asset($faccia)) ?>" alt=""
+                 width="40" height="40" loading="lazy">
+          <?php endif; ?>
           <b><a href="<?= e(url('/verso/' . (int) $p['id'])) ?>"><?= e($p['cognome'] . ' ' . $p['nome']) ?></a></b>
           <span class="tenue">
             <?= e($p['classe']) ?> · da <?= e(Personaggio::quantoFa((int) $p['da_minuti'])) ?>

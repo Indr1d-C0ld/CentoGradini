@@ -640,6 +640,79 @@ label.in_linea { display: inline-flex; align-items: center; gap: .4rem; }
   margin: .8rem 0;
 }
 
+/* --- La fotografia del personaggio ---------------------------------------- */
+
+/* Da non confondere con `.ritratti`, piu' sopra: quella e' la galleria del
+   santuario dedicata al maestro, e non c'entra niente con le facce dei
+   personaggi. */
+
+/* Quadrata sempre, perché quadrato è quello che il riquadro ha ritagliato: una
+   cornice di proporzioni diverse rimetterebbe il problema che il ritaglio
+   serviva a togliere. Il fondo pieno è lo stesso colore con cui `Ritratto`
+   riempie i bordi, così una foto più chiara non lascia un alone. */
+.fotografia {
+  display: block;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: var(--raggio);
+  background: var(--fondo-cavo);
+  border: 1px solid var(--bordo);
+}
+.fotografia--grande  { width: 10rem; }
+.fotografia--media   { width: 5rem; }
+.fotografia--piccola { width: 2.6rem; border-radius: 50%; }
+
+/* Le due colonne del riquadro: a sinistra com'è adesso, a destra come
+   cambiarla. Si impilano da sole quando non ci stanno — ed è il caso del
+   telefono, dove la cornice da trascinare vuole tutta la larghezza. */
+.riquadro-fotografia {
+  display: grid; gap: 1.2rem; align-items: start;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+}
+
+/* Chi non ha fotografia non resta con un buco: ci sta l'iniziale. */
+.fotografia--vuota {
+  display: flex; align-items: center; justify-content: center;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 2.4rem; font-weight: 700;
+  color: var(--arancio); background: var(--arancio-pallido);
+  border-color: var(--arancio-pallido);
+}
+.fotografia--piccola.fotografia--vuota { font-size: 1rem; }
+.fotografia--media.fotografia--vuota   { font-size: 1.6rem; }
+
+/* La riga «faccia + nome» che compare in cima alle pagine di una persona. */
+.riga-fotografia { display: flex; gap: 1rem; align-items: center; }
+.riga-fotografia > div { min-width: 0; }
+
+/* Nelle liste la faccia non segue la linea di base del testo: si centra sulla
+   riga e non si lascia stringere. */
+.elenco-persone .fotografia { align-self: center; flex: 0 0 auto; }
+
+/* Il riquadro di centratura: dentro ci si trascina l'immagine.
+   `touch-action: none` è quello che permette il trascinamento col dito senza
+   che il telefono interpreti il gesto come uno scorrimento della pagina. */
+.cornice {
+  position: relative;
+  width: 100%; max-width: 15rem; aspect-ratio: 1;
+  overflow: hidden;
+  border: 1px solid var(--bordo); border-radius: var(--raggio);
+  background: var(--fondo-cavo);
+  cursor: grab; touch-action: none;
+  margin-top: .6rem;
+}
+.cornice:active { cursor: grabbing; }
+.cornice img {
+  position: absolute; max-width: none;
+  user-select: none; -webkit-user-drag: none;
+}
+/* Il mirino: dice dove cade il centro senza coprire quello che c'è sotto. */
+.cornice::after {
+  content: ''; position: absolute; inset: 12%;
+  border: 1px dashed color-mix(in srgb, var(--arancio) 45%, transparent);
+  border-radius: 50%; pointer-events: none;
+}
+
 /* --- Amministrazione ---------------------------------------------------- */
 
 .nav-admin { margin-bottom: .6rem; }
