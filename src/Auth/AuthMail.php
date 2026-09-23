@@ -30,6 +30,49 @@ final class AuthMail
     }
 
     /** @return array{ok:bool, error?:string} */
+    /**
+     * Il collegamento per rifare la password. Stesso tono della conferma, e
+     * la stessa priorita': e' l'unica porta per chi e' rimasto fuori.
+     *
+     * @return array{ok:bool, error?:string}
+     */
+    public static function sendRecupero(int $userId, string $email, string $username, string $token): array
+    {
+        $link  = self::publicUrl('/recupero?token=' . $token);
+        $ttl   = GameConfig::int('auth.recupero_ttl_ore', 2);
+        $gioco = self::nomeGioco();
+        $ore   = $ttl === 1 ? "un'ora" : "{$ttl} ore";
+
+        $subject = "{$gioco} — rifare la password";
+        $body = <<<TXT
+        {$username},
+
+        qualcuno ha chiesto di rifare la password di questo account. Se sei
+        tu, apri questo collegamento e scegline una nuova:
+
+        {$link}
+
+        Il collegamento vale {$ore} e si usa una volta sola. Appena la password
+        cambia, tutte le sessioni gia' aperte si chiudono: se qualcuno era
+        entrato al posto tuo, si ritrova fuori.
+
+        Se non hai chiesto niente, non devi fare niente: senza questo
+        collegamento la password resta quella di prima.
+
+        Ci vediamo in cima ai gradini.
+
+        --
+        {$gioco} — gioco di ruolo nell'universo di Kimagure Orange Road
+        Messaggio automatico: non rispondere a questo indirizzo.
+        TXT;
+
+        $res = Posta::invia($email, $subject, $body, 'recupero', 1);
+        if (!$res['ok']) {
+            logger('recupero per utente ' . $userId . ' messo in coda: ' . ($res['error'] ?? '?'), 'warning');
+        }
+        return $res;
+    }
+
     public static function sendVerification(int $userId, string $email, string $username, string $token): array
     {
         $link  = self::publicUrl('/conferma?token=' . $token);

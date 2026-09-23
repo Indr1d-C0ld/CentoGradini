@@ -12,6 +12,9 @@ return [
     'tabella'     => 'oggetti_unici',
     'chiave'      => 'okey',
     'descrizione' => 'oggetti unici',
+    // Chi lo tiene e dove sta sono del gioco: il seme li decide solo la prima
+    // volta. Senza questa riga ogni deploy rimetteva il cappello sui gradini.
+    'solo_alla_nascita' => ['detentore_id', 'luogo', 'gts'],
     'righe' => [
         [
             'okey' => 'cappello',

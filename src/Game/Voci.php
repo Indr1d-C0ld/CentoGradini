@@ -45,6 +45,9 @@ final class Voci
     /** I nuclei possibili. Ognuno ha la sua scala di frasi in FRASI. */
     public const TIPI = ['potere', 'gesto', 'confessione', 'litigio', 'insieme', 'partenza', 'affisso'];
 
+    /** I tipi che hanno sempre due persone: chi fa, e a chi (o con chi). */
+    private const A_DUE = ['gesto', 'confessione', 'litigio', 'insieme'];
+
     // --- Nascita ---------------------------------------------------------------
 
     /**
@@ -313,36 +316,103 @@ final class Voci
     private const SFOCATO      = 55;
     private const PETTEGOLEZZO = 30;
 
-    /** @param array<string,mixed> $r riga grezza della query di per() */
+    /**
+     * Ricostruisce la frase di una voce, nel momento in cui la si legge.
+     *
+     * Le frasi hanno segnaposto espliciti, e non sono piu' un «chi + cosa +
+     * dove» incollato: un audit del 23 settembre 2026 ha letto tutte le 3571
+     * combinazioni e ha trovato tre difetti di lingua che la vecchia colla
+     * produceva da sola —
+     *
+     *  * nessun accordo al femminile («Kurumi si e' preso la briga», «se n'e'
+     *    andato»), perche' il participio stava scritto nella frase al maschile;
+     *  * chi-fa-e-a-chi reso come soggetto plurale con verbo singolare («Kyosuke
+     *    e Madoka si e' dichiarato»): una confessione ha un autore e un
+     *    destinatario, non due autori;
+     *  * il luogo sempre in coda, anche dove sembrava una destinazione («ha
+     *    cambiato scuola all'ABCB»).
+     *
+     * Segnaposto: {A} chi fa, {B} a chi, {AB} i due insieme quando sono
+     * soggetto plurale, {o} la desinenza di A (o/a), {i} quella del plurale
+     * (i/e), {det} il particolare, {dove} il luogo. Ognuno sta dove la frase lo
+     * vuole — o non c'e', se la frase non lo vuole.
+     *
+     * @param array<string,mixed> $r riga grezza della query di per()
+     */
     private static function racconta(array $r): string
     {
         $p   = (int) $r['precisione'];
         $rng = Rng::for((int) $r['seme'], 'racconto', (int) $r['id'], $p);
 
-        $chi  = self::comeSiChiama($r, '1', $p, $rng);
-        $chi2 = $r['soggetto2_id'] === null ? null : self::comeSiChiama($r, '2', $p, $rng);
-        $dove = self::comeSiDice((string) $r['luogo'], $p, $rng);
-        $cosa = self::cheCosa((string) $r['tipo'], (string) $r['dettaglio'], $p, $rng);
-
-        // Quando i protagonisti sono due si nominano sempre tutti e due, anche
-        // a precisione bassa: il pettegolezzo perde i nomi, non il fatto che
-        // fossero in due. «Uno del terzo anno e una del primo stavano insieme»
-        // e' precisamente il modo in cui una scuola rovina una reputazione.
-        if ($chi2 !== null && $chi === $chi2) {
-            // Due descrizioni identiche non si ripetono: chi racconta dice
-            // «due del terzo anno», non «uno del terzo anno e uno del terzo anno».
-            $chi  = preg_replace('/^(uno|una|un ragazzo|una ragazza)\b/u', 'due', $chi) ?? $chi;
-            $chi2 = null;
+        $tipo   = (string) $r['tipo'];
+        $a      = self::comeSiChiama($r, '1', $p, $rng);
+        $b      = $r['soggetto2_id'] === null ? null : self::comeSiChiama($r, '2', $p, $rng);
+        // Le voci a due persone perdono la seconda se il suo account viene
+        // cancellato (la chiave esterna mette NULL). La voce sopravvive, e
+        // deve restare una frase: la persona che manca diventa «qualcuno».
+        if ($b === null && in_array($tipo, self::A_DUE, true)) {
+            $b = 'qualcuno';
         }
-        $frase = $chi2 !== null
-            ? sprintf('%s e %s %s %s', $chi, $chi2, $cosa, $dove)
-            : sprintf('%s %s %s', $chi, $cosa, $dove);
+        $donnaA = (string) ($r['s1_sesso'] ?? 'm') === 'f';
+        $donnaB = (string) ($r['s2_sesso'] ?? 'm') === 'f';
 
-        $frase = trim(preg_replace('/\s+/', ' ', $frase) ?? $frase);
-        $frase = str_replace([' ,', ' .'], [',', '.'], $frase);
+        // Due descrizioni identiche (succede a precisione bassa): come
+        // soggetto plurale diventano «due del terzo anno», come destinatario
+        // «un altro del terzo anno» — mai «uno del terzo anno e uno del terzo
+        // anno», e mai «uno del terzo anno si e' dichiarato a uno del terzo anno».
+        $uguali = $b !== null && $a === $b;
+        $ab = $b === null ? $a : ($uguali ? self::due($a) : "{$a} e {$b}");
+        if ($uguali) {
+            $b = self::unAltro((string) $b);
+        }
+
+        $fascia = match (true) {
+            $p >= self::PRECISO      => 'preciso',
+            $p >= self::SFOCATO      => 'sfocato',
+            $p >= self::PETTEGOLEZZO => 'pettegolezzo',
+            default                  => 'nebbia',
+        };
+        $scala   = self::FRASI[$tipo] ?? self::FRASI['potere'];
+        $modello = (string) ($rng->pick($scala[$fascia]) ?? '{A} ha combinato qualcosa {dove}');
+
+        $frase = strtr($modello, [
+            '{det}'  => self::dettaglio($tipo, (string) $r['dettaglio'], (string) $a, (string) $b),
+        ]);
+        $frase = strtr($frase, [
+            '{AB}'   => $ab,
+            '{A}'    => $a,
+            '{B}'    => (string) $b,
+            '{o}'    => $donnaA ? 'a' : 'o',
+            '{i}'    => ($donnaA && ($b === null || $donnaB)) ? 'e' : 'i',
+            '{dove}' => self::comeSiDice((string) $r['luogo'], $p, $rng),
+        ]);
+
+        $frase = trim(preg_replace('/\s+/u', ' ', $frase) ?? $frase);
+        $frase = str_replace([' ,', ' .', ',,'], [',', '.', ','], $frase);
+        $frase = rtrim($frase, ', ');
         $frase = mb_strtoupper(mb_substr($frase, 0, 1)) . mb_substr($frase, 1);
 
         return $frase . self::coda((int) $r['tono'], (int) $r['passaggi'], $rng);
+    }
+
+    /** «uno del terzo anno» → «due del terzo anno»; «una ragazza» → «due ragazze». */
+    private static function due(string $chi): string
+    {
+        return match (true) {
+            str_starts_with($chi, 'un ragazzo')  => 'due ragazzi' . substr($chi, strlen('un ragazzo')),
+            str_starts_with($chi, 'una ragazza') => 'due ragazze' . substr($chi, strlen('una ragazza')),
+            default => (string) preg_replace('/^(uno|una)\b/u', 'due', $chi),
+        };
+    }
+
+    /** «uno del terzo anno» → «un altro del terzo anno»; «una ragazza» → «un'altra ragazza». */
+    private static function unAltro(string $chi): string
+    {
+        return match (true) {
+            str_starts_with($chi, 'un ragazzo')  => 'un altro' . substr($chi, strlen('un')),
+            str_starts_with($chi, 'una ragazza') => 'un\'altra' . substr($chi, strlen('una')),
+            default => (string) preg_replace(['/^uno\b/u', '/^una\b/u'], ['un altro', 'un\'altra'], $chi),
+        };
     }
 
     /**
@@ -372,11 +442,16 @@ final class Voci
         $sezione = (string) ($r["s{$n}_sezione"] ?? Scuola::SUPERIORI);
         $anno    = (int) ($r["s{$n}_anno"] ?? 2);
         if ($p >= self::PETTEGOLEZZO) {
-            $ord = [1 => 'primo', 2 => 'secondo', 3 => 'terzo'][max(1, min(3, $anno))];
             $chi = $donna ? 'una' : 'uno';
-            return $sezione === Scuola::MEDIE
-                ? "{$chi} delle medie, di {$ord} anno"
-                : "{$chi} del {$ord} anno";
+            // «Uno di terza media», come si dice. La forma di prima, «uno delle
+            // medie, di terzo anno», aveva una virgola dentro che spezzava la
+            // frase: «una delle medie, di terzo anno ha fatto…».
+            if ($sezione === Scuola::MEDIE) {
+                $ord = [1 => 'prima', 2 => 'seconda', 3 => 'terza'][max(1, min(3, $anno))];
+                return "{$chi} di {$ord} media";
+            }
+            $ord = [1 => 'primo', 2 => 'secondo', 3 => 'terzo'][max(1, min(3, $anno))];
+            return "{$chi} del {$ord} anno";
         }
         // Niente forme spoglie («uno», «una»): da sole passano, ma in coppia
         // danno «uno e una stavano insieme», che non e' italiano.
@@ -412,40 +487,51 @@ final class Voci
     }
 
     /**
-     * Il fatto. Ogni nucleo ha la sua scala, dal preciso al nebbioso, e le
-     * scale sono scritte a mano: un generatore di frasi a caso, qui, farebbe
-     * soltanto rumore.
+     * Il particolare, quando la frase lo chiede.
+     *
+     * Per un potere e' un'AZIONE, non un nome: «si e' teletrasportato», non
+     * «ha usato teletrasporto». Incollare il nome del potere dentro una frase
+     * fatta dava «ha fatto supervelocita'», «ha usato bloccare i poteri»,
+     * «ha usato comunicare con la natura». Per un gesto e' la sua lettura vera,
+     * con i nomi come la voce li conosce a quella precisione.
      */
-    private static function cheCosa(string $tipo, string $dettaglio, int $p, Rng $rng): string
-    {
-        $scala  = self::FRASI[$tipo] ?? self::FRASI['potere'];
-        $fascia = match (true) {
-            $p >= self::PRECISO      => 'preciso',
-            $p >= self::SFOCATO      => 'sfocato',
-            $p >= self::PETTEGOLEZZO => 'pettegolezzo',
-            default                  => 'nebbia',
-        };
-        $frase = (string) ($rng->pick($scala[$fascia]) ?? 'ha combinato qualcosa');
-
-        if ($fascia === 'preciso' && $dettaglio !== '' && str_contains($frase, '%s')) {
-            return sprintf($frase, self::dettaglio($tipo, $dettaglio));
-        }
-        return str_replace('%s', 'qualcosa', $frase);
-    }
-
-    /** Il particolare vero, quando la precisione lo regge. */
-    private static function dettaglio(string $tipo, string $dettaglio): string
+    private static function dettaglio(string $tipo, string $dettaglio, string $a, string $b): string
     {
         if ($tipo === 'potere') {
-            $n = Database::first('SELECT nome FROM poteri WHERE pkey = ?', [$dettaglio]);
-            return $n === null ? 'qualcosa di impossibile' : mb_strtolower((string) $n['nome']);
+            return self::AZIONI_POTERE[$dettaglio] ?? 'ha fatto una cosa impossibile';
         }
         if ($tipo === 'gesto') {
-            $n = Database::first('SELECT nome FROM gesti WHERE gkey = ?', [$dettaglio]);
-            return $n === null ? 'qualcosa' : mb_strtolower((string) $n['nome']);
+            $g = Database::first('SELECT lettura_vera FROM gesti WHERE gkey = ?', [$dettaglio]);
+            $lettura = rtrim((string) ($g['lettura_vera'] ?? '%A ha fatto qualcosa per %B.'), '. ');
+            return strtr($lettura, ['%A' => $a, '%B' => $b]);
         }
         return $dettaglio;
     }
+
+    /**
+     * Cosa si racconta che abbia fatto, potere per potere. Una voce dice
+     * quello che si e' visto fare, non il nome di un potere che nessuno
+     * conosce. {o} e' la desinenza di chi l'ha fatto.
+     */
+    public const AZIONI_POTERE = [
+        'telecinesi'      => 'ha spostato delle cose col pensiero',
+        'teletrasporto'   => 'si è teletrasportat{o}',
+        'telepatia'       => 'ha letto nel pensiero di qualcuno',
+        'supervelocita'   => 'ha corso a una velocità impossibile',
+        'supersensi'      => 'ha sentito cose che nessuno poteva sentire',
+        'chiaroveggenza'  => 'ha visto un posto dove non era',
+        'sogni'           => 'ha sognato una cosa che poi è successa davvero',
+        'scambio_corpo'   => 'si è scambiat{o} di corpo con qualcuno',
+        'cambio_identita' => 'si è fatt{o} passare per un\'altra persona',
+        'fantasmi'        => 'ha fatto comparire una cosa che non c\'era',
+        'ipnosi'          => 'ha ipnotizzato qualcuno',
+        'autoipnosi'      => 'si è ipnotizzat{o} da sol{o}',
+        'natura'          => 'ha parlato con gli animali',
+        'invisibilita'    => 'è diventat{o} invisibile',
+        'sesto_senso'     => 'ha sentito arrivare un guaio prima che succedesse',
+        'voce'            => 'ha parlato con la voce di un altro',
+        'blocco'          => 'ha spento il potere di qualcun altro',
+    ];
 
     /**
      * La coda: il tono, e quante bocche ha attraversato. Una voce di quarta
@@ -490,48 +576,71 @@ final class Voci
      */
     private const FRASI = [
         'potere' => [
-            'preciso'      => ['ha fatto %s davanti a tutti', 'ha usato %s senza nemmeno nascondersi',
-                               'ha fatto %s in mezzo alla gente'],
-            'sfocato'      => ['ha fatto una cosa che non si spiega', 'ha combinato qualcosa di impossibile',
-                               'ha fatto muovere della roba senza toccarla'],
-            'pettegolezzo' => ['ha fatto una cosa stranissima', 'ha fatto qualcosa che nessuno sa spiegare'],
-            'nebbia'       => ['ha fatto una cosa strana', 'si è comportato in un modo strano'],
+            'preciso'      => ['{A} {det} davanti a tutti {dove}',
+                               '{A} {det}, senza nemmeno nascondersi, {dove}',
+                               '{A} {det} in mezzo alla gente {dove}'],
+            'sfocato'      => ['{A} ha fatto una cosa che non si spiega {dove}',
+                               '{A} ha combinato qualcosa di impossibile {dove}',
+                               '{A} ha fatto una cosa da non crederci {dove}'],
+            'pettegolezzo' => ['{A} ha fatto una cosa stranissima {dove}',
+                               '{A} ha fatto qualcosa che nessuno sa spiegare {dove}'],
+            'nebbia'       => ['{A} ha fatto una cosa strana {dove}',
+                               '{A} si è comportat{o} in un modo strano {dove}'],
         ],
+        // Nasce solo dai gesti che non si prestano a equivoci — gli altri
+        // nascono come «insieme», perche' chi passava ha visto due persone
+        // vicine, non il gesto.
         'gesto' => [
-            'preciso'      => ['ha fatto %s', 'si è preso la briga di %s'],
-            'sfocato'      => ['ha avuto un gesto carino', 'si è fatto avanti'],
-            'pettegolezzo' => ['ha fatto qualcosa', 'ci ha provato'],
-            'nebbia'       => ['ha fatto qualcosa', 'c\'entrava in qualche modo'],
+            'preciso'      => ['{det} {dove}'],
+            'sfocato'      => ['{A} ha avuto un gesto carino con {B} {dove}',
+                               '{A} si è fatt{o} avanti con {B} {dove}'],
+            'pettegolezzo' => ['{A} ha fatto qualcosa con {B} {dove}',
+                               '{A} ci ha provato con {B} {dove}'],
+            'nebbia'       => ['{A} ha fatto qualcosa a {B}',
+                               '{AB} c\'entravano in qualche modo'],
         ],
         'confessione' => [
-            'preciso'      => ['si è dichiarato', 'ha detto quello che provava, ad alta voce'],
-            'sfocato'      => ['ha detto una cosa importante', 'si è dichiarato a qualcuno'],
-            'pettegolezzo' => ['ha detto qualcosa di grosso', 'si è dichiarato, pare'],
-            'nebbia'       => ['ha detto qualcosa', 'ha fatto una scenata'],
+            'preciso'      => ['{A} si è dichiarat{o} a {B} {dove}',
+                               '{A} ha detto a {B} quello che provava, ad alta voce, {dove}'],
+            'sfocato'      => ['{A} ha detto una cosa importante a {B} {dove}',
+                               '{A} si è dichiarat{o} a qualcuno {dove}'],
+            'pettegolezzo' => ['{A} ha detto qualcosa di grosso a {B} {dove}',
+                               '{A} si è dichiarat{o} a qualcuno, pare'],
+            'nebbia'       => ['{A} ha detto qualcosa a {B}',
+                               '{A} ha fatto una scenata'],
         ],
+        // Oggi non lo fa nascere nessuna meccanica: e' nel vocabolario per il
+        // giorno in cui ci sara' un litigio. Le frasi sono comunque giuste.
         'litigio' => [
-            'preciso'      => ['ha litigato di brutto', 'ha alzato la voce'],
-            'sfocato'      => ['ha litigato', 'ha avuto una discussione pesante'],
-            'pettegolezzo' => ['ha avuto da ridire con qualcuno', 'ha fatto una scenata'],
-            'nebbia'       => ['ha fatto una scenata', 'ha combinato un guaio'],
+            'preciso'      => ['{AB} hanno litigato di brutto {dove}', '{A} ha alzato la voce con {B} {dove}'],
+            'sfocato'      => ['{AB} hanno litigato {dove}', '{AB} hanno avuto una discussione pesante {dove}'],
+            'pettegolezzo' => ['{A} ha avuto da ridire con qualcuno {dove}', '{A} ha fatto una scenata {dove}'],
+            'nebbia'       => ['{A} ha fatto una scenata', '{A} ha combinato un guaio'],
         ],
         'insieme' => [
-            'preciso'      => ['sono stati visti insieme', 'se ne stavano insieme, da soli'],
-            'sfocato'      => ['erano insieme', 'li hanno visti insieme'],
-            'pettegolezzo' => ['stavano insieme', 'erano in giro insieme'],
-            'nebbia'       => ['stavano insieme', 'si vedevano'],
+            'preciso'      => ['{AB} sono stat{i} vist{i} insieme {dove}',
+                               '{AB} se ne stavano insieme, da sol{i}, {dove}'],
+            'sfocato'      => ['{AB} erano insieme {dove}',
+                               'hanno visto {AB} insieme {dove}'],
+            'pettegolezzo' => ['{AB} stavano insieme {dove}',
+                               '{AB} erano in giro insieme {dove}'],
+            'nebbia'       => ['{AB} stavano insieme {dove}',
+                               '{AB} si vedevano {dove}'],
         ],
+        // Qui il luogo non c'e', e apposta: e' l'ultimo posto dove lo si e'
+        // visto, e in coda a «ha cambiato scuola» sembrava la destinazione.
         'partenza' => [
-            'preciso'      => ['se n\'è andato, e non è più tornato', 'ha traslocato di punto in bianco'],
-            'sfocato'      => ['se n\'è andato', 'ha cambiato scuola'],
-            'pettegolezzo' => ['non si vede più in giro', 'è sparito'],
-            'nebbia'       => ['è sparito', 'non c\'è più'],
+            'preciso'      => ['{A} se n\'è andat{o}, e non è più tornat{o}',
+                               '{A} ha traslocato di punto in bianco'],
+            'sfocato'      => ['{A} se n\'è andat{o}', '{A} ha cambiato scuola'],
+            'pettegolezzo' => ['{A} non si vede più in giro', '{A} è sparit{o}'],
+            'nebbia'       => ['{A} è sparit{o}', '{A} non c\'è più'],
         ],
         'affisso' => [
-            'preciso'      => ['ha attaccato un avviso in bacheca'],
-            'sfocato'      => ['ha scritto qualcosa in bacheca'],
-            'pettegolezzo' => ['ha lasciato un messaggio da qualche parte'],
-            'nebbia'       => ['ha scritto qualcosa'],
+            'preciso'      => ['{A} ha attaccato un avviso in bacheca {dove}'],
+            'sfocato'      => ['{A} ha scritto qualcosa in bacheca {dove}'],
+            'pettegolezzo' => ['{A} ha lasciato un messaggio {dove}'],
+            'nebbia'       => ['{A} ha scritto qualcosa {dove}'],
         ],
     ];
 

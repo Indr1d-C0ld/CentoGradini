@@ -18,6 +18,8 @@ use App\Support\Audit;
 final class Auth
 {
     private const SESSION_KEY = 'uid';
+    /** La generazione delle sessioni con cui questa sessione e' nata. */
+    private const SESSION_GEN = 'uid_gen';
 
     /** @var array<string,mixed>|null cache per richiesta */
     private static ?array $cached = null;
@@ -39,13 +41,23 @@ final class Auth
         }
 
         $row = Database::first(
-            'SELECT id, username, email, status, role, email_verified_at, created_at, last_login_at
+            'SELECT id, username, email, status, role, email_verified_at, created_at, last_login_at, sessioni_gen
              FROM users WHERE id = ?',
             [(int) $id]
         );
 
         if ($row === null || in_array((string) $row['status'], ['banned', 'suspended'], true)) {
             Session::forget(self::SESSION_KEY);
+            return self::$cached = null;
+        }
+
+        // Una sessione nata prima che la password venisse rifatta non vale
+        // piu'. E' la meta' del recupero che si dimentica sempre: la password
+        // la si rifa' quasi sempre perche' qualcun altro e' entrato, e se la
+        // sua sessione restasse aperta la password nuova non servirebbe a niente.
+        if ((int) Session::get(self::SESSION_GEN, 0) < (int) $row['sessioni_gen']) {
+            Session::forget(self::SESSION_KEY);
+            Session::forget(self::SESSION_GEN);
             return self::$cached = null;
         }
 
@@ -183,7 +195,12 @@ final class Auth
     public static function issueToken(int $userId, string $kind, ?string $ip = null): string
     {
         $token = bin2hex(random_bytes(32));
-        $ttl   = max(1, GameConfig::int('auth.verify_ttl_hours', 48));
+        // Un collegamento di conferma puo' aspettare due giorni; uno per
+        // rifare la password no: se finisce nelle mani sbagliate, deve
+        // scadere presto.
+        $ttl   = max(1, $kind === 'reset_password'
+            ? GameConfig::int('auth.recupero_ttl_ore', 2)
+            : GameConfig::int('auth.verify_ttl_hours', 48));
 
         // Un solo gettone vivo per tipo: i precedenti vengono invalidati.
         Database::run(
@@ -253,7 +270,7 @@ final class Auth
         // quindi il passaggio e' innocuo anche quando si entra con quello.
         $login = self::normalizeUsername($login);
         $row = Database::first(
-            'SELECT id, username, email, password_hash, status, role FROM users WHERE username = ? OR email = ?',
+            'SELECT id, username, email, password_hash, status, role, sessioni_gen FROM users WHERE username = ? OR email = ?',
             [$login, mb_strtolower($login)]
         );
 
@@ -285,6 +302,7 @@ final class Auth
 
         Session::regenerate();
         Session::put(self::SESSION_KEY, (int) $row['id']);
+        Session::put(self::SESSION_GEN, (int) ($row['sessioni_gen'] ?? 0));
         self::$resolved = false;
         self::$cached = null;
 
@@ -295,6 +313,108 @@ final class Auth
         Audit::log('auth.login', (int) $row['id'], 'user', (int) $row['id'], [], $ip);
 
         return ['ok' => true, 'user' => $row];
+    }
+
+    // --- Il recupero della password ----------------------------------------------
+
+    /**
+     * Chiede il collegamento per rifare la password.
+     *
+     * Risponde SEMPRE nello stesso modo, che l'indirizzo esista o no: dire
+     * «questo indirizzo non risulta» vorrebbe dire regalare a chiunque un modo
+     * per sapere chi e' iscritto. Il modulo d'iscrizione lo prometteva («serve
+     * per recuperare l'accesso») e fino all'audit del 23 settembre 2026 non
+     * esisteva: chi dimenticava la password restava fuori, e l'unica via era
+     * la console. Portato da Atlantik, dove gira da mesi.
+     *
+     * @return array{ok:bool, error?:string}
+     */
+    public static function richiediRecupero(string $email, ?string $ip = null): array
+    {
+        $email = trim(mb_strtolower($email));
+        if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return ['ok' => false, 'error' => 'Indirizzo non valido.'];
+        }
+        $u = Database::first('SELECT id, username, email, status FROM users WHERE LOWER(email) = ?', [$email]);
+
+        // Account che non c'e', o sospeso, o bandito: silenzio. Un account
+        // sospeso non si riapre da solo con una password nuova.
+        if ($u !== null && in_array((string) $u['status'], ['active', 'pending'], true)) {
+            $token = self::issueToken((int) $u['id'], 'reset_password', $ip);
+            AuthMail::sendRecupero((int) $u['id'], (string) $u['email'], (string) $u['username'], $token);
+            Audit::log('auth.recupero_richiesto', (int) $u['id'], 'user', (int) $u['id'], [], $ip);
+        }
+        return ['ok' => true];
+    }
+
+    /**
+     * Guarda se un gettone di recupero vale ancora, senza consumarlo: la
+     * pagina della password nuova si apre solo se il collegamento e' buono,
+     * invece di farla scrivere e poi dire di no.
+     *
+     * @return array{ok:bool, error?:string, user_id?:int}
+     */
+    public static function recuperoValido(string $token): array
+    {
+        $token = trim($token);
+        if ($token === '' || !ctype_xdigit($token)) {
+            return ['ok' => false, 'error' => 'Collegamento non valido.'];
+        }
+        $row = Database::first(
+            'SELECT t.user_id, t.used_at, t.expires_at, u.status
+             FROM user_tokens t JOIN users u ON u.id = t.user_id
+             WHERE t.token_hash = ? AND t.kind = ?',
+            [hash('sha256', $token), 'reset_password']
+        );
+        if ($row === null) {
+            return ['ok' => false, 'error' => 'Collegamento non valido.'];
+        }
+        if ($row['used_at'] !== null) {
+            return ['ok' => false, 'error' => 'Questo collegamento è già stato usato.'];
+        }
+        if (strtotime((string) $row['expires_at']) < time()) {
+            return ['ok' => false, 'error' => 'Il collegamento è scaduto: chiedine uno nuovo.'];
+        }
+        if (!in_array((string) $row['status'], ['active', 'pending'], true)) {
+            return ['ok' => false, 'error' => 'Questo account non può accedere.'];
+        }
+        return ['ok' => true, 'user_id' => (int) $row['user_id']];
+    }
+
+    /**
+     * Consuma il gettone, mette la password nuova e fa cadere tutte le
+     * sessioni aperte.
+     *
+     * @return array{ok:bool, error?:string}
+     */
+    public static function rifaiPassword(string $token, string $password, ?string $ip = null): array
+    {
+        $valido = self::recuperoValido($token);
+        if (!$valido['ok']) {
+            return $valido;
+        }
+        if (mb_strlen($password) < self::minPasswordLength()) {
+            return ['ok' => false, 'error' => sprintf(
+                'La password deve avere almeno %d caratteri.', self::minPasswordLength()
+            )];
+        }
+        $uid = (int) $valido['user_id'];
+
+        Database::run('UPDATE users SET password_hash = ? WHERE id = ?', [self::hashPassword($password), $uid]);
+        Database::run('UPDATE user_tokens SET used_at = NOW() WHERE token_hash = ? AND kind = ?',
+            [hash('sha256', trim($token)), 'reset_password']);
+        // Chi era in attesa e rifa' la password ha dimostrato di leggere quella
+        // casella: vale come conferma dell'indirizzo.
+        Database::run(
+            "UPDATE users SET status = 'active', email_verified_at = COALESCE(email_verified_at, NOW())
+             WHERE id = ? AND status = 'pending'",
+            [$uid]
+        );
+        // Tutte le sessioni nate prima di adesso cadono alla prossima pagina.
+        Database::run('UPDATE users SET sessioni_gen = sessioni_gen + 1 WHERE id = ?', [$uid]);
+        Audit::log('auth.password_rifatta', $uid, 'user', $uid, [], $ip);
+
+        return ['ok' => true];
     }
 
     public static function logout(): void

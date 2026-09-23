@@ -15,6 +15,7 @@
     <div class="campo">
       <label for="password">Password</label>
       <input type="password" id="password" name="password" required autocomplete="current-password">
+      <span class="aiuto"><a href="<?= e(url('/password-dimenticata')) ?>">Password dimenticata?</a></span>
     </div>
 
     <div class="bottoni">

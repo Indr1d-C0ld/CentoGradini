@@ -99,7 +99,7 @@ final class Diario
             $r[] = '### Com\'è fatto';
             $r[] = '';
             foreach ($tratti as $t) {
-                $r[] = sprintf('- **%s.** %s', (string) $t['nome'], (string) $t['descrizione']);
+                $r[] = sprintf('- **%s.** %s', (string) $t['nome'], accorda((string) $t['descrizione'], $pg));
             }
         }
         return implode("\n", $r) . "\n";
@@ -177,13 +177,14 @@ final class Diario
             [$id]
         );
         $sanno = Database::all(
-            'SELECT p.nome, p.cognome, s.come, s.gts FROM sanno s
+            'SELECT p.nome, p.cognome, p.sesso, s.come, s.gts FROM sanno s
              JOIN personaggi p ON p.id = s.chi_sa_id WHERE s.esper_id = ? ORDER BY s.gts',
             [$id]
         );
         if ($inc === [] && $sanno === []) {
             return '';
         }
+        $esper = (string) (Database::first('SELECT sesso FROM personaggi WHERE id = ?', [$id])['sesso'] ?? 'm');
         $r = ['## Il Segreto', ''];
         if ($sanno !== []) {
             $r[] = 'Chi lo sa:';
@@ -191,7 +192,14 @@ final class Diario
             foreach ($sanno as $s) {
                 $r[] = sprintf('- **%s %s** — %s, dal %s.',
                     (string) $s['nome'], (string) $s['cognome'],
-                    (string) $s['come'] === 'confidato' ? 'gliel\'ha detto lui' : 'l\'ha scoperto da solo',
+                    // «Lui» e' chi scrive il diario, «da solo/a» chi ha scoperto:
+                    // due persone diverse, e due accordi diversi.
+                    (string) $s['come'] === 'confidato'
+                        ? 'gliel\'ha detto ' . ($esper === 'f' ? 'lei' : 'lui')
+                        // «l'ha scoperto»: il participio va col «lo», cioe' il
+                        // segreto, non con chi l'ha scoperto. Si accorda solo
+                        // «da solo/da sola».
+                        : 'l\'ha scoperto da sol' . ((string) $s['sesso'] === 'f' ? 'a' : 'o'),
                     Orologio::esteso((int) $s['gts']));
             }
             $r[] = '';

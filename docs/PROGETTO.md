@@ -431,6 +431,9 @@ Non ci sono livelli, punti esperienza né potenziamenti. Si accumulano quattro c
 1. **Controllo** sui propri poteri (solo esper).
 2. **Legami** — il grafo delle relazioni è il vero punteggio.
 3. **Reputazione** per zona e per gruppo (la classe, il club, i clienti dell'ABCB, i teppisti).
+   *Non implementata come numero.* Oggi la reputazione emerge dalle **voci** — quello che si
+   dice di te, con il suo tono — e il README lo dice così. Una reputazione per zona e per
+   gruppo resta un'idea di progetto aperta.
 4. **Ricordi** — album di scene concluse, illustrate, permanenti. Sopravvivono al Trasloco. È la
    collezione, ed è anche il diario narrativo del personaggio, esportabile in testo.
 
@@ -494,6 +497,11 @@ Dopo F7 si aggiunge contenuto e comodità, non impalcatura. In ordine di arrivo:
   è già incontrato, perché una rubrica di tutti gli abitanti racconterebbe un altro mondo.
 - **Il muro delle fotografie** (`/admin/fotografie`) e la **carta dell'amministrazione**, che
   è l'unica a distinguere i giocatori dagli abitanti mossi dal motore.
+- **L'audit del 23 settembre 2026**: il **ritorno dopo il trasloco** (migrazione `0018`,
+  com'era scritto al §7 e non era mai stato fatto), il **recupero della password** con le
+  sessioni che cadono, la difficoltà degli episodi rimessa nel verso giusto, il calore che
+  scende, le voci e i testi in seconda persona **accordati al femminile**, il seeder che non
+  riscrive più lo stato del gioco a ogni deploy, il cappello di paglia che non si perde più.
 - **Le comunicazioni** (migrazione `0016`): filo diretto fra la gestione e un giocatore, nei
   due sensi, con avviso per posta che non ripete il messaggio. Non è finzione e non si
   traveste da tale — vedi la nota in testa a `src/Game/Comunicazioni.php`.

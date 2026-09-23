@@ -47,7 +47,7 @@ return [
     'righe' => [
 
 $t('combinaguai', 1, 7, 'Combinaguai', 'MF', [],
-  'Sei quello che ci prova sempre e la prende sempre. Sai a memoria chi esce con chi in '
+  'Sei quell{o} che ci prova sempre e la prende sempre. Sai a memoria chi esce con chi in '
   . 'tutta la scuola, hai una teoria su ogni ragazza e nessuna funziona. Nei guai ci finisci '
   . 'per curiosità, non per cattiveria, e ne esci con un bernoccolo e nessuna lezione imparata. '
   . 'Gli altri ti vogliono bene esattamente per questo.',
@@ -62,7 +62,7 @@ $t('miope', 8, 11, 'Miope', 'MF', ['testa' => 1],
 $t('cuore_deciso', 12, 15, 'Cuore deciso', 'MF', ['rissa' => 1, 'cuore' => 1],
   'Parli chiaro, cammini svelto, non ti scusi per esistere. Porti i pantaloni quando gli '
   . 'altri si aspettano una gonna, o il contrario, e non è una dichiarazione: è comodo. Sai '
-  . 'benissimo di chi sei innamorato. Quello che non sai è come dirglielo senza rovinare tutto.',
+  . 'benissimo di chi sei innamorat{o}. Quello che non sai è come dirglielo senza rovinare tutto.',
   'Dire a quella persona quello che provi, prima che lo faccia qualcun altro.'),
 
 $t('motorino', 16, 21, 'Il motorino', 'MF', ['dai_suki' => 2, 'kakko' => 2, 'guida' => 9],
@@ -81,7 +81,7 @@ $t('club', 26, 29, 'Anima del club', 'MF', ['sport' => 2],
   'Allenamento tutti i giorni, ritiro d\'estate, domenica compresa. Il club ti ha preso i '
   . 'pomeriggi, le vacanze e mezza adolescenza, e tu lo difenderesti a costo di litigare con '
   . 'chiunque. Solo che ogni tanto passi davanti al bar e vedi gli altri seduti dentro.',
-  'Decidere se il club è quello che vuoi o solo quello a cui ti sei abituato.'),
+  'Decidere se il club è quello che vuoi o solo quello a cui ti sei abituat{o}.'),
 
 $t('negozio', 30, 34, 'Figlio del negozio', 'MF', ['cucina' => 2],
   'La tua famiglia ha una bottega sulla strada commerciale, e dopo la scuola c\'è il turno. '
@@ -134,7 +134,7 @@ $t('precoce', 60, 62, 'Precoce', 'MF', ['testa' => 1, 'candore' => -2],
   'Far succedere qualcosa fra due persone che non si decidono.'),
 
 $t('trasferito', 63, 66, 'Trasferito di recente', 'MF', [],
-  'Sei arrivato da poco e conosci sì e no due persone. Nel posto di prima è successo qualcosa '
+  'Sei arrivat{o} da poco e conosci sì e no due persone. Nel posto di prima è successo qualcosa '
   . 'che ha reso necessario andarsene — e se sei della stirpe, sai benissimo cosa. Ricominciare '
   . 'da capo è una seconda occasione e una condanna insieme.',
   'Costruirti qui qualcosa che valga la pena di non perdere di nuovo.'),
@@ -159,10 +159,10 @@ $t('solo_in_casa', 74, 76, 'Solo in casa', 'MF', ['cucina' => 2, 'cuore' => -1],
   'Invitare qualcuno, una volta, senza un motivo particolare.'),
 
 $t('arti_marziali', 77, 80, 'Arti marziali', 'MF', ['rissa' => 2, 'sport' => 1],
-  'Cintura nera, o quasi. Ti alleni da quando eri piccolo e in genere per un motivo preciso: '
+  'Cintura nera, o quasi. Ti alleni da quando eri piccol{o} e in genere per un motivo preciso: '
   . 'qualcuno che volevi proteggere, o a cui volevi dimostrare qualcosa. Sai fermare un pugno '
   . 'e non sai cosa dire a quella persona quando ti sta davanti.',
-  'Che quella persona si accorga che sei diventato forte.'),
+  'Che quella persona si accorga che sei diventat{o} forte.'),
 
 $t('doppia_vita', 81, 83, 'Doppia vita', 'MF', ['testa' => 1, 'kakko' => 1],
   'Hai un impegno di cui a scuola non sa niente nessuno: un lavoro, una band, un dovere di '
@@ -184,7 +184,7 @@ $t('super_gentile', 87, 90, 'Super-gentile', 'MF', ['dai_suki' => 2, 'cuore' => 
 
 $t('acqua', 91, 93, 'Sfortuna con l\'acqua', 'MF', ['nuoto' => 2],
   'Finisci in acqua con una regolarità che ha dell\'assurdo: fontane, pioggia improvvisa, '
-  . 'secchi rovesciati dalle finestre, il fiume. Ti sei rassegnato a tenere un asciugamano '
+  . 'secchi rovesciati dalle finestre, il fiume. Ti sei rassegnat{o} a tenere un asciugamano '
   . 'nella borsa. Il raffreddore te lo prendi sempre, e ogni volta qualcuno si offre di '
   . 'accompagnarti a casa.',
   'Accorgerti che non è sempre sfortuna.'),

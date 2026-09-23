@@ -65,8 +65,8 @@ use App\Sim\Scuola;
   <?php foreach ($tratti as $t): ?>
     <div class="tratto">
       <h3><?= e($t['nome']) ?></h3>
-      <p><?= e($t['descrizione']) ?></p>
-      <p class="obiettivo"><span>il tuo scopo</span> <?= e($t['obiettivo']) ?></p>
+      <p><?= e(accorda((string) $t['descrizione'], $pg)) ?></p>
+      <p class="obiettivo"><span>il tuo scopo</span> <?= e(accorda((string) $t['obiettivo'], $pg)) ?></p>
     </div>
   <?php endforeach; ?>
 </div>
@@ -82,8 +82,8 @@ use App\Sim\Scuola;
         <span class="tenue"><?= e($p['nome_jp']) ?></span>
         <?php if ((int) $p['primario'] === 1): ?><em class="marchio-primario">principale</em><?php endif; ?>
       </h3>
-      <p><?= e($p['descrizione']) ?></p>
-      <p class="tenue"><strong>Limiti.</strong> <?= e($p['limiti']) ?></p>
+      <p><?= e(accorda((string) $p['descrizione'], $pg)) ?></p>
+      <p class="tenue"><strong>Limiti.</strong> <?= e(accorda((string) $p['limiti'], $pg)) ?></p>
     </div>
   <?php endforeach; ?>
 </div>

@@ -43,6 +43,16 @@ final class Database
             throw new RuntimeException('Connessione al database non riuscita: ' . $e->getMessage(), 0, $e);
         }
 
+        // Il database e PHP devono leggere lo stesso orologio. Il codice scrive
+        // le date col NOW() del database (scadenze dei gettoni, ultimo accesso,
+        // registro) e le rilegge con il time() di PHP: finche' i due fusi
+        // coincidono per caso va tutto bene, e in produzione coincidevano. Su
+        // una macchina col database in UTC e PHP in Europe/Rome, invece, un
+        // collegamento per rifare la password — due ore di validita' — nasceva
+        // gia' scaduto. Si allinea qui, una volta, all'offset che PHP sta usando
+        // adesso (che il bootstrap ha gia' preso da app.timezone).
+        self::$pdo->exec('SET time_zone = ' . self::$pdo->quote(date('P')));
+
         return self::$pdo;
     }
 

@@ -447,7 +447,7 @@ final class Legami
                 'Apri la bocca e non esce niente. Parli del tempo, di un compito, di una cosa '
                 . 'che non interessa a nessuno dei due. ' . $altro['nome'] . ' aspetta un momento '
                 . 'di troppo prima di rispondere, e poi la conversazione riparte da un\'altra '
-                . 'parte. Ci sei andato vicino.'];
+                . 'parte. Ci sei andat' . ((string) $pg['sesso'] === 'f' ? 'a' : 'o') . ' vicino.'];
         }
 
         Personaggio::traccia((string) $pg['luogo'], (int) $pg['id'], 'confessione',
@@ -535,6 +535,53 @@ final class Legami
         Database::run('INSERT INTO oggetti_passaggi (okey, da_id, a_id, luogo, gts) VALUES (?, ?, ?, ?, ?)',
             [$okey, null, (int) $pg['id'], (string) $pg['luogo'], $gts]);
         return ['ok' => true, 'racconto' => 'Te lo ritrovi in mano senza aver deciso di raccoglierlo.'];
+    }
+
+    /**
+     * Riporta nel mondo gli oggetti unici che nessuno puo' piu' passare.
+     *
+     * Un oggetto unico esiste in un esemplare solo per server, quindi non si
+     * deve poter perdere. Si perdeva in due modi, trovati da un audit:
+     *
+     *  * chi lo teneva traslocava — e l'oggetto restava in mano a una persona
+     *    che non era piu' nel quartiere, per sempre;
+     *  * l'account di chi lo teneva veniva cancellato — la chiave esterna
+     *    mette `detentore_id` a NULL, ma `luogo` e' gia' NULL finche' lo si
+     *    tiene in mano, e l'oggetto non era piu' da nessuna parte.
+     *
+     * In entrambi i casi lo si ritrova dove e' stato visto passare l'ultima
+     * volta, o sui gradini se non ha una storia. Lo chiama il trasloco, per
+     * farlo subito, e il battito, come rete di sicurezza per tutti i casi a cui
+     * nessuno ha ancora pensato.
+     *
+     * @return int quanti oggetti sono tornati nel mondo
+     */
+    public static function ritrovaOggetti(?int $gts = null): int
+    {
+        $gts ??= Orologio::lineare();
+        $persi = Database::all(
+            "SELECT o.okey, o.detentore_id, p.luogo AS dove_era
+             FROM oggetti_unici o
+             LEFT JOIN personaggi p ON p.id = o.detentore_id
+             WHERE (o.detentore_id IS NULL AND o.luogo IS NULL)
+                OR (o.detentore_id IS NOT NULL AND (p.id IS NULL OR p.stato <> 'attivo'))"
+        );
+        foreach ($persi as $o) {
+            $ultimo = Database::first(
+                'SELECT luogo FROM oggetti_passaggi WHERE okey = ? AND luogo IS NOT NULL ORDER BY id DESC LIMIT 1',
+                [(string) $o['okey']]
+            );
+            $dove = (string) ($o['dove_era'] ?? '') !== '' ? (string) $o['dove_era']
+                : (string) ($ultimo['luogo'] ?? 'gradini');
+            // Nessuna riga in oggetti_passaggi: quella tabella registra chi DA' a
+            // chi, e qui non riceve nessuno (a_id non ammette NULL, e una prima
+            // versione che ci provava faceva fallire il trasloco intero).
+            Database::run(
+                'UPDATE oggetti_unici SET detentore_id = NULL, luogo = ?, gts = ? WHERE okey = ?',
+                [$dove, $gts, (string) $o['okey']]
+            );
+        }
+        return count($persi);
     }
 
     /** @return array<string,mixed>|null */

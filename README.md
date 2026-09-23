@@ -46,9 +46,10 @@ dove le due cose divergono, sta in [`docs/CANONE.md`](docs/CANONE.md).
 ## Che gioco è
 
 Non si combatte, non si sale di livello, non c'è niente da conquistare. Ci sono
-quattro cose che si accumulano — il **Controllo** sui propri poteri, i **legami**
-con le persone, la **reputazione** nel quartiere e i **ricordi** — e una sola che
-si può perdere davvero: il posto dove vivi.
+tre cose che si accumulano — il **Controllo** sui propri poteri, i **legami**
+con le persone e i **ricordi** — e una che non si accumula ma si subisce: quello
+che **si dice di te**, cioè le voci, che nessuno controlla e ognuno racconta a
+modo suo. E una sola cosa si può perdere davvero: il posto dove vivi.
 
 Il gioco sta in piedi su quattro pilastri, e sono intrecciati apposta.
 
@@ -69,9 +70,14 @@ la **pioggia**, e il tuo **Controllo** — che dimezza, ma non annulla mai.
 
 Chi si accorge di qualcosa non capisce subito: si porta a casa un'**anomalia**,
 una riga sul suo taccuino. Tre anomalie coerenti sulla stessa persona, un tiro di
-Intuizione, e quella persona **ha capito**. Due persone che hanno capito, e la
-tua famiglia trasloca — nel manga succede davvero, ed è la sola punizione del
-gioco: non muori, te ne vai.
+Intuizione, e quella persona **ha capito**. Due persone che hanno capito — fra
+quelle che abitano ancora nel quartiere — e la tua famiglia trasloca: nel manga
+succede davvero, ed è la sola punizione del gioco. Non muori, te ne vai; e dopo
+un paio di giorni di gioco **torni**, in stazione, *trasferito di recente*. Ti
+porti dietro poteri, Controllo, carattere e l'album dei ricordi; lasci i legami,
+i club, e chi aveva capito, che adesso ha solo una storia vecchia da raccontare.
+E se ignori un incidente invece di coprirlo, il tempo decide per te: il silenzio
+è una risposta, e il testimone si tiene la sua anomalia.
 
 La valvola di sfogo è **confidarsi**. Dieci persone che sanno perché gliel'hai
 detto tu non spostano un mobile; due che l'hanno scoperto da sole sì. Fidarsi di
@@ -84,9 +90,9 @@ può semplicemente non partire. Nel canone lo sa fare un bambino di otto anni, e
 **E dall'altra parte?** Chi non ha poteri non gioca una versione ridotta: gioca
 il lato opposto dello stesso sistema. Ha più punti abilità da distribuire e un
 tratto in più, l'**Intuizione** per collegare le anomalie che ha annotato, il
-**taccuino** dove segnarle, e il peso sociale per muovere le voci meglio di
-chiunque altro. Il non-esper è quello che *può capire*, ed è la ragione per cui
-l'esper ha paura.
+**taccuino** dove segnarle, e quattro punti in più che possono finire nel
+Dai-suki — l'abilità con cui le voci passano di bocca in bocca. Il non-esper è
+quello che *può capire*, ed è la ragione per cui l'esper ha paura.
 
 ### 2. I legami, su due assi
 
@@ -105,7 +111,8 @@ capito benissimo, ed è proprio per questo che gli brucia. Malinteso e gelosia
 sono due meccaniche distinte, apposta.
 
 E **il fraintendimento non decade col tempo**. Il tempo non aggiusta niente:
-serve una conversazione, che costa Cuore e **può peggiorare le cose**. È l'unica
+serve una conversazione, che si tira sul Cuore, costa Compostezza e **può
+peggiorare le cose**. È l'unica
 regola del gioco che non ammette eccezioni, ed è il motivo per cui il triangolo
 di *Kimagure Orange Road* dura diciotto volumi invece di due.
 
@@ -129,11 +136,12 @@ La frase si ricostruisce nel momento in cui la leggi, e a ogni passaggio di bocc
 si perde qualcosa nell'ordine in cui lo perde la gente vera:
 
 ```
-p=95   Kyosuke Kasuga ha fatto telecinesi davanti a tutti all'ABCB.
-p=70   Kyosuke ha fatto muovere della roba senza toccarla all'ABCB.
-p=45   Uno del terzo anno ha fatto una cosa stranissima in uno di quei
-       posti dove si ritrovano tutti.
-p=8    Uno di quelli del liceo ha fatto una cosa strana, o almeno così dicono.
+p=95   Kyosuke Kasuga ha spostato delle cose col pensiero davanti a tutti
+       all'ABCB.
+p=70   Kyosuke ha fatto una cosa che non si spiega all'ABCB.
+p=45   Uno del terzo anno ha fatto qualcosa che nessuno sa spiegare in uno di
+       quei posti dove si ritrovano tutti.
+p=8    Un ragazzo si è comportato in un modo strano, o almeno così dicono.
 ```
 
 Il nome se ne va per primo, ed è la perdita che fa più danno: da quel momento
@@ -165,7 +173,9 @@ ricorrenza del calendario, o un sospetto già acceso su qualcuno. Chi si trova l
 entra nel cast.
 
 Poi si va a scene, e a ogni scena ciascuno sceglie. Le scelte muovono legami,
-Compostezza, calore e sospetti **veri**, non punteggi finti. Chi non si fa vivo
+malintesi, Compostezza e il **calore** dei posti — in su, e anche in giù: certe
+scelte servono a calmare le acque — cose **vere** del mondo, non punteggi finti.
+Più una scelta è difficile, meno spesso riesce. Chi non si fa vivo
 entro la finestra non blocca la storia: un **agente autonomo** sceglie per lui
 pesando le opzioni sulla sua scheda, così un timido resta timido anche quando a
 giocarlo è il motore.
@@ -241,17 +251,18 @@ progetto esiste.
 | **10** | club scolastici |
 | **14** | eventi stagionali di server |
 | **10** | copioni di episodi |
-| **49** | manopole di configurazione, tutte lette da qualcuno |
-| **17** | migrazioni |
-| **75** | rotte |
-| **415** | verifiche su 16 file di prova (15 unitari + 1 end-to-end) |
+| **51** | manopole di configurazione, tutte lette da qualcuno |
+| **18** | migrazioni |
+| **81** | rotte |
+| **449** | verifiche su 16 file di prova (15 unitari + 1 end-to-end) |
 
 ### Le schermate
 
 `/quartiere` la carta e dove sei · `/luogo/{x}` la scheda di un posto ·
 `/personaggio` la tua scheda · `/personaggio/profilo` la fotografia e l'aspetto ·
 `/chi/{id}` il profilo di una persona che conosci · `/legami` il grafo delle relazioni ·
-`/comunicazioni` il filo diretto con la gestione ·
+`/comunicazioni` il filo diretto con la gestione · `/trasloco` dopo il trasloco, fino al ritorno ·
+`/password-dimenticata` per rifarla, con un collegamento che vale due ore ·
 `/verso/{id}` cosa provi per una persona, e cosa puoi farci ·
 `/taccuino` le anomalie che hai annotato · `/incidente/{id}` coprire un potere
 appena usato · `/voci` quello che ti è arrivato · `/bacheca` e `/biglietti` ·
@@ -263,7 +274,7 @@ Il pannello, per chi amministra: `/admin` il cruscotto · `/admin/utenti` e
 `/admin/utente/{id}` gli account, i personaggi e la moderazione ·
 `/admin/mappa` la carta con le presenze · `/admin/statistiche` ·
 `/admin/comunicazioni` i fili con i giocatori · `/admin/fotografie` il muro delle
-facce · `/admin/accessi` le provenienze · `/admin/impostazioni` le quarantanove leve.
+facce · `/admin/accessi` le provenienze · `/admin/impostazioni` le cinquantuno leve.
 
 È anche una **PWA**: si installa, e il service worker tiene in tasca il guscio
 del sito. Non mette mai in cache le pagine di gioco — il quartiere cambia ogni
@@ -649,6 +660,50 @@ Annotate qui perché non si ripetano.
    generale: ogni ramo di una scelta di gioco deve avere un esito, **compreso
    il ramo di chi non risponde** — ed è quello che si dimentica, perché non ha
    un bottone.
+
+21. **Uno stato senza uscita è un difetto anche se non dà errori.** Dopo il
+   trasloco il personaggio passava a `trasferito` e lì restava: invisibile agli
+   altri, ma ancora capace di muoversi e usare i poteri, mentre il giocatore non
+   poteva nemmeno crearne un altro («Hai già un personaggio»). Nessuna eccezione,
+   nessuna pagina rotta — solo un giocatore chiuso in una stanza senza porte. Il
+   progetto il ritorno lo descriveva, e il tratto «Trasferito di recente» era nei
+   semi dal primo giorno: mancava soltanto la freccia che dallo stato portava
+   fuori. Quando si aggiunge uno stato, si scrive **prima** come se ne esce.
+
+22. **Un seme che gira a ogni deploy non deve riscrivere quello che il gioco
+   cambia.** Il seeder, su una riga esistente, aggiornava ogni colonna tranne la
+   chiave. Per i nomi dei luoghi va benissimo; per il cappello di paglia rosso —
+   un esemplare per server, che passa di mano — voleva dire rimetterlo sui gradini
+   a ogni pubblicazione, togliendolo a chi lo teneva. E riportare i tredici
+   abitanti al punto e ai valori di partenza. Adesso un seme dichiara quali
+   colonne sono **solo lo stato iniziale** (`solo_alla_nascita`), e il seeder le
+   scrive una volta sola.
+
+23. **Un numero va letto con il significato che gli dà chi lo scrive.** I copioni
+   chiamavano `difficolta` il valore del tiro e lo usavano come tale — 30 per
+   «stare col bar, funziona sempre», 55 per «scendere di corsa sul ghiaccio» — e
+   il motore lo **sommava** alla probabilità: la mossa sicura riusciva il 42%
+   delle volte, quella spericolata il 67%. Nessuna prova se n'era accorta perché
+   le prove usavano opzioni senza tiro. La prova nuova non guarda la formula:
+   confronta due opzioni e pretende che la più difficile riesca meno spesso.
+
+24. **Una frase fatta di pezzi si controlla generandole tutte.** Le voci erano
+   un «chi + cosa + dove» incollato, e sembravano giuste lette a campione. Lette
+   tutte e 3571, dicevano di Kurumi «si è preso la briga» e «se n'è andato»,
+   mettevano due soggetti con un verbo singolare, e appendevano il luogo anche
+   dove sembrava una destinazione («ha cambiato scuola all'ABCB»). Adesso le frasi
+   hanno segnaposto espliciti, e una prova le genera tutte — ogni tipo, fascia,
+   genere e coppia — e cerca le forme sbagliate. Lo stesso valeva per i testi in
+   seconda persona: il gioco parlava a una giocatrice al maschile («sei arrivato
+   da poco», «ti sei rassegnato»). Si scrive `arrivat{o}` e lo si accorda nel
+   momento in cui lo si mostra.
+
+25. **Due orologi che coincidono per caso sono un orologio rotto.** Le scadenze
+   le scrive `NOW()` del database e le rilegge `time()` di PHP. In produzione i
+   due fusi coincidevano; sulla macchina di sviluppo il database era in UTC, e un
+   collegamento per rifare la password — due ore — nasceva già scaduto. Adesso la
+   sessione del database si allinea al fuso di PHP alla connessione, e una prova
+   pretende che i due leggano la stessa ora.
 
 ## Licenza e diritti
 

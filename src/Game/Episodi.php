@@ -361,7 +361,7 @@ final class Episodi
             }
 
             $riuscita = self::tira($pg, $o, $epId, $scenaN);
-            $racconto = $riuscita ? (string) $o['ok'] : (string) ($o['ko'] ?: $o['ok']);
+            $racconto = accorda($riuscita ? (string) $o['ok'] : (string) ($o['ko'] ?: $o['ok']), $pg);
             Database::run(
                 'UPDATE episodio_scelte SET riuscita = ?, racconto = ?
                  WHERE episodio_id = ? AND scena = ? AND personaggio_id = ?',
@@ -397,7 +397,18 @@ final class Episodi
         // Le quattro abilità principali arrivano a 15, le secondarie a 10:
         // il moltiplicatore le porta sulla stessa scala percentuale.
         $passo = in_array($prova, Scheda::ABILITA, true) ? 4 : 6;
-        $prob  = max(5, min(95, (int) $o['difficolta'] + $valore * $passo - 20));
+        // La difficoltà si SOTTRAE: è «quanto serve superare», come dice il
+        // seme, ed è così che i copioni la usano — 30 per «stare col bar:
+        // funziona sempre», 55 per «scendere di corsa sul ghiaccio». Fino
+        // all'audit del 23 settembre si sommava, e la scala era rovesciata: la
+        // mossa sicura riusciva il 42% delle volte e quella spericolata il 67%.
+        // Il 65 non è arbitrario: con le difficoltà dei copioni (30–55) tiene
+        // la stessa GAMMA di prima (10–35 prima del bonus), solo rovesciata
+        // sulle opzioni giuste. La media sale di cinque punti e mezzo (da 52%
+        // a 57% per un personaggio con l'abilità a 8), perché i copioni hanno
+        // più opzioni facili che difficili — e adesso sono quelle a riuscire
+        // di più, che è il punto.
+        $prob  = max(5, min(95, 65 - (int) $o['difficolta'] + $valore * $passo));
         $rng   = Rng::for(GameConfig::int('world.seed', 19870406), 'episodio',
             $epId, $scena, (int) $pg['id']);
         return $rng->int(1, 100) <= $prob;
@@ -468,10 +479,17 @@ final class Episodi
                 'pp' => Database::run(
                     'UPDATE personaggi SET pp = GREATEST(0, LEAST(pp_max, pp + ?)) WHERE id = ?',
                     [$quanto, $id]),
-                'calore' => $quanto >= 0
-                    ? Segreto::alzaCalore($lkey, $quanto, $gts)
-                    : Segreto::alzaCalore($lkey, 0, $gts),
-                default => null,
+                // Il calore scende anche: «smentire», «dire la verità»,
+                // «renderla ridicola» sono le scelte che calmano un posto, e
+                // prima un valore negativo valeva zero — le otto opzioni fatte
+                // apposta per spegnere un sospetto non spegnevano niente.
+                'calore' => Segreto::muoviCalore($lkey, $quanto, $gts),
+                // Un effetto che il motore non conosce non si ignora in
+                // silenzio: e' quasi sempre un errore di battitura in un
+                // copione, e l'unico modo di accorgersene e' dirlo. Non si
+                // blocca la scena — chi gioca non ne ha colpa — ma si scrive.
+                // La prova sui copioni lo prende prima che arrivi qui.
+                default => logger("episodi: effetto sconosciuto «{$che}» ignorato", 'error'),
             };
         }
     }

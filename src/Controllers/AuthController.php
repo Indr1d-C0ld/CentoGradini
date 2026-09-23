@@ -151,6 +151,64 @@ final class AuthController
         return redirect('/quartiere');
     }
 
+    // --- Password dimenticata ---------------------------------------------------
+
+    public function mostraRecupero(Request $request): Response
+    {
+        return Response::html(view('auth/recupero_richiesta', ['title' => 'Password dimenticata']));
+    }
+
+    /** Manda il collegamento — o fa finta, se l'indirizzo non risulta. */
+    public function chiediRecupero(Request $request): Response
+    {
+        // Un freno per indirizzo di rete: senza, il modulo sarebbe un modo per
+        // riempire di posta la casella di qualcun altro.
+        if (!RateLimiter::hit('recupero:' . $request->ip(), 5, 1800)) {
+            Session::flash('error', "Troppe richieste. Riprova fra mezz'ora.");
+            return redirect('/password-dimenticata');
+        }
+        $res = Auth::richiediRecupero($request->str('email'), $request->ip());
+        if (!$res['ok']) {
+            Session::flashInput(['email' => $request->str('email')]);
+            Session::flash('error', $res['error'] ?? 'Richiesta non valida.');
+            return redirect('/password-dimenticata');
+        }
+        Session::flash('success', 'Se quell\'indirizzo risulta iscritto, il collegamento è partito. '
+            . 'Controlla la posta, anche fra lo spam.');
+        return redirect('/accesso');
+    }
+
+    /** La pagina della password nuova, aperta dal collegamento. */
+    public function mostraRifai(Request $request): Response
+    {
+        $token = $request->str('token');
+        $stato = Auth::recuperoValido($token);
+        return Response::html(view('auth/recupero', [
+            'title'  => 'Password nuova',
+            'token'  => $token,
+            'valido' => (bool) $stato['ok'],
+            'errore' => $stato['error'] ?? null,
+            'minimo' => Auth::minPasswordLength(),
+        ]));
+    }
+
+    public function rifai(Request $request): Response
+    {
+        $token = $request->str('token');
+        $pw    = (string) $request->input('password', '');
+        if ($pw !== (string) $request->input('password_confirm', '')) {
+            Session::flash('error', 'Le due password non coincidono.');
+            return redirect('/recupero?token=' . urlencode($token));
+        }
+        $res = Auth::rifaiPassword($token, $pw, $request->ip());
+        if (!$res['ok']) {
+            Session::flash('error', $res['error'] ?? 'Non è stato possibile cambiare la password.');
+            return redirect('/recupero?token=' . urlencode($token));
+        }
+        Session::flash('success', 'Password cambiata. Le sessioni aperte sono state chiuse: entra con quella nuova.');
+        return redirect('/accesso');
+    }
+
     public function esci(Request $request): Response
     {
         Auth::logout();

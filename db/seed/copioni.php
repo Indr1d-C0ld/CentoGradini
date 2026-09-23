@@ -119,7 +119,7 @@ return [
       ['k' => 'ridi', 'testo' => 'Buttarla sul ridere',
        'prova' => 'dai_suki', 'difficolta' => 35,
        'ok' => 'Ridi per primo e ridono tutti. Non è risolto niente, però si respira.',
-       'ko' => 'Ridi da solo, e il suono resta lì in mezzo al tavolo.',
+       'ko' => 'Ridi da sol{o}, e il suono resta lì in mezzo al tavolo.',
        'effetti_ok' => ['affetto_cast' => 3],
        'effetti_ko' => ['affetto_cast' => -2, 'compostezza' => -1],
        'peso' => ['dai_suki' => 3, 'kakko' => 1]],
@@ -453,7 +453,7 @@ return [
        'prova' => 'dai_suki', 'difficolta' => 40,
        'ok' => 'Descrivi il corridoio al buio, la mano che esce dal muro, la ragazza che urla. '
            . 'A metà del discorso hanno già cominciato a dividersi i compiti.',
-       'ko' => 'Ti entusiasmi da solo per tre minuti. Quando finisci, qualcuno chiede se si '
+       'ko' => 'Ti entusiasmi da sol{o} per tre minuti. Quando finisci, qualcuno chiede se si '
            . 'torna al bar.',
        'effetti_ok' => ['affetto_cast' => 3, 'compostezza' => -1],
        'effetti_ko' => ['compostezza' => -2],
@@ -487,7 +487,7 @@ return [
       ['k' => 'professore', 'testo' => 'Andare a chiamare il professore',
        'prova' => 'nessuna', 'difficolta' => 0,
        'ok' => 'Ci metti quattro minuti. Quando tornate se ne sono andati, e resta da rimettere '
-           . 'a posto. Nessuno si è fatto male, e nessuno si ricorderà che sei stato tu a '
+           . 'a posto. Nessuno si è fatto male, e nessuno si ricorderà che sei stat{o} tu a '
            . 'risolverla.',
        'ko' => '', 'effetti_ok' => ['affetto_cast' => 1], 'effetti_ko' => [],
        'peso' => ['testa' => 3, 'rissa' => -2]],
@@ -526,8 +526,8 @@ return [
     'opzioni' => [
       ['k' => 'chiedi', 'testo' => 'Chiedere la cosa che vuoi davvero',
        'prova' => 'cuore', 'difficolta' => 30,
-       'ok' => 'Tiri la corda, batti le mani, e per mezzo secondo la formuli anche a te stesso, '
-           . 'che è la parte difficile. Esci sapendo una cosa in più di quando sei entrato.',
+       'ok' => 'Tiri la corda, batti le mani, e per mezzo secondo la formuli anche a te stess{o}, '
+           . 'che è la parte difficile. Esci sapendo una cosa in più di quando sei entrat{o}.',
        'ko' => 'Tiri la corda, batti le mani, e ti accorgi che non sai cosa chiedere. Chiedi '
            . 'salute per la famiglia, che va sempre bene e non impegna nessuno.',
        'effetti_ok' => ['compostezza' => 2], 'effetti_ko' => [],
@@ -697,7 +697,7 @@ return [
        'prova' => 'sport', 'difficolta' => 55,
        'ok' => 'Arrivi in fondo in piedi, con le braccia larghe, e ti giri come se niente fosse. '
            . 'Applausi di quattro persone, ma quattro persone sono quattro persone.',
-       'ko' => 'Il primo metro va bene. Poi il mondo gira di novanta gradi e tu sei seduto in '
+       'ko' => 'Il primo metro va bene. Poi il mondo gira di novanta gradi e tu sei sedut{o} in '
            . 'fondo alla discesa con la neve nei pantaloni.',
        'effetti_ok' => ['affetto_cast' => 3, 'compostezza' => 1],
        'effetti_ko' => ['pf' => -3, 'compostezza' => -3],

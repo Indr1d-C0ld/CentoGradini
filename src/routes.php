@@ -36,7 +36,20 @@ $router->get('/accesso', [AuthController::class, 'mostraAccesso'], ['guest']);
 $router->post('/accesso', [AuthController::class, 'accedi'], ['guest', 'throttle']);
 $router->post('/esci', [AuthController::class, 'esci'], ['auth']);
 
+// --- Password dimenticata -------------------------------------------------------
+// Il modulo d'iscrizione lo prometteva («serve per recuperare l'accesso») e non
+// esisteva. Aperto anche a chi e' collegato: lo si puo' voler usare per cambiare
+// la password, e comunque non rivela niente.
+$router->get('/password-dimenticata', [AuthController::class, 'mostraRecupero']);
+$router->post('/password-dimenticata', [AuthController::class, 'chiediRecupero'], ['throttle']);
+$router->get('/recupero', [AuthController::class, 'mostraRifai']);
+$router->post('/recupero', [AuthController::class, 'rifai'], ['throttle']);
+
 // --- Il personaggio ------------------------------------------------------------
+// Il filtro 'quartiere' chiude le rotte che agiscono nel mondo (o lo mostrano
+// dal vivo) a chi ha il personaggio traslocato: vede /trasloco finche' non
+// torna. Restano aperti la scheda, il profilo, i ricordi e il diario — cose
+// che il trasloco non porta via — e le comunicazioni con la gestione.
 $router->get('/personaggio/nuovo', [QuartiereController::class, 'mostraCreazione'], ['active']);
 $router->post('/personaggio/nuovo', [QuartiereController::class, 'crea'], ['active', 'throttle']);
 $router->get('/personaggio/abilita', [QuartiereController::class, 'mostraAbilita'], ['active']);
@@ -52,49 +65,53 @@ $router->post('/personaggio/profilo/foto/togli', [ProfiloController::class, 'tog
 $router->post('/personaggio/profilo/aspetto', [ProfiloController::class, 'aspetto'], ['active', 'throttle']);
 
 // --- Il quartiere ----------------------------------------------------------------
-$router->get('/quartiere', [QuartiereController::class, 'index'], ['active']);
-$router->get('/luogo/{lkey}', [QuartiereController::class, 'luogo'], ['active']);
-$router->post('/vai', [QuartiereController::class, 'vai'], ['active', 'throttle']);
+$router->get('/quartiere', [QuartiereController::class, 'index'], ['active', 'quartiere']);
+$router->get('/luogo/{lkey}', [QuartiereController::class, 'luogo'], ['active', 'quartiere']);
+$router->post('/vai', [QuartiereController::class, 'vai'], ['active', 'quartiere', 'throttle']);
 
 // --- Il Segreto ------------------------------------------------------------------
-$router->post('/potere', [SegretoController::class, 'usa'], ['active', 'throttle']);
-$router->get('/incidente/{id}', [SegretoController::class, 'incidente'], ['active']);
-$router->post('/copri', [SegretoController::class, 'copri'], ['active', 'throttle']);
-$router->post('/confida', [SegretoController::class, 'confida'], ['active', 'throttle']);
-$router->get('/taccuino', [SegretoController::class, 'taccuino'], ['active']);
-$router->post('/taccuino/collega', [SegretoController::class, 'collega'], ['active', 'throttle']);
+// Il trasloco e il ritorno: SENZA il filtro 'quartiere', per forza — e' la
+// pagina verso cui quel filtro manda.
+$router->get('/trasloco', [SegretoController::class, 'trasloco'], ['active']);
+$router->post('/trasloco/rientra', [SegretoController::class, 'rientra'], ['active', 'throttle']);
+$router->post('/potere', [SegretoController::class, 'usa'], ['active', 'quartiere', 'throttle']);
+$router->get('/incidente/{id}', [SegretoController::class, 'incidente'], ['active', 'quartiere']);
+$router->post('/copri', [SegretoController::class, 'copri'], ['active', 'quartiere', 'throttle']);
+$router->post('/confida', [SegretoController::class, 'confida'], ['active', 'quartiere', 'throttle']);
+$router->get('/taccuino', [SegretoController::class, 'taccuino'], ['active', 'quartiere']);
+$router->post('/taccuino/collega', [SegretoController::class, 'collega'], ['active', 'quartiere', 'throttle']);
 
 // --- I legami ----------------------------------------------------------------------
-$router->get('/legami', [LegamiController::class, 'elenco'], ['active']);
-$router->get('/chi/{id}', [LegamiController::class, 'profilo'], ['active']);
-$router->get('/verso/{id}', [LegamiController::class, 'verso'], ['active']);
-$router->post('/gesto', [LegamiController::class, 'gesto'], ['active', 'throttle']);
-$router->post('/chiarisci', [LegamiController::class, 'chiarisci'], ['active', 'throttle']);
-$router->post('/confessa', [LegamiController::class, 'confessa'], ['active', 'throttle']);
-$router->post('/oggetto/passa', [LegamiController::class, 'passaOggetto'], ['active', 'throttle']);
-$router->post('/oggetto/raccogli', [LegamiController::class, 'raccogliOggetto'], ['active', 'throttle']);
+$router->get('/legami', [LegamiController::class, 'elenco'], ['active', 'quartiere']);
+$router->get('/chi/{id}', [LegamiController::class, 'profilo'], ['active', 'quartiere']);
+$router->get('/verso/{id}', [LegamiController::class, 'verso'], ['active', 'quartiere']);
+$router->post('/gesto', [LegamiController::class, 'gesto'], ['active', 'quartiere', 'throttle']);
+$router->post('/chiarisci', [LegamiController::class, 'chiarisci'], ['active', 'quartiere', 'throttle']);
+$router->post('/confessa', [LegamiController::class, 'confessa'], ['active', 'quartiere', 'throttle']);
+$router->post('/oggetto/passa', [LegamiController::class, 'passaOggetto'], ['active', 'quartiere', 'throttle']);
+$router->post('/oggetto/raccogli', [LegamiController::class, 'raccogliOggetto'], ['active', 'quartiere', 'throttle']);
 
 // --- Gli episodi ------------------------------------------------------------------
-$router->get('/episodio', [EpisodiController::class, 'corrente'], ['active']);
-$router->post('/episodio/scegli', [EpisodiController::class, 'scegli'], ['active', 'throttle']);
+$router->get('/episodio', [EpisodiController::class, 'corrente'], ['active', 'quartiere']);
+$router->post('/episodio/scegli', [EpisodiController::class, 'scegli'], ['active', 'quartiere', 'throttle']);
 $router->get('/ricordi', [EpisodiController::class, 'ricordi'], ['active']);
 $router->get('/diario', [EpisodiController::class, 'diario'], ['active']);
 
 // --- F6: il quartiere vivo ---------------------------------------------------
-$router->get('/voci', [QuartiereVivoController::class, 'voci'], ['active']);
+$router->get('/voci', [QuartiereVivoController::class, 'voci'], ['active', 'quartiere']);
 
-$router->get('/bacheca', [QuartiereVivoController::class, 'bacheca'], ['active']);
-$router->post('/bacheca/affiggi', [QuartiereVivoController::class, 'affiggi'], ['active', 'throttle']);
-$router->post('/bacheca/stacca', [QuartiereVivoController::class, 'stacca'], ['active', 'throttle']);
+$router->get('/bacheca', [QuartiereVivoController::class, 'bacheca'], ['active', 'quartiere']);
+$router->post('/bacheca/affiggi', [QuartiereVivoController::class, 'affiggi'], ['active', 'quartiere', 'throttle']);
+$router->post('/bacheca/stacca', [QuartiereVivoController::class, 'stacca'], ['active', 'quartiere', 'throttle']);
 
-$router->get('/biglietti', [QuartiereVivoController::class, 'biglietti'], ['active']);
-$router->post('/biglietto/lascia', [QuartiereVivoController::class, 'lascia'], ['active', 'throttle']);
-$router->post('/biglietto/leggi', [QuartiereVivoController::class, 'leggiBiglietto'], ['active', 'throttle']);
+$router->get('/biglietti', [QuartiereVivoController::class, 'biglietti'], ['active', 'quartiere']);
+$router->post('/biglietto/lascia', [QuartiereVivoController::class, 'lascia'], ['active', 'quartiere', 'throttle']);
+$router->post('/biglietto/leggi', [QuartiereVivoController::class, 'leggiBiglietto'], ['active', 'quartiere', 'throttle']);
 
-$router->get('/club', [QuartiereVivoController::class, 'club'], ['active']);
-$router->post('/club/iscrivi', [QuartiereVivoController::class, 'iscrivi'], ['active', 'throttle']);
-$router->post('/club/esci', [QuartiereVivoController::class, 'esciClub'], ['active', 'throttle']);
-$router->get('/club/{ckey}', [QuartiereVivoController::class, 'unClub'], ['active']);
+$router->get('/club', [QuartiereVivoController::class, 'club'], ['active', 'quartiere']);
+$router->post('/club/iscrivi', [QuartiereVivoController::class, 'iscrivi'], ['active', 'quartiere', 'throttle']);
+$router->post('/club/esci', [QuartiereVivoController::class, 'esciClub'], ['active', 'quartiere', 'throttle']);
+$router->get('/club/{ckey}', [QuartiereVivoController::class, 'unClub'], ['active', 'quartiere']);
 
 $router->get('/calendario', [QuartiereVivoController::class, 'calendario'], ['active']);
 
@@ -122,5 +139,5 @@ $router->get('/admin/accessi', [AdminController::class, 'accessi'], ['active', '
 $router->get('/admin/impostazioni', [AdminController::class, 'impostazioni'], ['active', 'admin']);
 
 // Le due chiamate che la pagina fa da sola, senza ricaricarsi.
-$router->get('/api/carta', [QuartiereController::class, 'carta'], ['active']);
-$router->get('/api/battito', [QuartiereController::class, 'battito'], ['active']);
+$router->get('/api/carta', [QuartiereController::class, 'carta'], ['active', 'quartiere']);
+$router->get('/api/battito', [QuartiereController::class, 'battito'], ['active', 'quartiere']);

@@ -11,7 +11,7 @@
   <p class="tenue">
     Il modo per farne capitare di più è semplice e non è un trucco: stare in giro dove c'è
     gente, nei momenti in cui succede qualcosa. Un pomeriggio d'autunno all'ABCB vale più di
-    tre serate sull'argine da solo.
+    tre serate passate da soli sull'argine.
   </p>
   <div class="bottoni">
     <a class="bottone secondario" href="<?= e(url('/ricordi')) ?>">L'album dei ricordi</a>

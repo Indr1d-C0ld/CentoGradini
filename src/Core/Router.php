@@ -113,8 +113,34 @@ final class Router
             // Freno sulle azioni che cambiano stato. La lettura non consuma nulla.
             'throttle' => $this->throttle($request),
 
+            // Serve un personaggio che sia NEL quartiere. Chi ha traslocato vede
+            // solo la pagina del trasloco finche' non torna: prima non c'era
+            // questo filtro, e un personaggio traslocato restava un fantasma
+            // invisibile agli altri ma capace di muoversi e usare i poteri.
+            'quartiere' => $this->nelQuartiere(),
+
             default => null,
         };
+    }
+
+    /**
+     * Il personaggio di chi guarda e' ancora nel quartiere?
+     *
+     * Legge solo lo stato, con una query sua: `Personaggio::perUtente()`
+     * farebbe avanzare i viaggi e garantirebbe i tiri, cose che qui non
+     * servono. Senza account o senza personaggio lascia passare: a quei casi
+     * pensano gli altri filtri e i controller, che sanno dove mandarti.
+     */
+    private function nelQuartiere(): ?Response
+    {
+        $id = Auth::id();
+        if ($id === null) {
+            return null;
+        }
+        $r = Database::first('SELECT stato FROM personaggi WHERE user_id = ?', [$id]);
+        return ($r !== null && (string) $r['stato'] === 'trasferito')
+            ? Response::redirect(url('/trasloco'))
+            : null;
     }
 
     private function throttle(Request $request): ?Response

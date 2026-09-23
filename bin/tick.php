@@ -26,6 +26,7 @@ use App\Game\Abitanti;
 use App\Game\Bacheca;
 use App\Game\Personaggio;
 use App\Game\Episodi;
+use App\Game\Legami;
 use App\Game\Segreto;
 use App\Game\Voci;
 
@@ -74,6 +75,11 @@ try {
     // collegato: il camioncino arriva di mattina presto e non chiede permesso.
     $partiti = $fase('traslochi', static fn (): int => Segreto::traslochiDovuti(), 0);
 
+    // Gli oggetti unici che nessuno puo' piu' passare tornano nel mondo: chi li
+    // teneva ha traslocato, o il suo account non c'e' piu'. Il trasloco lo fa
+    // gia' da se'; questa e' la rete per i casi a cui nessuno ha pensato.
+    $ritrovati = $fase('oggetti', static fn (): int => Legami::ritrovaOggetti(), 0);
+
     // Gli abitanti canonici seguono il loro giro. Vanno mossi PRIMA delle
     // chiacchiere: e' il loro spostarsi che mette in contatto persone che
     // altrimenti non si incontrerebbero mai, ed e' il motivo per cui una
@@ -115,6 +121,7 @@ try {
                 'arrivati'     => $arrivati,
                 'tracce_potate'=> $tracce,
                 'traslocati'   => $partiti,
+                'oggetti_ritrovati' => $ritrovati,
                 'scene_chiuse' => $scene,
                 'episodi_nuovi'=> $nuovi,
                 'abitanti'     => $abitanti,

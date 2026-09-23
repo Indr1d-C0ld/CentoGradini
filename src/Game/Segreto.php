@@ -478,14 +478,14 @@ final class Segreto
     private static function segnaAnomalia(
         int $osservatore, int $soggetto, int $incidenteId, string $pkey, string $luogo, int $gts
     ): void {
-        $chi = Database::first('SELECT nome, cognome FROM personaggi WHERE id = ?', [$soggetto]);
+        $chi = Database::first('SELECT nome, cognome, sesso FROM personaggi WHERE id = ?', [$soggetto]);
         $pot = Database::first('SELECT nome FROM poteri WHERE pkey = ?', [$pkey]);
         $testo = sprintf(
             '%s %s, %s, %s: qualcosa che non torna. %s.',
             $chi['cognome'] ?? '?', $chi['nome'] ?? '?',
             Luoghi::nome($luogo),
             mb_strtolower(Orologio::breve($gts)),
-            self::comeAppare((string) $pkey)
+            self::comeAppare((string) $pkey, (string) ($chi['sesso'] ?? 'm') === 'f')
         );
         Database::run(
             'INSERT INTO anomalie (osservatore_id, soggetto_id, incidente_id, gts, luogo, testo)
@@ -499,25 +499,29 @@ final class Segreto
      * vede una persona che c'era e poi non c'è più. È la differenza fra un
      * indizio e un'etichetta, ed è tutto il mestiere di chi indaga.
      */
-    private static function comeAppare(string $pkey): string
+    private static function comeAppare(string $pkey, bool $donna = false): string
     {
-        return match ($pkey) {
-            'telecinesi'      => 'Una cosa si è mossa da sola, e lui guardava proprio lì',
+        // Il testo resta scritto nel taccuino una volta per tutte, quindi
+        // l'accordo va fatto qui: prima era tutto al maschile, e il taccuino
+        // diceva di Kurumi «si è voltato», «è rimasto immobile», «lui guardava».
+        $frase = match ($pkey) {
+            'telecinesi'      => 'Una cosa si è mossa da sola, e {lui} guardava proprio lì',
             'teletrasporto'   => 'Era lì, e un istante dopo non c\'era più',
             'telepatia'       => 'Ha risposto a una domanda che nessuno aveva fatto ad alta voce',
             'supervelocita'   => 'Ha attraversato il cortile in un tempo che non è un tempo',
-            'supersensi'      => 'Si è voltato verso un rumore che non si sentiva',
-            'chiaroveggenza'  => 'È rimasto immobile con gli occhi chiusi, e poi sapeva',
-            'scambio_corpo'   => 'Per qualche minuto non si è comportato come sé stesso',
-            'cambio_identita' => 'Per un attimo è sembrato un\'altra persona',
+            'supersensi'      => 'Si è voltat{o} verso un rumore che non si sentiva',
+            'chiaroveggenza'  => 'È rimast{o} immobile con gli occhi chiusi, e poi sapeva',
+            'scambio_corpo'   => 'Per qualche minuto non si è comportat{o} come sé stess{o}',
+            'cambio_identita' => 'Per un attimo è sembrat{o} un\'altra persona',
             'fantasmi'        => 'C\'era qualcosa nell\'aria che non poteva esserci',
-            'ipnosi'          => 'Ha detto una frase, e quell\'altro ha obbedito senza discutere',
-            'autoipnosi'      => 'Si è messo davanti a uno specchio e ne è uscito diverso',
-            'natura'          => 'Il gatto lo ha ascoltato. Il gatto',
+            'ipnosi'          => 'Ha detto una frase, e l\'altro ha obbedito senza discutere',
+            'autoipnosi'      => 'Si è mess{o} davanti a uno specchio e ne è uscit{o} divers{o}',
+            'natura'          => 'Il gatto stava a sentire quello che {lui} diceva. Il gatto',
             'invisibilita'    => 'Ha sentito dei passi dove non c\'era nessuno',
-            'voce'            => 'La voce veniva da dove lui non era',
+            'voce'            => 'La voce veniva da dove {lui} non era',
             default           => 'Non saprebbe dire cosa, ma qualcosa',
         };
+        return strtr($frase, ['{o}' => $donna ? 'a' : 'o', '{lui}' => $donna ? 'lei' : 'lui']);
     }
 
     /**
@@ -755,8 +759,19 @@ final class Segreto
 
     public static function alzaCalore(string $lkey, int $quanto, ?int $gts = null): void
     {
+        self::muoviCalore($lkey, max(0, $quanto), $gts);
+    }
+
+    /**
+     * Sposta il calore di un luogo in su o in giu', fra zero e il tetto.
+     *
+     * Serve agli episodi, dove certe scelte calmano un posto invece di
+     * scaldarlo. `alzaCalore()` resta per i poteri, che scaldano e basta.
+     */
+    public static function muoviCalore(string $lkey, int $quanto, ?int $gts = null): void
+    {
         $gts ??= Orologio::lineare();
-        $nuovo = min(GameConfig::int('segreto.calore_max', 100), self::calore($lkey, $gts) + max(0, $quanto));
+        $nuovo = max(0, min(GameConfig::int('segreto.calore_max', 100), self::calore($lkey, $gts) + $quanto));
         Database::run(
             'INSERT INTO calore (luogo, valore, gts) VALUES (?, ?, ?)
              ON DUPLICATE KEY UPDATE valore = VALUES(valore), gts = VALUES(gts)',
@@ -788,11 +803,20 @@ final class Segreto
 
     // --- Il Trasloco --------------------------------------------------------------------------
 
-    /** Quante persone hanno capito da sole. */
+    /**
+     * Quante persone hanno capito da sole — fra quelle ancora nel quartiere.
+     *
+     * Chi ha traslocato non conta: le chiacchiere hanno bisogno di qualcuno
+     * che stia negli stessi posti, e chi se n'e' andato non ci sta piu'. Prima
+     * contava lo stesso, e un esper poteva essere costretto al trasloco da
+     * due persone di cui una non abitava piu' li'. Se torna, torna a contare.
+     */
     public static function quantiSanno(int $pgId, string $come = 'scoperto'): int
     {
         return (int) (Database::first(
-            'SELECT COUNT(*) n FROM sanno WHERE esper_id = ? AND come = ?', [$pgId, $come]
+            "SELECT COUNT(*) n FROM sanno s JOIN personaggi p ON p.id = s.chi_sa_id
+             WHERE s.esper_id = ? AND s.come = ? AND p.stato = 'attivo'",
+            [$pgId, $come]
         )['n'] ?? 0);
     }
 
@@ -850,6 +874,11 @@ final class Segreto
         // un soggetto da riguardare.
         Database::run('DELETE FROM anomalie WHERE soggetto_id = ?', [$id]);
 
+        // Gli oggetti unici non partono col camioncino: restano dove li si
+        // stava tenendo in mano. Prima partivano, e il cappello di paglia —
+        // uno solo per server — finiva in mano a chi non c'era piu'.
+        Legami::ritrovaOggetti($gts);
+
         Personaggio::traccia((string) $pg['luogo'], null, 'trasloco',
             sprintf('La famiglia di %s ha traslocato, all\'improvviso, senza salutare nessuno.',
                 Personaggio::nomeCompleto($pg)), $gts, 90);
@@ -875,11 +904,91 @@ final class Segreto
             . 'Dalla curva in fondo al viale si vedono ancora i tetti, e poi nemmeno quelli.'];
     }
 
+    /**
+     * Quando si potra' tornare: l'istante di gioco, o null se non si e' via.
+     */
+    public static function ritornoDa(array $pg): ?int
+    {
+        if ((string) $pg['stato'] !== 'trasferito') {
+            return null;
+        }
+        $giorni = max(0, GameConfig::int('segreto.rientro_giorni', 2));
+        return (int) ($pg['ultimo_trasloco_gts'] ?? 0) + $giorni * 86400;
+    }
+
+    /**
+     * Il ritorno: «rientri nel quartiere come trasferito di recente».
+     *
+     * PROGETTO §7 lo dice cosi', e il tratto «Trasferito di recente» era nei
+     * semi dall'inizio; il ritorno invece non esisteva, e dopo il trasloco il
+     * giocatore restava un fantasma che non poteva nemmeno ricominciare.
+     *
+     * Cosa si tiene e cosa si perde e' scritto nel progetto, e qui si fa
+     * esattamente quello: si TENGONO i poteri e il Controllo, i tratti, le
+     * abilita', l'album dei ricordi e quello che si sa degli altri; si PERDONO
+     * i legami (in tutte e due le direzioni: nessuno si ricorda di te come
+     * prima), chi aveva capito il tuo segreto (sei un altro ragazzo in un'altra
+     * casa, e la voce e' vecchia), i club. Si arriva in stazione, come arriva
+     * chi si trasferisce, e ci si porta dietro il tratto nuovo.
+     *
+     * @return array{ok:bool, error?:string, racconto?:string}
+     */
+    public static function rientra(array $pg): array
+    {
+        $quando = self::ritornoDa($pg);
+        if ($quando === null) {
+            return ['ok' => false, 'error' => 'Sei già nel quartiere.'];
+        }
+        $gts = Orologio::lineare();
+        if ($gts < $quando) {
+            return ['ok' => false, 'error' => 'Il camioncino non è ancora ripartito dall\'altra parte.'];
+        }
+        $id = (int) $pg['id'];
+
+        return Lock::con('rientro:' . $id, function () use ($id, $gts): array {
+            $fresco = Database::first('SELECT stato FROM personaggi WHERE id = ?', [$id]);
+            if ($fresco === null || (string) $fresco['stato'] !== 'trasferito') {
+                return ['ok' => false, 'error' => 'Sei già nel quartiere.'];
+            }
+
+            Database::run('DELETE FROM legami WHERE da_id = ? OR a_id = ?', [$id, $id]);
+            Database::run('DELETE FROM sanno WHERE esper_id = ?', [$id]);
+            Database::run('DELETE FROM club_membri WHERE personaggio_id = ?', [$id]);
+            Database::run('INSERT IGNORE INTO personaggio_tratti (personaggio_id, tkey) VALUES (?, ?)',
+                [$id, 'trasferito']);
+            Database::run(
+                "UPDATE personaggi SET stato = 'attivo', luogo = 'stazione', arrivato_gts = ?,
+                        verso = NULL, arrivo_gts = NULL, visto_gts = ?
+                 WHERE id = ?",
+                [$gts, $gts, $id]
+            );
+            Database::run('INSERT INTO presenze (personaggio_id, luogo, dal_gts) VALUES (?, ?, ?)',
+                [$id, 'stazione', $gts]);
+
+            $pg = (array) Database::first('SELECT * FROM personaggi WHERE id = ?', [$id]);
+            $o  = (string) ($pg['sesso'] ?? 'm') === 'f' ? 'a' : 'o';
+            Personaggio::traccia('stazione', $id, 'arrivo',
+                sprintf('%s è sces%s dal treno con una borsa sola, e si è guardat%s intorno come chi '
+                    . 'cerca di ricordarsi dove abita adesso.', Personaggio::nomeCompleto($pg), $o, $o),
+                $gts, 40);
+
+            return ['ok' => true, 'racconto' =>
+                'Il treno si ferma a Nakagawa con uno sbuffo, e scendi. La stazione è la stessa, il '
+                . 'viale anche; tu no. Chi ti conosceva non ti riconoscerà subito, e chi aveva '
+                . 'capito qualcosa adesso ha solo una storia vecchia da raccontare. Hai tutto quello '
+                . 'che ti porti dentro, e niente di quello che avevi qui. Si ricomincia.'];
+        }, ['ok' => false, 'error' => 'Un momento: stai già tornando.']);
+    }
+
     /** Fa traslocare chi ha superato la soglia. Lo chiama il battito. */
     public static function traslochiDovuti(): int
     {
         $n = 0;
-        foreach (Database::all("SELECT * FROM personaggi WHERE esper = 1 AND stato = 'attivo'") as $pg) {
+        // Solo i giocatori. Oggi un abitante canonico non puo' arrivarci — non
+        // usa poteri, quindi nessuno annota anomalie su di lui — ma il giorno in
+        // cui un copione lo facesse, il battito spedirebbe Kyosuke fuori dal
+        // quartiere per sempre. Meglio che sia impossibile per costruzione.
+        foreach (Database::all("SELECT * FROM personaggi WHERE esper = 1 AND stato = 'attivo' AND png IS NULL") as $pg) {
             if (self::pericolo($pg)['stato'] === 'trasloco') {
                 if (self::trasloca($pg)['ok']) {
                     $n++;

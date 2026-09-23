@@ -263,3 +263,23 @@ if (!function_exists('is_admin')) {
         return \App\Auth\Auth::isAdmin();
     }
 }
+
+if (!function_exists('accorda')) {
+    /**
+     * Accorda al genere di un personaggio un testo che contiene «{o}».
+     *
+     * I testi scritti a mano — tratti, poteri, esiti degli episodi — parlano al
+     * giocatore in seconda persona, e prima davano per scontato che fosse un
+     * ragazzo: «sei arrivato da poco», «ti sei rassegnato», «sei stato tu». A
+     * una giocatrice il gioco parlava al maschile. Adesso il participio si
+     * scrive «arrivat{o}» e si accorda qui, nel momento in cui lo si mostra.
+     *
+     * Senza personaggio si resta al maschile, che in italiano e' il generico.
+     *
+     * @param array<string,mixed>|null $pg
+     */
+    function accorda(string $testo, ?array $pg = null): string
+    {
+        return str_replace('{o}', (string) ($pg['sesso'] ?? 'm') === 'f' ? 'a' : 'o', $testo);
+    }
+}

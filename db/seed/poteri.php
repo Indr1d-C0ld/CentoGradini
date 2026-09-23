@@ -132,7 +132,7 @@ $p('cambio_identita', 'Cambio d\'identità', '変身', null, 3, 57, 61, 5,
   . 'non cambi davvero, cambi **quello che vede una persona sola**. Tutti gli altri continuano '
   . 'a vedere te, ed è lì che nascono i guai.',
   'Un bersaglio per volta. Chi sa che hai questo potere può accorgersene: tira sotto '
-  . '30+(TESTA×2) su cento. Se sei spaventato o malato, una volta su due sbagli forma.'),
+  . '30+(TESTA×2) su cento. Se sei spaventat{o} o malat{o}, una volta su due sbagli forma.'),
 
 $p('fantasmi', 'Proiezione di fantasmi', '幻影', null, 2, 62, 67, 8,
   'Piegare la luce e disegnarci qualcosa: un UFO nel cielo, una scena sul muro della camera '

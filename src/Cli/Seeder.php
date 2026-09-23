@@ -56,14 +56,25 @@ final class Seeder
         $chiave  = (string) $def['chiave'];
         $righe   = $def['righe'];
 
+        // Le colonne che il seme scrive solo quando la riga NASCE. Il resto lo
+        // riallinea a ogni giro, ed e' giusto per i dati di ambientazione — i
+        // nomi dei luoghi, le frasi dei gesti, le bande dei poteri — ma non per
+        // lo stato che il gioco modifica. Prima questa distinzione non c'era, e
+        // poiche' il seme gira a ogni deploy, ogni pubblicazione toglieva il
+        // cappello di paglia a chi lo teneva e lo rimetteva sui gradini, e
+        // riportava i tredici abitanti al punto e ai valori di partenza.
+        $soloAllaNascita = array_map('strval', (array) ($def['solo_alla_nascita'] ?? []));
+
         if ($righe === []) {
             return "{$nome}: nessuna riga";
         }
 
         foreach ($righe as $r) {
             $campi = array_keys($r);
-            // La chiave naturale non si aggiorna: e' il perno su cui si riconosce la riga.
-            $aggiorna = array_filter($campi, static fn (string $c): bool => $c !== $chiave);
+            // La chiave naturale non si aggiorna: e' il perno su cui si riconosce la
+            // riga. E nemmeno lo stato di partenza: quello e' del gioco, adesso.
+            $aggiorna = array_filter($campi, static fn (string $c): bool
+                => $c !== $chiave && !in_array($c, $soloAllaNascita, true));
             $sql = 'INSERT INTO ' . $tabella . ' (' . implode(', ', $campi) . ') VALUES ('
                 . implode(', ', array_fill(0, count($campi), '?')) . ')'
                 . ($aggiorna === [] ? ' ON DUPLICATE KEY UPDATE ' . $chiave . ' = VALUES(' . $chiave . ')'

@@ -27,7 +27,7 @@ use App\Sim\Scuola;
 
 <?php if ($legami === []): ?>
   <div class="carta">
-    <p>Non conosci ancora nessuno. È normale: sei arrivato da poco.</p>
+    <p>Non conosci ancora nessuno. È normale: sei <?= e(accorda('arrivat{o}', $pg)) ?> da poco.</p>
     <p class="tenue">
       Si comincia stando negli stessi posti delle stesse persone, e scambiando due parole. Il
       resto viene o non viene.

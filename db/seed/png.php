@@ -78,6 +78,11 @@ return [
     'tabella'     => 'personaggi',
     'chiave'      => 'png',
     'descrizione' => 'personaggi canonici che abitano il quartiere',
+    // Dove sono e come stanno lo decide il gioco: gli abitanti si spostano col
+    // loro giro, e gli episodi muovono Compostezza, punti ferita e punti
+    // potere anche a loro. Il seme scrive queste colonne solo quando la riga
+    // nasce; tutto il resto — nomi, giro, abilita' — lo riallinea a ogni giro.
+    'solo_alla_nascita' => ['stato', 'luogo', 'pf', 'pp', 'compostezza'],
     'righe' => [
 
         // --- Il triangolo -----------------------------------------------------

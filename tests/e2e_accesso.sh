@@ -552,9 +552,14 @@ if contiene "${BASE}/diario" "Izumi Matsumoto"; then verde "il diario porta l'at
 
 # La PWA. Il manifesto e il service worker devono uscire col tipo giusto:
 # col tipo sbagliato il browser li scarta e non lo dice a nessuno.
-if curl -sS -o /dev/null -D- "${BASE}/manifest.webmanifest" | grep -qi 'content-type: application/manifest'; then
+# Qui e negli altri controlli del genere la risposta si raccoglie PRIMA e si
+# cerca DOPO: `curl … | grep -q` con pipefail fallisce a caso quando grep esce
+# presto e curl riceve SIGPIPE (vedi contiene()). Sei controlli lo facevano
+# ancora; uno, quello «al negativo» sulla carta del giocatore, in quel caso
+# sarebbe risultato verde nascondendo proprio il difetto che deve cogliere.
+if grep -qi 'content-type: application/manifest' <<< "$(curl -sS -o /dev/null -D- "${BASE}/manifest.webmanifest")"; then
   verde "il manifesto esce col tipo giusto"; else rosso "tipo del manifesto sbagliato"; fi
-if curl -sS -o /dev/null -D- "${BASE}/sw.js" | grep -qi 'content-type: text/javascript'; then
+if grep -qi 'content-type: text/javascript' <<< "$(curl -sS -o /dev/null -D- "${BASE}/sw.js")"; then
   verde "il service worker esce col tipo giusto"; else rosso "tipo del service worker sbagliato"; fi
 if contiene "${BASE}/sw.js" "cento-gradini-v"; then verde "il service worker e' il nostro"; else rosso "/sw.js non e' il nostro"; fi
 if contiene "${BASE}/quartiere" 'rel="manifest"'; then verde "la pagina dichiara il manifesto"; else rosso "manca il rel=manifest"; fi
@@ -749,7 +754,7 @@ else
 fi
 
 # La carta del giocatore NON deve dire chi e' mosso dal motore e chi no.
-if curl -sS -b "${BISCOTTI}" "${BASE}/api/carta" | grep -q '"giocatori"'; then
+if grep -q '"giocatori"' <<< "$(curl -sS -b "${BISCOTTI}" "${BASE}/api/carta")"; then
   rosso "la carta del giocatore distingue i giocatori dagli abitanti"
 else verde "la carta del giocatore non distingue giocatori e abitanti"; fi
 
@@ -850,7 +855,7 @@ if contiene "${BASE}/admin/mappa" "luogo per luogo"; then verde "e elenca i luog
 if contiene "${BASE}/admin/mappa" 'data-api="[^"]*admin/api/carta"'; then
   verde "e adesso ha anche la carta disegnata"; else rosso "manca la tela sulla mappa admin"; fi
 # La carta dell'amministrazione e' l'unica che puo' dire chi e' giocatore.
-if curl -sS -b "${BISCOTTI}" "${BASE}/admin/api/carta" | grep -q '"giocatori"'; then
+if grep -q '"giocatori"' <<< "$(curl -sS -b "${BISCOTTI}" "${BASE}/admin/api/carta")"; then
   verde "la carta admin distingue i giocatori dagli abitanti"
 else rosso "la carta admin non distingue giocatori e abitanti"; fi
 
@@ -1020,6 +1025,107 @@ curl -sS -o /dev/null -b "${BISCOTTI}" -c "${BISCOTTI}" -d "_token=${T}" \
   -d "chiave=chiave.inventata" -d "valore=7" "${BASE}/admin/config" >/dev/null
 INVENTATA=$(php bin/console.php config:get chiave.inventata 2>&1 | head -1)
 if grep -qiv '^7$' <<< "${INVENTATA}"; then verde "una chiave inventata non si crea dal pannello"; else rosso "il pannello ha creato una chiave nuova"; fi
+
+# --- Il trasloco, e il ritorno ------------------------------------------------
+# Prima dell'audit del 23 settembre un personaggio traslocato restava un
+# fantasma: invisibile agli altri, ma ancora capace di muoversi e usare i poteri,
+# e il giocatore non poteva nemmeno ricominciare.
+titolo "Il trasloco"
+
+php_db() {
+  php -r '
+    require "src/autoload.php"; require "src/Support/helpers.php";
+    $GLOBALS["__project_root"] = getcwd(); App\Core\Config::load(getcwd());
+    eval($argv[1]);' "$@"
+}
+PGID_T=$(php_db 'echo (int) (App\Core\Database::first("SELECT id FROM personaggi WHERE nome = ?", [$argv[2]])["id"] ?? 0);' "${PGNOME}")
+php_db '
+  $pg = App\Core\Database::first("SELECT * FROM personaggi WHERE id = ?", [(int) $argv[2]]);
+  App\Game\Segreto::trasloca($pg);' "${PGID_T}" >/dev/null 2>&1
+
+DEST=$(curl -sS -o /dev/null -w '%{redirect_url}' -b "${BISCOTTI}" "${BASE}/quartiere")
+if [[ "${DEST}" == *"/trasloco" ]]; then verde "chi ha traslocato non entra nel quartiere: va alla pagina del trasloco"
+else rosso "il quartiere si apre ancora a un personaggio traslocato (${DEST:-nessun rinvio})"; fi
+
+PRIMA=$(php_db 'echo (int) App\Core\Database::first("SELECT COUNT(*) n FROM incidenti WHERE attore_id = ?", [(int) $argv[2]])["n"];' "${PGID_T}")
+T=$(gettone "${BASE}/trasloco")
+curl -sS -o /dev/null -b "${BISCOTTI}" -c "${BISCOTTI}" -d "_token=${T}" -d "potere=teletrasporto" "${BASE}/potere" >/dev/null
+DOPO=$(php_db 'echo (int) App\Core\Database::first("SELECT COUNT(*) n FROM incidenti WHERE attore_id = ?", [(int) $argv[2]])["n"];' "${PGID_T}")
+if [[ "${PRIMA}" == "${DOPO}" ]]; then verde "e non puo' usare poteri in un quartiere dove non abita piu'"
+else rosso "un personaggio traslocato ha usato un potere"; fi
+
+if contiene "${BASE}/trasloco" "Non ancora"; then verde "la pagina dice quando si potra' tornare"; else rosso "/trasloco non dice quando si torna"; fi
+if grep -qi 'content-type: text/markdown' <<< "$(curl -sS -o /dev/null -D- -b "${BISCOTTI}" "${BASE}/diario")"; then
+  verde "il diario resta suo"; else rosso "dopo il trasloco il diario non si scarica"; fi
+
+# L'attesa si fa passare spostando indietro il giorno del trasloco.
+php_db 'App\Core\Database::run("UPDATE personaggi SET ultimo_trasloco_gts = ultimo_trasloco_gts - 90 * 86400 WHERE id = ?", [(int) $argv[2]]);' "${PGID_T}"
+T=$(gettone "${BASE}/trasloco")
+curl -sS -o /dev/null -b "${BISCOTTI}" -c "${BISCOTTI}" -d "_token=${T}" "${BASE}/trasloco/rientra" >/dev/null
+STATO_T=$(php_db 'echo implode("|", App\Core\Database::first("SELECT stato, luogo FROM personaggi WHERE id = ?", [(int) $argv[2]]));' "${PGID_T}")
+if [[ "${STATO_T}" == "attivo|stazione" ]]; then verde "si torna, e si arriva in stazione"
+else rosso "il ritorno non ha funzionato: ${STATO_T}"; fi
+if contiene "${BASE}/personaggio" "Sei arrivat"; then verde "col tratto «trasferito di recente»"; else rosso "manca il tratto del ritorno"; fi
+
+# --- Password dimenticata --------------------------------------------------------
+# Il modulo d'iscrizione lo prometteva e non esisteva. Account usa e getta, con
+# due sessioni aperte: una deve cadere quando la password cambia.
+titolo "Password dimenticata"
+
+RECUPERO="prova-rec-$$"; VECCHIA="parolalungabastante"; NUOVA="un'altraparolalunga"
+# Il recupero ha un freno per indirizzo di rete (5 richieste ogni mezz'ora), e
+# questa prova ne fa due a giro, sempre da 127.0.0.1: alla terza esecuzione
+# ravvicinata ci sbatteva contro e falliva a caso. Il freno e' giusto; e' la
+# prova che non deve dipendere da quanto e' stata lanciata di recente.
+php_db 'App\Core\Database::run("DELETE FROM rate_limits WHERE rkey LIKE ?", ["recupero:%"]);' >/dev/null 2>&1
+printf '%s\n%s\n' "${VECCHIA}" "${VECCHIA}" \
+  | php bin/console.php user:create "${RECUPERO}" "${RECUPERO}@example.invalid" >/dev/null 2>&1
+B_REC=$(mktemp); B_ALTRA=$(mktemp)
+for jar in "${B_REC}" "${B_ALTRA}"; do
+  T=$(curl -sS -c "${jar}" "${BASE}/accesso" | grep -o 'name="_token" value="[0-9a-f]*"' | head -1 | sed 's/.*value="//;s/"//')
+  curl -sS -o /dev/null -b "${jar}" -c "${jar}" -d "_token=${T}" -d "login=${RECUPERO}" -d "password=${VECCHIA}" "${BASE}/accesso"
+done
+if [[ "$(curl -sS -o /dev/null -w '%{http_code}' -b "${B_ALTRA}" "${BASE}/comunicazioni")" == "200" ]]; then
+  verde "una seconda sessione e' aperta"; else rosso "la seconda sessione non si e' aperta"; fi
+
+# Senza biscotti: un utente collegato che apre /accesso viene rimandato nel
+# quartiere, e il collegamento non lo vedrebbe comunque.
+if grep -q "password-dimenticata" <<< "$(curl -sS "${BASE}/accesso")"; then verde "la pagina di accesso porta al recupero"; else rosso "manca il collegamento «password dimenticata»"; fi
+
+B_OSP=$(mktemp)
+T=$(curl -sS -c "${B_OSP}" "${BASE}/password-dimenticata" | grep -o 'name="_token" value="[0-9a-f]*"' | head -1 | sed 's/.*value="//;s/"//')
+RISP_VERA=$(curl -sS -L -b "${B_OSP}" -c "${B_OSP}" -d "_token=${T}" -d "email=${RECUPERO}@example.invalid" "${BASE}/password-dimenticata")
+T=$(curl -sS -c "${B_OSP}" "${BASE}/password-dimenticata" | grep -o 'name="_token" value="[0-9a-f]*"' | head -1 | sed 's/.*value="//;s/"//')
+RISP_FINTA=$(curl -sS -L -b "${B_OSP}" -c "${B_OSP}" -d "_token=${T}" -d "email=nessuno-$$@example.invalid" "${BASE}/password-dimenticata")
+# (senza l'apostrofo: nell'HTML e' diventato &#039;)
+if grep -q "risulta iscritto, il collegamento" <<< "${RISP_VERA}" && grep -q "risulta iscritto, il collegamento" <<< "${RISP_FINTA}"; then
+  verde "la risposta e' la stessa che l'indirizzo esista o no"
+else rosso "la risposta rivela se un indirizzo e' iscritto"; fi
+
+GETTONE_REC=$(php_db '
+  $m = App\Core\Database::first("SELECT corpo FROM mail_queue WHERE destinatario = ? ORDER BY id DESC LIMIT 1", [$argv[2]]);
+  preg_match("/recupero\?token=([0-9a-f]+)/", (string) ($m["corpo"] ?? ""), $x); echo $x[1] ?? "";' "${RECUPERO}@example.invalid")
+if [[ -n "${GETTONE_REC}" ]]; then verde "il messaggio contiene il collegamento"; else rosso "nessun messaggio di recupero in coda"; fi
+if contiene "${BASE}/recupero?token=ffff" "non valido"; then verde "un gettone inventato viene respinto"; else rosso "gettone di recupero inventato accettato"; fi
+
+T=$(curl -sS -c "${B_OSP}" "${BASE}/recupero?token=${GETTONE_REC}" | grep -o 'name="_token" value="[0-9a-f]*"' | head -1 | sed 's/.*value="//;s/"//')
+curl -sS -o /dev/null -b "${B_OSP}" -c "${B_OSP}" -d "_token=${T}" -d "token=${GETTONE_REC}" \
+  --data-urlencode "password=${NUOVA}" --data-urlencode "password_confirm=${NUOVA}" "${BASE}/recupero"
+
+DEST=$(curl -sS -o /dev/null -w '%{redirect_url}' -b "${B_ALTRA}" "${BASE}/comunicazioni")
+if [[ "${DEST}" == *"/accesso" ]]; then verde "cambiata la password, la sessione aperta prima cade"
+else rosso "la vecchia sessione e' ancora aperta dopo il cambio di password"; fi
+
+B_NUOVA=$(mktemp)
+T=$(curl -sS -c "${B_NUOVA}" "${BASE}/accesso" | grep -o 'name="_token" value="[0-9a-f]*"' | head -1 | sed 's/.*value="//;s/"//')
+DEST=$(curl -sS -o /dev/null -w '%{redirect_url}' -b "${B_NUOVA}" -c "${B_NUOVA}" -d "_token=${T}" -d "login=${RECUPERO}" \
+  --data-urlencode "password=${NUOVA}" "${BASE}/accesso")
+if [[ "${DEST}" == *"/quartiere" ]]; then verde "con la password nuova si entra"; else rosso "la password nuova non fa entrare (${DEST})"; fi
+if contiene "${BASE}/recupero?token=${GETTONE_REC}" "già stato usato"; then verde "e il collegamento non si usa due volte"
+else rosso "il collegamento di recupero si puo' riusare"; fi
+
+php bin/console.php user:delete "${RECUPERO}" >/dev/null 2>&1 <<< "SI" || true
+rm -f "${B_REC}" "${B_ALTRA}" "${B_OSP}" "${B_NUOVA}"
 
 # --- Uscita ---------------------------------------------------------------------------------
 titolo "Uscita"
