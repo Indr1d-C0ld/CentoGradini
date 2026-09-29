@@ -79,6 +79,16 @@ final class Personaggio
         if (mb_strlen($nome) > 32 || mb_strlen($cognome) > 32) {
             return ['ok' => false, 'error' => 'Nome e cognome non possono superare i 32 caratteri.'];
         }
+        // Un cognome del canone farebbe del personaggio un parente che
+        // l'opera non ha — e il gioco, che adesso sa chi e' fratello di chi,
+        // non saprebbe dove metterlo. Vedi Parentele.
+        if (($famiglia = Parentele::cognomeDiFamiglia($cognome)) !== null) {
+            return ['ok' => false, 'error' => sprintf(
+                'La famiglia %s nel quartiere c\'è già, tutta: nell\'opera non ha altri parenti da far '
+                . 'arrivare. Scegli un altro cognome — chi arriva da fuori è la persona più interessante '
+                . 'di tutte, perché nessuno sa niente di lei.', $famiglia
+            )];
+        }
         if (!in_array($sesso, ['m', 'f'], true)) {
             return ['ok' => false, 'error' => 'Indica se il personaggio è maschio o femmina.'];
         }
@@ -276,7 +286,7 @@ final class Personaggio
     {
         $righe = Database::all(
             'SELECT id, nome, cognome, sesso, sezione, anno, anno_nascita, nato_mese, nato_giorno,
-                    esper, arrivato_gts, png, png_nota, ritratto_file
+                    esper, arrivato_gts, png, png_nota, png_giro, ritratto_file
              FROM personaggi
              WHERE luogo = ? AND verso IS NULL AND id <> ? AND stato = ?
              ORDER BY arrivato_gts',
@@ -285,6 +295,10 @@ final class Personaggio
         $adesso = Orologio::lineare();
         foreach ($righe as &$r) {
             $r['da_minuti'] = (int) floor(($adesso - (int) $r['arrivato_gts']) / 60);
+            // Un abitante il cui giro e' un posto solo non «e' li' da» un certo
+            // tempo: c'e' sempre, ed e' quello che si dice di lui.
+            $r['sempre'] = $r['png'] !== null
+                && count(array_filter(explode(',', (string) ($r['png_giro'] ?? '')))) === 1;
             $r['classe']    = Scuola::nomeClasse((string) $r['sezione'], (int) $r['anno']);
             // Se è il suo compleanno lo sa il quartiere, non solo lei.
             $r['compleanno'] = Scuola::compleanno((int) $r['nato_mese'], (int) $r['nato_giorno']);

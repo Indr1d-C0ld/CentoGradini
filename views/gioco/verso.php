@@ -42,6 +42,7 @@ $soglia = GameConfig::int('legami.soglia_confessione', 45);
     <?php if ((string) ($altro['aspetto'] ?? '') !== ''): ?>
       <p class="occhiello" style="margin:.35rem 0 0"><em><?= e((string) $altro['aspetto']) ?></em></p>
     <?php endif; ?>
+    <?= partial('famiglia', ['chi' => $altro]) ?>
     <p class="occhiello" style="margin:.35rem 0 0">
       <a href="<?= e(url('/chi/' . (int) $altro['id'])) ?>">il suo profilo</a>
     </p>
@@ -122,7 +123,7 @@ $soglia = GameConfig::int('legami.soglia_confessione', 45);
   <h3 style="margin-top:0"><?= e($oggetto['nome']) ?></h3>
   <p><?= e($oggetto['descrizione']) ?></p>
   <form method="post" action="<?= e(url('/oggetto/passa')) ?>"
-        onsubmit="return confirm('Darglielo è definitivo. Sicuro?')">
+        data-conferma="Darglielo è definitivo. Sicuro?">
     <?= csrf_field() ?>
     <input type="hidden" name="verso" value="<?= (int) $altro['id'] ?>">
     <input type="hidden" name="oggetto" value="<?= e($oggetto['okey']) ?>">
@@ -139,7 +140,7 @@ $soglia = GameConfig::int('legami.soglia_confessione', 45);
     prima o poi qualcuno lo dice, oppure non lo dice nessuno e finisce lì.
   </p>
   <form method="post" action="<?= e(url('/confessa')) ?>"
-        onsubmit="return confirm('Una volta detto non si torna indietro. Sicuro?')">
+        data-conferma="Una volta detto non si torna indietro. Sicuro?">
     <?= csrf_field() ?>
     <input type="hidden" name="verso" value="<?= (int) $altro['id'] ?>">
     <button type="submit">Dirglielo</button>

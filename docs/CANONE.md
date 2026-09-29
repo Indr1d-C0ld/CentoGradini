@@ -535,3 +535,32 @@ numero.
 6. **Le edizioni successive**: l'*aizōban* e il *bunkobon* in 10 volumi hanno testo aggiunto
    (il volume 18 ha 45 pagine in più rispetto alla rivista, aggiunte «per Hikaru-chan» per
    esplicita dichiarazione dell'autore in copertina).
+
+---
+
+## 7-quater. La famiglia, e cosa fra parenti non succede
+
+Fino al 29 settembre 2026 il gioco non sapeva che Kyosuke, Manami e Kurumi sono fratelli: i
+legami sono costruiti tutti come legami fra estranei — il gesto che si presta a equivoci, la
+gelosia di chi guarda, la dichiarazione, il secondo bottone, il cappello di paglia — e fra
+parenti nessuna di queste cose ha il significato che il gioco le dà.
+
+| Chi | Parentela | Fonte | Confidenza |
+|:---|:---|:---|:---|
+| Kyosuke, Manami, Kurumi | fratelli; Manami e Kurumi gemelle (Manami la maggiore) | §2.4, CANONE passim | **canone** |
+| Akane, Kazuya | sorella maggiore e fratello minore | madoka.ayukawa.free.fr, *koref05*: «soeur aînée de Kazuya et cousine de Kyosuke» | **documentato** |
+| Akane e Kazuya ↔ Kyosuke e le gemelle | cugini | capp. 35, 39, 43, 46 («il cugino»); *koref05* | **canone** |
+
+Nel gioco (`src/Game/Parentele.php`), fra parenti:
+
+- **non ci si dichiara**, non si chiede il **secondo bottone**, non si dà il **cappello**;
+- un gesto **non è ambiguo**: accompagnare a casa la propria sorella non è un corteggiamento, e
+  non fa nascere chiacchiere;
+- chi guarda **non è geloso** di un parente: Kurumi che vede il fratello con una ragazza si
+  arrabbia, magari, ma non è gelosia nel senso del gioco;
+- l'**affetto** invece cresce come fra chiunque: in famiglia ci si vuole bene.
+
+I cognomi delle tre case del canone — **Kasuga, Ayukawa, Hiyama** — non si possono prendere per un
+personaggio nuovo: sarebbe un parente che l'opera non ha, e il gioco non saprebbe trattarlo da
+tale. Il nonno e la nonna Kasuga, e i genitori, esistono nell'opera ma non sono abitanti del
+quartiere: la tabella li aggiungerà se un giorno lo diventeranno.

@@ -502,6 +502,9 @@ Dopo F7 si aggiunge contenuto e comodità, non impalcatura. In ordine di arrivo:
   sessioni che cadono, la difficoltà degli episodi rimessa nel verso giusto, il calore che
   scende, le voci e i testi in seconda persona **accordati al femminile**, il seeder che non
   riscrive più lo stato del gioco a ogni deploy, il cappello di paglia che non si perde più.
+- **La famiglia** (29 settembre 2026): chi è parente di chi fra gli abitanti, e cosa fra
+  parenti non succede; i ritratti degli abitanti dalla serie, con l'anteprima grande al
+  passaggio del mouse; e le tre conferme delle azioni irreversibili, che la CSP bloccava.
 - **Le comunicazioni** (migrazione `0016`): filo diretto fra la gestione e un giocatore, nei
   due sensi, con avviso per posta che non ripete il messaggio. Non è finzione e non si
   traveste da tale — vedi la nota in testa a `src/Game/Comunicazioni.php`.

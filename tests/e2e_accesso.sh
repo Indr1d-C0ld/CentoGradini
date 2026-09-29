@@ -246,9 +246,12 @@ titolo "Il personaggio"
 DEST=$(curl -sS -o /dev/null -w '%{redirect_url}' -b "${BISCOTTI}" "${BASE}/quartiere")
 if [[ "${DEST}" == *"/personaggio/nuovo" ]]; then verde "senza personaggio il quartiere rimanda alla creazione"; else rosso "gate del personaggio assente (-> '${DEST}')"; fi
 
+# Non «Kasuga»: dal 29 settembre i cognomi delle famiglie del canone sono
+# riservati (vedi Parentele), e anche il controllo sugli omonimi più sotto
+# userebbe il cognome sbagliato: rifiutato per il cognome, non per l'omonimia.
 T=$(gettone "${BASE}/personaggio/nuovo")
 DEST=$(curl -sS -o /dev/null -w '%{redirect_url}' -b "${BISCOTTI}" -c "${BISCOTTI}" \
-  -d "_token=${T}" -d "cognome=Kasuga" -d "nome=${PGNOME}" -d "sesso=f" \
+  -d "_token=${T}" -d "cognome=Tachibana" -d "nome=${PGNOME}" -d "sesso=f" \
   -d "classe=superiori-2" -d "nato_giorno=15" -d "nato_mese=11" -d "stirpe=esper" \
   "${BASE}/personaggio/nuovo")
 if [[ "${DEST}" == *"/personaggio/abilita" ]]; then verde "la creazione porta alla distribuzione dei punti"; else rosso "creazione -> '${DEST}'"; fi
@@ -492,7 +495,7 @@ OMONIMO=$(php -r '
   // L utente 999999 non esiste: se il controllo sugli omonimi non scattasse,
   // la INSERT fallirebbe sulla chiave esterna e si vedrebbe.
   try {
-      $r = App\Game\Personaggio::crea(999999, $argv[1], "Kasuga", "f", "superiori", 2, 6, 15, false);
+      $r = App\Game\Personaggio::crea(999999, $argv[1], "Tachibana", "f", "superiori", 2, 6, 15, false);
       echo $r["ok"] ? "CREATO" : "rifiutato";
   } catch (Throwable $e) { echo "ECCEZIONE"; }
 ' "${PGNOME}")
@@ -720,6 +723,14 @@ if [[ "${VICINO}" != "0" ]]; then
   if contiene "${BASE}/chi/${VICINO}" "Cosa provi"; then
     verde "il profilo di chi e' qui adesso si apre"
   else rosso "/chi/${VICINO} non si apre per una persona presente"; fi
+  # «Confidati» e' irreversibile e deve chiedere conferma. Lo chiedeva con un
+  # gestore in linea che la CSP bloccava: partiva al primo clic.
+  if contiene "${BASE}/quartiere" 'data-conferma="Dirgli il tuo segreto'; then
+    verde "«confidati» chiede conferma con data-conferma, che la CSP lascia passare"
+  else rosso "la conferma di «confidati» manca o e' tornata un gestore in linea"; fi
+  if contiene "${BASE}/quartiere" 'onsubmit='; then
+    rosso "c'e' ancora un gestore in linea: la CSP lo blocca e la conferma non parte"
+  else verde "e nessun gestore in linea"; fi
   if contiene "${BASE}/chi/${VICINO}" "cosa puoi fare"; then
     verde "e porta alla pagina dei gesti"
   else rosso "il profilo non rimanda ai gesti"; fi
@@ -940,6 +951,29 @@ else
   verde "e quello che fa sul proprio personaggio non sporca il registro"
 fi
 rm -f "${FOTO}"
+
+# --- I ritratti degli abitanti -------------------------------------------------
+if contiene "${BASE}/admin/abitanti" "Gli abitanti"; then verde "la pagina degli abitanti si apre"; else rosso "/admin/abitanti"; fi
+if contiene "${BASE}/admin/abitante/master" 'name="torna" value="/admin/abitante/master"'; then
+  verde "e quella di un abitante ha il riquadro, che poi riporta li'"
+else rosso "la pagina dell'abitante non porta il ritorno"; fi
+MID=$(php -r '
+  require "src/autoload.php"; require "src/Support/helpers.php";
+  $GLOBALS["__project_root"] = getcwd(); App\Core\Config::load(getcwd());
+  echo (int) App\Core\Database::first("SELECT id FROM personaggi WHERE png = ?", ["master"])["id"];')
+FOTO_M="$(mktemp)".png
+php -r '$im = imagecreatetruecolor(400, 400); imagefilledrectangle($im, 0, 0, 399, 399, imagecolorallocate($im, 150, 120, 90)); imagepng($im, $argv[1]);' "${FOTO_M}"
+T=$(gettone "${BASE}/admin/abitante/master")
+DEST=$(curl -sS -o /dev/null -w '%{redirect_url}' -b "${BISCOTTI}" -c "${BISCOTTI}" \
+  -F "_token=${T}" -F "personaggio=${MID}" -F "torna=/admin/abitante/master" -F "foto=@${FOTO_M};type=image/png" \
+  -F "sx=0" -F "sy=0" -F "lato=400" "${BASE}/personaggio/profilo/foto")
+if [[ "${DEST}" == *"/admin/abitante/master" ]]; then verde "il ritratto di un abitante si carica, e si torna alla sua pagina"
+else rosso "dopo il caricamento si finisce altrove: ${DEST}"; fi
+if contiene "${BASE}/admin/abitanti" "img/ritratti/"; then verde "e compare fra gli abitanti"; else rosso "il ritratto dell'abitante non compare"; fi
+T=$(gettone "${BASE}/admin/abitante/master")
+curl -sS -o /dev/null -b "${BISCOTTI}" -c "${BISCOTTI}" -d "_token=${T}" -d "personaggio=${MID}" \
+  -d "torna=/admin/abitante/master" "${BASE}/personaggio/profilo/foto/togli" >/dev/null
+rm -f "${FOTO_M}"
 
 # La gestione risponde nello stesso filo, e il giocatore lo rilegge.
 T=$(gettone "${BASE}/admin/comunicazioni/${UID_PROVA}")

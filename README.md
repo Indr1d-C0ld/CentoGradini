@@ -120,6 +120,13 @@ Poi c'è la confessione, con due prove in fila — riuscire a dirlo, e la rispos
 e il **cappello di paglia rosso**, che esiste in un esemplare solo per server e
 passa di mano.
 
+E c'è la **famiglia**. Kyosuke e le gemelle sono fratelli, Akane e Kazuya sono i
+loro cugini, e il gioco lo sa: fra parenti non ci si dichiara, il secondo bottone
+e il cappello non si danno, un gesto non si presta a equivoci e chi guarda non è
+geloso — ma ci si vuole bene come fra chiunque. I cognomi delle famiglie del
+canone non si possono prendere per un personaggio nuovo: sarebbe un parente che
+l'opera non ha. Fonti in `docs/CANONE.md` §7-quater.
+
 ### 3. Il quartiere, e le voci
 
 Il quartiere è **ventidue luoghi** con orari, stagionalità e tempi di percorrenza
@@ -253,8 +260,8 @@ progetto esiste.
 | **10** | copioni di episodi |
 | **51** | manopole di configurazione, tutte lette da qualcuno |
 | **18** | migrazioni |
-| **81** | rotte |
-| **449** | verifiche su 16 file di prova (15 unitari + 1 end-to-end) |
+| **83** | rotte |
+| **462** | verifiche su 16 file di prova (15 unitari + 1 end-to-end) |
 
 ### Le schermate
 
@@ -274,7 +281,7 @@ Il pannello, per chi amministra: `/admin` il cruscotto · `/admin/utenti` e
 `/admin/utente/{id}` gli account, i personaggi e la moderazione ·
 `/admin/mappa` la carta con le presenze · `/admin/statistiche` ·
 `/admin/comunicazioni` i fili con i giocatori · `/admin/fotografie` il muro delle
-facce · `/admin/accessi` le provenienze · `/admin/impostazioni` le cinquantuno leve.
+facce · `/admin/abitanti` i tredici del canone e i loro ritratti · `/admin/accessi` le provenienze · `/admin/impostazioni` le cinquantuno leve.
 
 È anche una **PWA**: si installa, e il service worker tiene in tasca il guscio
 del sito. Non mette mai in cache le pagine di gioco — il quartiere cambia ogni
@@ -302,6 +309,12 @@ riscritto in WebP. Il tipo si decide guardando i byte, non l'estensione; gli SVG
 non si accettano. Il nome del file è l'impronta sha256 del risultato, quindi non
 è indovinabile e due fotografie identiche occupano un file solo — con la
 conseguenza che toglierla a uno non la toglie all'altro.
+
+Negli elenchi la faccia è abbastanza grande da riconoscere qualcuno, e passandoci sopra col
+mouse se ne apre un'anteprima grande. Anche i **tredici abitanti** del canone possono averne
+una: si mette da `/admin/abitanti`, con lo stesso riquadro, un fotogramma della serie per
+ciascuno. Sono immagini dell'opera — character design di Akemi Takada, Studio Pierrot — e come
+le fotografie dei giocatori stanno solo sull'installazione viva e nel backup privato.
 
 La faccia non resta sulla propria scheda: compare nell'elenco di **chi c'è adesso** in un
 luogo, sulla pagina di chi si incontra, nell'elenco dei **legami**, e su `/chi/{id}` — il
@@ -704,6 +717,25 @@ Annotate qui perché non si ripetano.
    collegamento per rifare la password — due ore — nasceva già scaduto. Adesso la
    sessione del database si allinea al fuso di PHP alla connessione, e una prova
    pretende che i due leggano la stessa ora.
+
+26. **Una conferma che la CSP blocca non chiede niente, e non lo dice.** Le tre
+   azioni irreversibili del gioco — confidare il segreto, dare il cappello,
+   dichiararsi — chiedevano «Sicuro?» con `onsubmit="return confirm(...)"`. La
+   nostra CSP (`script-src 'self'`) i gestori scritti in linea li blocca, e lo
+   segnala soltanto nella console: le tre azioni partivano al primo clic. Nessuna
+   prova se n'era accorta perché nessuna prova clicca. Adesso la domanda sta in
+   `data-conferma` e la pone `assets/js/conferma.js`, e una prova fallisce se in
+   una vista ricompare un gestore in linea. È la terza volta che la CSP morde in
+   silenzio (la registrazione del service worker, l'anteprima del ritaglio): vale
+   la pena cercarla apposta ogni volta che si scrive un attributo `on…`.
+
+27. **Una prova che si aspetta un rifiuto deve controllare il motivo.** Il
+   personaggio della prova end-to-end si chiamava «Kasuga». Quando i cognomi delle
+   famiglie del canone sono diventati riservati, la prova sugli omonimi — che crea
+   un secondo «Kasuga» con lo stesso nome e si aspetta un rifiuto — avrebbe
+   continuato a passare: rifiutato, sì, ma per il cognome, non per l'omonimia. Una
+   prova che verifica solo che qualcosa venga respinto passa anche quando viene
+   respinto per la ragione sbagliata.
 
 ## Licenza e diritti
 

@@ -37,6 +37,7 @@ $via    = (string) $altro['stato'] !== 'attivo';
     <?php if ((string) ($altro['aspetto'] ?? '') !== ''): ?>
       <p style="margin:.5rem 0 0"><em><?= e((string) $altro['aspetto']) ?></em></p>
     <?php endif; ?>
+    <?= partial('famiglia', ['chi' => $altro]) ?>
     <?php if ($qui): ?>
       <p class="occhiello" style="margin:.5rem 0 0">
         È qui con te, <?= e(Luoghi::dove((string) $altro['luogo'])) ?>.

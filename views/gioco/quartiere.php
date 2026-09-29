@@ -124,10 +124,11 @@ $luogo = $qui['luogo'];
   <ul class="elenco-persone">
     <?php foreach ($qui['presenti'] as $p): ?>
       <li>
+        <?= partial('faccia', ['p' => $p, 'collega' => url('/chi/' . (int) $p['id'])]) ?>
         <div>
-          <b><a href="<?= e(url('/verso/' . (int) $p['id'])) ?>"><?= e($p['cognome'] . ' ' . $p['nome']) ?></a></b>
+          <b><a href="<?= e(url('/verso/' . (int) $p['id'])) ?>"><?= e(trim($p['cognome'] . ' ' . $p['nome'])) ?></a></b>
           <span class="tenue">
-            <?= e($p['classe']) ?> · da <?= e(Personaggio::quantoFa((int) $p['da_minuti'])) ?>
+            <?= e($p['classe']) ?> · <?= $p['sempre'] ? 'c\'è sempre' : 'da ' . e(Personaggio::quantoFa((int) $p['da_minuti'])) ?>
             <?php if ($p['compleanno']): ?> · <em>oggi è il suo compleanno</em><?php endif; ?>
             <?php if (\App\Game\Segreto::sa((int) $pg['id'], (int) $p['id'])): ?>
               · <em>sa di te</em>
@@ -136,7 +137,7 @@ $luogo = $qui['luogo'];
         </div>
         <?php if ((bool) $pg['esper'] && !\App\Game\Segreto::sa((int) $pg['id'], (int) $p['id'])): ?>
           <form method="post" action="<?= e(url('/confida')) ?>"
-                onsubmit="return confirm('Dirgli il tuo segreto è irreversibile. Sicuro?')">
+                data-conferma="Dirgli il tuo segreto è irreversibile. Sicuro?">
             <?= csrf_field() ?>
             <input type="hidden" name="a" value="<?= (int) $p['id'] ?>">
             <button type="submit" class="tenue">confidati</button>

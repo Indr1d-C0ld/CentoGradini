@@ -90,6 +90,13 @@ final class Abitanti
      */
     public static function assicura(): array
     {
+        // Un abitante che non si sposta mai (il Master) non riceveva mai un
+        // istante d'arrivo: restava a zero, e la lista dei presenti scriveva
+        // «all'ABCB da 6333 giorni». Chi non ha un arrivo arriva adesso.
+        Database::run(
+            'UPDATE personaggi SET arrivato_gts = ? WHERE png IS NOT NULL AND (arrivato_gts IS NULL OR arrivato_gts = 0)',
+            [Orologio::lineare()]
+        );
         return ['poteri' => self::assicuraPoteri(), 'club' => self::assicuraClub()];
     }
 

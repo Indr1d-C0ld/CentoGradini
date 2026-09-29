@@ -15,6 +15,7 @@ require __DIR__ . '/_prova.php';
 use App\Core\Config;
 use App\Core\Database;
 use App\Core\GameConfig;
+use App\Game\Personaggio;
 use App\Game\Segreto;
 use App\Sim\Orologio;
 
@@ -534,6 +535,115 @@ prova('il database e PHP leggono la stessa ora', function () {
     // rifare la password nasceva gia' scaduto.
     $db = strtotime((string) Database::first('SELECT NOW() n')['n']);
     vero(abs($db - time()) < 5, sprintf('scarto di %d minuti fra database e PHP', ($db - time()) / 60));
+});
+
+// =============================================================================
+titolo('La famiglia (29 settembre)');
+
+function abitante(string $png): array
+{
+    return Database::first('SELECT * FROM personaggi WHERE png = ?', [$png]);
+}
+
+prova('il gioco sa chi e\' fratello di chi, e lo dice al genere giusto', function () {
+    [$ky, $ma, $ku, $ak, $kz, $md] = array_map('abitante', ['kyosuke', 'manami', 'kurumi', 'akane', 'kazuya', 'madoka']);
+    uguale('sorella', \App\Game\Parentele::come($ky, $ku));
+    uguale('fratello', \App\Game\Parentele::come($ku, $ky));
+    uguale('sorella gemella', \App\Game\Parentele::come($ma, $ku));
+    uguale('cugina', \App\Game\Parentele::come($ky, $ak));
+    uguale('fratello', \App\Game\Parentele::come($ak, $kz), 'Akane e Kazuya sono fratelli');
+    uguale('cugino', \App\Game\Parentele::come($ma, $kz));
+    uguale(null, \App\Game\Parentele::come($ky, $md), 'Madoka non e\' parente di nessuno');
+    uguale(null, \App\Game\Parentele::come($ky, ['png' => null, 'sesso' => 'f']), 'un giocatore non e\' parente di nessuno');
+});
+
+prova('un giocatore non puo\' prendere il cognome di una famiglia del canone', function () {
+    foreach (['Kasuga', 'kasuga', ' Ayukawa ', 'HIYAMA'] as $c) {
+        vero(\App\Game\Parentele::cognomeDiFamiglia($c) !== null, "«{$c}» doveva essere riservato");
+    }
+    uguale(null, \App\Game\Parentele::cognomeDiFamiglia('Tanaka'));
+    $u = PREFISSO . '-cognome';
+    Database::run('INSERT INTO users (username, email, password_hash, status) VALUES (?, ?, ?, ?)', [$u, $u . '@example.invalid', 'x', 'active']);
+    $uid = (int) Database::lastInsertId();
+    $r = Personaggio::crea($uid, 'Taro', 'Kasuga', 'm', 'superiori', 2, 5, 5, true);
+    vero(!$r['ok'], 'un «Kasuga» nuovo non doveva nascere');
+    vero(str_contains((string) ($r['error'] ?? ''), 'Kasuga'), 'e il messaggio deve dire perche\'');
+});
+
+prova('fra parenti niente dichiarazioni, secondo bottone ne\' cappello', function () {
+    $ky = abitante('kyosuke'); $ku = abitante('kurumi');
+    $prima = [$ky['luogo'], $ku['luogo'], Database::first('SELECT * FROM oggetti_unici WHERE okey = ?', ['cappello'])];
+    try {
+        Database::run('UPDATE personaggi SET luogo = ?, verso = NULL WHERE id IN (?, ?)', ['parco', (int) $ky['id'], (int) $ku['id']]);
+        $ky = abitante('kyosuke');
+        $r = \App\Game\Legami::confessa($ky, (int) $ku['id']);
+        vero(!$r['ok'] && str_contains((string) $r['error'], 'sorella'), 'la dichiarazione a una sorella deve essere rifiutata');
+        $r = \App\Game\Legami::compi($ky, (int) $ku['id'], 'bottone');
+        vero(!$r['ok'] && str_contains((string) $r['error'], 'famiglia'), 'il secondo bottone non si chiede in famiglia');
+        Database::run('UPDATE oggetti_unici SET detentore_id = ?, luogo = NULL WHERE okey = ?', [(int) $ky['id'], 'cappello']);
+        $r = \App\Game\Legami::passaOggetto($ky, (int) $ku['id'], 'cappello');
+        vero(!$r['ok'], 'il cappello non si da\' a una sorella');
+    } finally {
+        Database::run('UPDATE personaggi SET luogo = ? WHERE id = ?', [$prima[0], (int) $ky['id']]);
+        Database::run('UPDATE personaggi SET luogo = ? WHERE id = ?', [$prima[1], (int) $ku['id']]);
+        Database::run('UPDATE oggetti_unici SET detentore_id = ?, luogo = ?, gts = ? WHERE okey = ?',
+            [$prima[2]['detentore_id'], $prima[2]['luogo'], $prima[2]['gts'], 'cappello']);
+    }
+});
+
+prova('una sorella che guarda non e\' gelosa, e un gesto in famiglia non fa chiacchiere', function () {
+    $ky = abitante('kyosuke'); $ku = abitante('kurumi');
+    $corteggiatrice = attore('Corteggiatrice', 'parco', 0);
+    $prima = [$ky['luogo'], $ku['luogo']];
+    try {
+        Database::run('UPDATE personaggi SET luogo = ?, verso = NULL WHERE id IN (?, ?)', ['parco', (int) $ky['id'], (int) $ku['id']]);
+        \App\Game\Legami::muovi((int) $ku['id'], (int) $ky['id'], 80, 0);
+        $affettoPrima = \App\Game\Legami::fra((int) $ku['id'], (int) $ky['id'])['affetto'];
+        // un gesto che si presta a equivoci, verso Kyosuke, con Kurumi li'
+        \App\Game\Legami::compi(ricarica($corteggiatrice), (int) $ky['id'], 'regalo');
+        uguale($affettoPrima, \App\Game\Legami::fra((int) $ku['id'], (int) $ky['id'])['affetto'],
+            'la gelosia avrebbe tolto affetto: quella di una sorella non e\' gelosia');
+        // e un gesto fra fratelli non e\' ambiguo: nessuno lo «legge male»
+        $r = \App\Game\Legami::compi(abitante('kyosuke'), (int) $ku['id'], 'accompagnare');
+        vero($r['ok'], $r['error'] ?? '');
+        uguale(0, (int) $r['fraintesi'], 'accompagnare a casa la sorella non si presta a equivoci');
+    } finally {
+        Database::run('UPDATE personaggi SET luogo = ? WHERE id = ?', [$prima[0], (int) $ky['id']]);
+        Database::run('UPDATE personaggi SET luogo = ? WHERE id = ?', [$prima[1], (int) $ku['id']]);
+        Database::run('DELETE FROM legami WHERE (da_id = ? AND a_id = ?) OR (da_id = ? AND a_id = ?)',
+            [(int) $ku['id'], (int) $ky['id'], (int) $ky['id'], (int) $ku['id']]);
+        Database::run('DELETE FROM gesti_fatti WHERE attore_id IN (?, ?)', [(int) $ky['id'], (int) $corteggiatrice['id']]);
+    }
+});
+
+prova('il Master c\'e\' sempre, e non da seimila giorni', function () {
+    \App\Game\Abitanti::assicura();
+    $m = abitante('master');
+    vero((int) $m['arrivato_gts'] > 0, 'l\'arrivo del Master non puo\' restare a zero');
+    uguale('Master', \App\Game\Personaggio::nomeCompleto($m), 'si chiama «Master», non «Master Il»');
+    $qui = array_values(array_filter(\App\Game\Personaggio::presenti((string) $m['luogo']), static fn (array $p): bool => $p['png'] === 'master'));
+    vero($qui !== [] && $qui[0]['sempre'] === true, 'per chi non si muove mai la lista dice «c\'e\' sempre»');
+});
+
+prova('nessun gestore di eventi scritto in linea: la CSP li blocca', function () {
+    // «confidati», «daglielo» e «dichiarati» chiedevano conferma con
+    // onsubmit="return confirm(...)": la CSP lo bloccava e le tre azioni
+    // irreversibili partivano al primo clic, senza chiedere niente.
+    $trovati = [];
+    foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator(dirname(__DIR__) . '/views')) as $f) {
+        if ($f->isFile() && preg_match('/\bon(submit|click|change|input|load|focus|blur|key\w+)=/', (string) file_get_contents($f->getPathname()))) {
+            $trovati[] = basename($f->getPathname());
+        }
+    }
+    uguale([], $trovati);
+});
+
+prova('la faccia negli elenchi ha l\'anteprima grande, o l\'iniziale', function () {
+    \App\Core\View::setPath(dirname(__DIR__) . '/views');
+    $con = \App\Core\View::renderPartial('partials/faccia', ['p' => ['id' => 1, 'nome' => 'Madoka', 'cognome' => 'Ayukawa', 'ritratto_file' => 'x.webp'], 'collega' => '/chi/1']);
+    vero(str_contains($con, 'faccia-grande') && substr_count($con, 'img/ritratti/x.webp') === 2, 'miniatura e anteprima');
+    $senza = \App\Core\View::renderPartial('partials/faccia', ['p' => ['id' => 1, 'nome' => 'Madoka', 'cognome' => 'Ayukawa'], 'collega' => null]);
+    vero(str_contains($senza, '>M<') && !str_contains($senza, 'faccia-grande'), 'senza fotografia: l\'iniziale, e nessuna anteprima vuota');
 });
 
 // --- pulizia ------------------------------------------------------------------

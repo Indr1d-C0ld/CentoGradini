@@ -68,20 +68,12 @@ $luogo = $dati['luogo'];
   <div class="carta">
     <p class="occhiello">Chi c'è adesso</p>
     <ul class="elenco-persone">
-      <?php foreach ($dati['presenti'] as $p): $faccia = \App\Game\Ritratto::di($p); ?>
+      <?php foreach ($dati['presenti'] as $p): ?>
         <li>
-          <a href="<?= e(url('/chi/' . (int) $p['id'])) ?>" aria-label="Il profilo di <?= e($p['nome']) ?>">
-            <?php if ($faccia !== null): ?>
-              <img class="fotografia fotografia--piccola" src="<?= e(asset($faccia)) ?>" alt=""
-                   width="40" height="40" loading="lazy">
-            <?php else: ?>
-              <span class="fotografia fotografia--piccola fotografia--vuota" aria-hidden="true"><?=
-                e(mb_strtoupper(mb_substr((string) $p['nome'], 0, 1))) ?></span>
-            <?php endif; ?>
-          </a>
-          <b><a href="<?= e(url('/verso/' . (int) $p['id'])) ?>"><?= e($p['cognome'] . ' ' . $p['nome']) ?></a></b>
+          <?= partial('faccia', ['p' => $p, 'collega' => url('/chi/' . (int) $p['id'])]) ?>
+          <b><a href="<?= e(url('/verso/' . (int) $p['id'])) ?>"><?= e(trim($p['cognome'] . ' ' . $p['nome'])) ?></a></b>
           <span class="tenue">
-            <?= e($p['classe']) ?> · da <?= e(Personaggio::quantoFa((int) $p['da_minuti'])) ?>
+            <?= e($p['classe']) ?> · <?= $p['sempre'] ? 'c\'è sempre' : 'da ' . e(Personaggio::quantoFa((int) $p['da_minuti'])) ?>
             <?php if ($p['compleanno']): ?> · <em>oggi è il suo compleanno</em><?php endif; ?>
           </span>
         </li>

@@ -175,6 +175,19 @@ final class Legami
             return ['ok' => false, 'error' => 'Quella persona non è qui.'];
         }
 
+        // Fra parenti un gesto e' un gesto, non un corteggiamento. Il secondo
+        // bottone non si chiede a un fratello; tutto il resto si fa, ma senza
+        // l'ambiguita' che fra estranei lo rende pericoloso — accompagnare a
+        // casa la propria sorella non e' niente di cui chiacchierare.
+        $parentela = Parentele::come($pg, $altro);
+        if ($parentela !== null && $gkey === 'bottone') {
+            return ['ok' => false, 'error' => sprintf('È tu%s %s: il secondo bottone non si chiede in famiglia.',
+                (string) $altro['sesso'] === 'f' ? 'a' : 'o', $parentela)];
+        }
+        if ($parentela !== null) {
+            $g['ambiguo'] = 0;
+        }
+
         $gts = Orologio::lineare();
         [$ok, $perche] = self::condizione((string) ($g['richiede'] ?? ''),
             Calendario::stato($gts), Meteo::a($gts));
@@ -297,7 +310,7 @@ final class Legami
         $rng = Rng::for(GameConfig::int('world.seed', 19870406), 'lettura', $gid);
 
         $presenti = Database::all(
-            'SELECT id, nome, cognome, testa FROM personaggi
+            'SELECT id, png, nome, cognome, testa FROM personaggi
              WHERE luogo = ? AND verso IS NULL AND stato = ? AND id NOT IN (?, ?)',
             [(string) $pg['luogo'], 'attivo', (int) $pg['id'], (int) $altro['id']]
         );
@@ -320,9 +333,12 @@ final class Legami
                 $fr += 8;            // ha visto metà scena e l'ha completata da sé
                 $male++;
             }
-            // La gelosia è un'altra cosa: chi ci tiene ha visto benissimo.
-            $tieneAlAttore = self::fra((int) $c['id'], (int) $pg['id'])['affetto'];
-            $tieneAlAltro  = self::fra((int) $c['id'], (int) $altro['id'])['affetto'];
+            // La gelosia è un'altra cosa: chi ci tiene ha visto benissimo. Ma
+            // quella dei parenti non e' gelosia: Kurumi che vede il fratello
+            // con una ragazza si arrabbia, magari, non si innamora. Il bene che
+            // si vuole a un parente non conta, qui.
+            $tieneAlAttore = Parentele::sonoParenti($c, $pg) ? 0 : self::fra((int) $c['id'], (int) $pg['id'])['affetto'];
+            $tieneAlAltro  = Parentele::sonoParenti($c, $altro) ? 0 : self::fra((int) $c['id'], (int) $altro['id'])['affetto'];
             $quanto = max($tieneAlAttore, $tieneAlAltro);
             if ($quanto >= $soglia && (int) $g['affetto'] > 0) {
                 $fr += (int) round(($quanto - $soglia) / 6) + 3;
@@ -417,6 +433,10 @@ final class Legami
         if ($altro === null) {
             return ['ok' => false, 'error' => 'Quella persona non è qui.'];
         }
+        if (($parentela = Parentele::come($pg, $altro)) !== null) {
+            return ['ok' => false, 'error' => sprintf('È tu%s %s. Quello che provi è un\'altra cosa.',
+                (string) $altro['sesso'] === 'f' ? 'a' : 'o', $parentela)];
+        }
         $mio = self::fra((int) $pg['id'], $versoId);
         $soglia = GameConfig::int('legami.soglia_confessione', 45);
         if ($mio['affetto'] < $soglia) {
@@ -501,6 +521,12 @@ final class Legami
         );
         if ($altro === null) {
             return ['ok' => false, 'error' => 'Quella persona non è qui.'];
+        }
+        // Il cappello dice una cosa che non si ha il coraggio di dire a voce:
+        // a un parente non la si dice.
+        if (($parentela = Parentele::come($pg, $altro)) !== null) {
+            return ['ok' => false, 'error' => sprintf('È tu%s %s: il cappello vuol dire un\'altra cosa.',
+                (string) $altro['sesso'] === 'f' ? 'a' : 'o', $parentela)];
         }
 
         $gts = Orologio::lineare();

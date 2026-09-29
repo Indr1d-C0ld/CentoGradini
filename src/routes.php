@@ -127,6 +127,8 @@ $router->post('/admin/battito', [AdminController::class, 'battito'], ['active', 
 $router->post('/admin/config', [AdminController::class, 'config'], ['active', 'admin', 'throttle']);
 $router->get('/admin/utenti', [AdminController::class, 'utenti'], ['active', 'admin']);
 $router->get('/admin/fotografie', [AdminController::class, 'fotografie'], ['active', 'admin']);
+$router->get('/admin/abitanti', [AdminController::class, 'abitanti'], ['active', 'admin']);
+$router->get('/admin/abitante/{png}', [AdminController::class, 'abitante'], ['active', 'admin']);
 $router->get('/admin/comunicazioni', [ComunicazioniController::class, 'elenco'], ['active', 'admin']);
 $router->post('/admin/comunicazioni', [ComunicazioniController::class, 'scrivi'], ['active', 'admin', 'throttle']);
 $router->get('/admin/comunicazioni/{id}', [ComunicazioniController::class, 'filo'], ['active', 'admin']);

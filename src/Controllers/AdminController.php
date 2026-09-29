@@ -163,6 +163,38 @@ final class AdminController
     }
 
     /**
+     * Gli abitanti canonici: chi sono, dove stanno, che faccia hanno.
+     *
+     * Le loro fotografie si mettono da qui, una per una, con lo stesso
+     * riquadro di ritaglio dei giocatori. Sono immagini della serie animata
+     * (character design di Akemi Takada, Studio Pierrot): stanno solo
+     * sull'installazione viva e nel backup privato, come le fotografie dei
+     * giocatori — la copia pubblica non le porta.
+     */
+    public function abitanti(Request $request): Response
+    {
+        return Response::html(view('admin/abitanti', [
+            'title'    => 'Gli abitanti',
+            'mondo'    => Mondo::adesso(),
+            'abitanti' => Database::all('SELECT * FROM personaggi WHERE png IS NOT NULL ORDER BY id'),
+        ]));
+    }
+
+    public function abitante(Request $request, string $png): Response
+    {
+        $pg = Database::first('SELECT * FROM personaggi WHERE png = ?', [$png]);
+        if ($pg === null) {
+            Session::flash('error', 'Nessun abitante con quel nome.');
+            return redirect('/admin/abitanti');
+        }
+        return Response::html(view('admin/abitante', [
+            'title' => trim($pg['nome'] . ' ' . $pg['cognome']),
+            'mondo' => Mondo::adesso(),
+            'pg'    => $pg,
+        ]));
+    }
+
+    /**
      * Tutte le fotografie caricate, in una schermata sola.
      *
      * Moderare una fotografia alla volta aprendo la scheda di ogni utente non

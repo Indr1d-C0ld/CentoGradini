@@ -15,6 +15,7 @@ $voci = [
     '/admin/utenti'       => 'utenti',
     '/admin/comunicazioni'=> 'comunicazioni',
     '/admin/fotografie'   => 'fotografie',
+    '/admin/abitanti'     => 'abitanti',
     '/admin/accessi'      => 'accessi',
     '/admin/impostazioni' => 'le leve',
 ];
@@ -25,7 +26,8 @@ $voci = [
 // qualcosa dentro di lei.
 $attiva = $qui;
 foreach (['/admin/utente' => '/admin/utenti',
-          '/admin/comunicazioni' => '/admin/comunicazioni'] as $ramo => $voce) {
+          '/admin/comunicazioni' => '/admin/comunicazioni',
+          '/admin/abitant' => '/admin/abitanti'] as $ramo => $voce) {
     if (str_starts_with($qui, $ramo)) {
         $attiva = $voce;
         break;

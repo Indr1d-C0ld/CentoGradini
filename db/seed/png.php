@@ -205,7 +205,10 @@ return [
         // --- Il quartiere -----------------------------------------------------
         // Il Master non esce mai dall'ABCB. Giro di un luogo solo: è il punto
         // fermo della mappa, e chi vuole sapere qualcosa passa da lui.
-        $p('master', 'Il', 'Master', 'm', 'adulti', 0, 1, 30, 1952, false,
+        // Si chiama «Master» e basta, com'è nel manga: niente cognome. Prima
+        // era cognome «Master», nome «Il», e le liste — che mettono il cognome
+        // davanti — scrivevano «Master Il».
+        $p('master', 'Master', '', 'm', 'adulti', 0, 1, 30, 1952, false,
            'abcb', 'abcb',
            [10, 12, 6, 11], [8, 4, 8, 8, 4, 8, 10, 2], 12, 0,
            'L\'uomo dietro il bancone dell\'ABCB. Non chiede niente e sente tutto.',

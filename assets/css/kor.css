@@ -689,6 +689,31 @@ label.in_linea { display: inline-flex; align-items: center; gap: .4rem; }
    riga e non si lascia stringere. */
 .elenco-persone .fotografia { align-self: center; flex: 0 0 auto; }
 
+/* La faccia negli elenchi: abbastanza grande da riconoscere qualcuno, e
+   un'anteprima piu' grande quando ci si passa sopra. Prima era un tondo da
+   42 pixel, che per un volto disegnato da Akemi Takada non basta. */
+.faccia { position: relative; display: inline-flex; flex: 0 0 auto; align-self: center; text-decoration: none; }
+.faccia-piccola { width: 3.5rem; border-radius: 50%; }
+.faccia-piccola.fotografia--vuota { font-size: 1.3rem; }
+.faccia-grande { display: none; }
+
+/* L'anteprima solo dove esiste il puntatore: su un dito il «passaggio» non
+   c'e', e un riquadro che si apre al tocco coprirebbe il nome da toccare. */
+@media (hover: hover) {
+  .faccia-grande {
+    position: absolute; z-index: 20;
+    left: calc(100% + .7rem); top: 50%; transform: translateY(-50%);
+    width: 13rem; padding: .45rem;
+    background: var(--fondo-carta); border: 1px solid var(--bordo);
+    border-radius: var(--raggio); box-shadow: var(--ombra);
+    pointer-events: none; text-align: center;
+  }
+  .faccia-grande .fotografia { width: 100%; }
+  .faccia-grande span { display: block; margin-top: .35rem; font-size: .85rem; color: var(--inchiostro); }
+  .faccia:hover .faccia-grande,
+  .faccia:focus-visible .faccia-grande { display: block; }
+}
+
 /* Nella tabella della situazione ogni giocatore e' faccia + nome, e i due non
    si devono separare a fine riga. */
 .chi-qui { display: inline-flex; align-items: center; gap: .35rem; margin-right: .6rem; }

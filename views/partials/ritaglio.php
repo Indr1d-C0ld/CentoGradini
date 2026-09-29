@@ -11,12 +11,18 @@
  * @var array<string,mixed> $pg
  * @var string|null $ritratto  indirizzo della fotografia, o null
  * @var bool $altrui           vero se ad agire è l'amministratore su un altro
+ * @var string|null $torna      dove tornare dopo, per l'amministratore (facoltativo)
  */
 $altrui   = (bool) ($altrui ?? false);
 $iniziale = mb_strtoupper(mb_substr((string) ($pg['nome'] ?? '?'), 0, 1));
 $campoPg  = $altrui
     ? '<input type="hidden" name="personaggio" value="' . (int) $pg['id'] . '">'
     : '';
+// Dove tornare dopo: serve alla pagina di un abitante, che non ha un utente
+// sulla cui scheda ricadere. ProfiloController accetta solo percorsi interni.
+if ($altrui && isset($torna) && is_string($torna) && $torna !== '') {
+    $campoPg .= '<input type="hidden" name="torna" value="' . e($torna) . '">';
+}
 ?>
 <div class="riquadro-fotografia">
   <div>

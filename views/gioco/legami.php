@@ -5,7 +5,6 @@
  * @var list<array<string,mixed>> $legami
  * @var array<string,mixed>|null $oggetto
  */
-use App\Game\Ritratto;
 use App\Sim\Scuola;
 ?>
 
@@ -39,14 +38,7 @@ use App\Sim\Scuola;
 <div class="carta">
   <div class="riga-scelta" style="border:0;padding:0">
     <div class="riga-fotografia">
-      <?php $faccia = Ritratto::di($l); ?>
-      <?php if ($faccia !== null): ?>
-        <img class="fotografia fotografia--media" src="<?= e(asset($faccia)) ?>" alt=""
-             width="80" height="80" loading="lazy">
-      <?php else: ?>
-        <div class="fotografia fotografia--media fotografia--vuota" aria-hidden="true"><?=
-          e(mb_strtoupper(mb_substr((string) $l['nome'], 0, 1))) ?></div>
-      <?php endif; ?>
+      <?= partial('faccia', ['p' => $l, 'collega' => url('/chi/' . (int) $l['a_id'])]) ?>
       <div>
         <h2 style="margin:0">
           <a href="<?= e(url('/chi/' . (int) $l['a_id'])) ?>"><?= e($l['cognome'] . ' ' . $l['nome']) ?></a>
