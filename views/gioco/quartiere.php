@@ -67,6 +67,9 @@ $luogo = $qui['luogo'];
     <span class="passi" aria-hidden="true">›››</span>
     <div>
       <b>Sei per strada, verso <?= e($viaggio['nome']) ?>.</b>
+      <?php if (($viaggio['chiuso'] ?? null) !== null): ?>
+        <span><?= e($viaggio['chiuso']) ?> ha chiuso, e ti hanno accompagnat<?= ($pg['sesso'] ?? 'm') === 'f' ? 'a' : 'o' ?> alla porta.</span>
+      <?php endif; ?>
       <span data-conto>Arrivi fra <?= e(App\Game\Personaggio::quantoFa(0)) ?></span>
     </div>
   </div>

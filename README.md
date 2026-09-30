@@ -135,6 +135,12 @@ solo d'estate, il luna park apre alle dieci, e la grande scalinata non la fa
 quasi nessuno — c'è una scaletta più comoda dietro la collina, ed è per questo
 che in cima si riesce sempre a stare da soli.
 
+Gli orari sono dei **locali**, non delle strade: la sera la via commerciale abbassa
+le saracinesche ma ci si passa lo stesso, perché è la strada per la stazione. E
+quando un locale chiude, chi è dentro **viene accompagnato alla porta** — nel luogo
+accanto, una strada se ce n'è una — e s'incammina col suo tempo di strada; sulla
+pagina trova scritto perché è per strada.
+
 Ma il vero collante del multigiocatore sono le **voci**, e la scelta che le
 regge è questa: **il testo di una voce non esiste a database**. Esistono un
 fatto — chi, cosa, dove, quando — e tante versioni soggettive quante sono le
@@ -261,7 +267,7 @@ progetto esiste.
 | **51** | manopole di configurazione, tutte lette da qualcuno |
 | **18** | migrazioni |
 | **83** | rotte |
-| **463** | verifiche su 16 file di prova (15 unitari + 1 end-to-end) |
+| **467** | verifiche su 16 file di prova (15 unitari + 1 end-to-end) |
 
 ### Le schermate
 
@@ -742,6 +748,16 @@ Annotate qui perché non si ripetano.
    continuato a passare: rifiutato, sì, ma per il cognome, non per l'omonimia. Una
    prova che verifica solo che qualcosa venga respinto passa anche quando viene
    respinto per la ragione sbagliata.
+
+28. **Un orario si prova sulla mappa, non sul luogo.** La via commerciale aveva
+   l'orario dei negozi, 9-20, e preso da solo era plausibile. Ma era l'unico
+   passaggio verso stazione, sala giochi e negozio di dischi: di notte circa 160
+   coppie di luoghi non si raggiungevano, e chi era in sala giochi alla chiusura
+   restava chiuso dentro, perché gli orari si controllavano solo all'ingresso e
+   tutte le sue uscite erano chiuse. La prova che mancava non guarda un luogo
+   alla volta: per ogni ora del giorno, in un giorno di scuola, d'estate e in
+   vacanza, controlla che quello che è aperto si raggiunga da qualunque posto
+   passando solo per quello che è aperto.
 
 ## Licenza e diritti
 

@@ -670,6 +670,43 @@ prova('le facce degli abitanti: il seme le da\' a chi nasce, e poi non le tocca 
     uguale(null, $dopo['ritratto_file'], 'il seme ha rimesso una fotografia che era stata tolta');
 });
 
+prova('alla chiusura chi e\' dentro viene accompagnato alla porta', function () {
+    $tz = new DateTimeZone('Asia/Tokyo');
+    $ore = static fn (string $s): int => (new DateTimeImmutable($s, $tz))->getTimestamp();
+
+    // La porta: una strada se c'e', la piu' vicina, mai una casa.
+    uguale('commerciale', \App\Game\Personaggio::portaDiUscita('sala_giochi', $ore('1987-05-14 22:30:00'))['a']);
+    uguale('commerciale', \App\Game\Personaggio::portaDiUscita('dischi', $ore('1987-05-14 22:30:00'))['a']);
+    uguale('viale', \App\Game\Personaggio::portaDiUscita('abcb', $ore('1987-05-14 23:30:00'))['a'],
+        'dall\'ABCB si esce sul viale, non a casa Hiyama che e\' piu\' vicina');
+    uguale('passaggio', \App\Game\Personaggio::portaDiUscita('stazione', $ore('1987-05-15 00:30:00'))['a']);
+
+    $g = giocatore('Chiusura', 'sala_giochi');
+    // Aperta: non succede niente.
+    uguale(0, \App\Game\Personaggio::accompagnaFuori($ore('1987-05-14 21:00:00'), (int) $g['id']));
+    uguale(null, ricarica($g)['verso']);
+
+    // Chiusa: si incammina verso la via, col suo tempo di strada, e lascia
+    // una traccia che dice perche'.
+    $alle = $ore('1987-05-14 22:10:00');
+    uguale(1, \App\Game\Personaggio::accompagnaFuori($alle, (int) $g['id']));
+    $dopo = ricarica($g);
+    uguale('commerciale', $dopo['verso']);
+    uguale($alle + 2 * 60, (int) $dopo['arrivo_gts'], 'due minuti di strada, come chi parte da se\'');
+    uguale('sala_giochi', \App\Game\Personaggio::accompagnatoDa($dopo), 'il gioco sa dire perche\' e\' per strada');
+    $traccia = Database::first("SELECT testo FROM tracce WHERE personaggio_id = ? AND tipo = 'chiusura'", [(int) $g['id']]);
+    vero($traccia !== null && str_contains((string) $traccia['testo'], 'accompagnata alla porta'), 'la traccia, al femminile');
+
+    // Chi e' gia' per strada non viene toccato una seconda volta.
+    uguale(0, \App\Game\Personaggio::accompagnaFuori($alle + 60, (int) $g['id']));
+
+    // Chi parte da se' non ha il messaggio della chiusura.
+    Database::run('UPDATE personaggi SET luogo = ?, verso = NULL, arrivo_gts = NULL WHERE id = ?', ['abcb', (int) $g['id']]);
+    $r = \App\Game\Personaggio::parti(ricarica($g), 'viale');
+    vero($r['ok']);
+    uguale(null, \App\Game\Personaggio::accompagnatoDa(ricarica($g)));
+});
+
 // --- pulizia ------------------------------------------------------------------
 pulisci();
 riepilogo();

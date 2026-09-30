@@ -256,7 +256,7 @@ final class QuartiereController
 
     /**
      * @param array<string,mixed> $pg
-     * @return array{verso:string,nome:string,restano:int}|null
+     * @return array{verso:string,nome:string,restano:int,chiuso:?string}|null
      */
     private function viaggio(array $pg): ?array
     {
@@ -268,6 +268,9 @@ final class QuartiereController
             'verso'   => (string) $pg['verso'],
             'nome'    => Luoghi::nome((string) $pg['verso']),
             'restano' => (int) ceil($restanoGioco / Orologio::compressione()),   // secondi reali
+            // Il nome del locale da cui l'hanno accompagnato fuori, se e' andata cosi':
+            // chi ritrova il proprio personaggio per strada deve sapere perche'.
+            'chiuso'  => ($da = \App\Game\Personaggio::accompagnatoDa($pg)) === null ? null : Luoghi::nome($da),
         ];
     }
 }

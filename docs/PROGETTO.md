@@ -505,6 +505,9 @@ Dopo F7 si aggiunge contenuto e comodità, non impalcatura. In ordine di arrivo:
 - **La famiglia** (29 settembre 2026): chi è parente di chi fra gli abitanti, e cosa fra
   parenti non succede; i ritratti degli abitanti dalla serie, con l'anteprima grande al
   passaggio del mouse; e le tre conferme delle azioni irreversibili, che la CSP bloccava.
+- **L'ora di chiusura** (30 settembre 2026): la via commerciale è una strada, sempre
+  percorribile, e chi è dentro un locale quando chiude viene accompagnato nel luogo accanto
+  (`Personaggio::accompagnaFuori`, fase `chiusure` del battito).
 - **Le comunicazioni** (migrazione `0016`): filo diretto fra la gestione e un giocatore, nei
   due sensi, con avviso per posta che non ripete il messaggio. Non è finzione e non si
   traveste da tale — vedi la nota in testa a `src/Game/Comunicazioni.php`.

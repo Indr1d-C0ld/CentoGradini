@@ -738,6 +738,36 @@ else
   rosso "non ho trovato nessuno nello stesso luogo su cui provare il profilo"
 fi
 
+# --- L'ora di chiusura --------------------------------------------------------------
+# Il personaggio sta in sala giochi, la sala giochi chiude (un'ora finta di
+# notte) e il gestore lo accompagna fuori. Il viaggio si sposta poi sull'ora
+# vera, altrimenti la pagina lo farebbe arrivare subito e il messaggio sparirebbe.
+PRIMA=$(php -r '
+  require "src/autoload.php"; require "src/Support/helpers.php";
+  $GLOBALS["__project_root"]=getcwd(); App\Core\Config::load(getcwd());
+  $io = App\Core\Database::first("SELECT id, luogo FROM personaggi WHERE nome = ? AND png IS NULL", [$argv[1]]);
+  if ($io === null) { echo "-"; exit; }
+  App\Core\Database::run("UPDATE personaggi SET luogo = ?, verso = NULL, arrivo_gts = NULL WHERE id = ?", ["sala_giochi", (int) $io["id"]]);
+  $notte = (new DateTimeImmutable("1987-05-14 23:00:00", new DateTimeZone("Asia/Tokyo")))->getTimestamp();
+  $n = App\Game\Personaggio::accompagnaFuori($notte, (int) $io["id"]);
+  $sposta = App\Sim\Orologio::lineare() - $notte;
+  App\Core\Database::run("UPDATE personaggi SET arrivo_gts = arrivo_gts + ? WHERE id = ?", [$sposta, (int) $io["id"]]);
+  App\Core\Database::run("UPDATE tracce SET gts = gts + ? WHERE personaggio_id = ? AND tipo = ?", [$sposta, (int) $io["id"], "chiusura"]);
+  echo $n === 1 ? $io["luogo"] : "-";
+' "${PGNOME}")
+if [[ "${PRIMA}" != "-" ]]; then
+  if contiene "${BASE}/quartiere" "La sala giochi ha chiuso, e ti hanno accompagnat"; then
+    verde "chi e' dentro alla chiusura viene accompagnato fuori, e la pagina dice perche'"
+  else rosso "/quartiere non dice che la sala giochi ha chiuso"; fi
+  php -r '
+    require "src/autoload.php"; require "src/Support/helpers.php";
+    $GLOBALS["__project_root"]=getcwd(); App\Core\Config::load(getcwd());
+    App\Core\Database::run("UPDATE personaggi SET luogo = ?, verso = NULL, arrivo_gts = NULL WHERE nome = ? AND png IS NULL", [$argv[2], $argv[1]]);
+  ' "${PGNOME}" "${PRIMA}"
+else
+  rosso "alla chiusura della sala giochi il personaggio di prova non e' stato accompagnato fuori"
+fi
+
 # Uno sconosciuto, lontano e mai incontrato: non si apre.
 LONTANO=$(php -r '
   require "src/autoload.php"; require "src/Support/helpers.php";

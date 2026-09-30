@@ -68,6 +68,10 @@ try {
     // quindi i due percorsi non possono divergere.
     $arrivati = $fase('arrivi', static fn (): int => Personaggio::avanzaTutti(), 0);
 
+    // Alla chiusura di un locale chi e' dentro viene accompagnato fuori, nel
+    // luogo accanto. Dopo gli arrivi, perche' chi e' appena entrato conta.
+    $accompagnati = $fase('chiusure', static fn (): int => Personaggio::accompagnaFuori(), 0);
+
     // Il quartiere dimentica: le tracce spente si buttano via.
     $tracce = $fase('tracce', static fn (): int => Personaggio::potaTracce(), 0);
 
@@ -119,6 +123,7 @@ try {
             $ms,
             json_encode([
                 'arrivati'     => $arrivati,
+                'accompagnati_fuori' => $accompagnati,
                 'tracce_potate'=> $tracce,
                 'traslocati'   => $partiti,
                 'oggetti_ritrovati' => $ritrovati,

@@ -180,6 +180,48 @@ prova('le uscite valutano l\'apertura ALL\'ARRIVO', function () use ($ts) {
         'due minuti di strada e la trova chiusa: va detto prima di partire');
 });
 
+prova('di notte chiudono i negozi, non la via commerciale', function () use ($ts) {
+    // La via era l'unico passaggio fra stazione, sala giochi, negozio di
+    // dischi e il resto del quartiere, e aveva l'orario dei negozi: dalle
+    // 20:00 alle 9:00 circa 160 coppie di luoghi non si raggiungevano.
+    vero(Luoghi::accessibile('commerciale', $ts('1987-05-14 23:30:00'))[0], 'alle 23:30 ci si passa');
+    vero(Luoghi::accessibile('commerciale', $ts('1987-05-14 04:00:00'))[0], 'e alle quattro di notte pure');
+});
+
+prova('a ogni ora, quello che e\' aperto si raggiunge da qualunque posto', function () use ($ts) {
+    // Passando solo per luoghi aperti. L'unica eccezione e' voluta: di notte
+    // non ci sono treni, e mare e montagna restano fuori finche' la stazione
+    // non riapre.
+    $treno = ['spiaggia', 'montagna'];
+    foreach (['1987-05-14', '1987-08-10', '1987-12-27'] as $giorno) {
+        for ($h = 0; $h < 24; $h++) {
+            $t  = $ts(sprintf('%s %02d:30:00', $giorno, $h));
+            $ok = static fn (string $k): bool => Luoghi::accessibile($k, $t)[0];
+            foreach (array_keys(Luoghi::tutti()) as $da) {
+                $visti = [$da => true];
+                $coda  = [$da];
+                while ($coda !== []) {
+                    foreach (Luoghi::archi()[array_shift($coda)] ?? [] as $arco) {
+                        if (!isset($visti[$arco['a']]) && $ok($arco['a'])) {
+                            $visti[$arco['a']] = true;
+                            $coda[] = $arco['a'];
+                        }
+                    }
+                }
+                foreach (array_keys(Luoghi::tutti()) as $a) {
+                    if ($a === $da || !$ok($a) || isset($visti[$a])) {
+                        continue;
+                    }
+                    if (in_array($a, $treno, true) || in_array($da, $treno, true)) {
+                        continue;
+                    }
+                    throw new RuntimeException("{$giorno} {$h}:30 — da {$da} non si arriva a {$a}");
+                }
+            }
+        }
+    }
+});
+
 prova('ogni luogo ha un testo suo', function () {
     $visti = [];
     foreach (Luoghi::tutti() as $k => $l) {

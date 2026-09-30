@@ -55,9 +55,17 @@ return [
             'sottotitolo' => 'Tettoia di plastica ondulata, musichetta in filodiffusione',
             'descrizione' => 'Il fruttivendolo che grida i prezzi, la tintoria, il negozio di '
                 . 'croquette con la coda all\'uscita da scuola. Tutti conoscono tutti, il che è '
-                . 'comodo per farsi prestare cento yen e pessimo per qualunque altra cosa.',
+                . 'comodo per farsi prestare cento yen e pessimo per qualunque altra cosa. La sera '
+                . 'le saracinesche si abbassano una dopo l\'altra, ma la tettoia resta accesa: '
+                . 'di qui si passa lo stesso, perché è la strada che porta alla stazione.',
+            // Ritrovo per la folla, strada per gli orari: di notte chiudono i
+            // negozi, non la via. Uno shotengai e' una strada pubblica sotto
+            // una tettoia, e questa e' l'unico passaggio fra la stazione, la
+            // sala giochi, il negozio di dischi e il resto del quartiere: con
+            // l'orario dei negozi (9-20) chiudeva dentro chi era in sala
+            // giochi e staccava la stazione dalla mappa per tredici ore.
             'tipo' => 'ritrovo', 'x' => 340, 'y' => 238,
-            'apre' => 540, 'chiude' => 1200, 'ordine' => 30,
+            'apre' => null, 'chiude' => null, 'ordine' => 30,
         ],
         [
             'lkey' => 'dischi', 'dove' => 'al negozio di dischi', 'nome' => 'Il negozio di dischi',

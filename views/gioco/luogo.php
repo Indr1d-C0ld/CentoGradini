@@ -103,7 +103,8 @@ $luogo = $dati['luogo'];
   <div class="carta">
     <p class="occhiello">Non sei qui</p>
     <?php if ($viaggio !== null): ?>
-      <p>Sei per strada verso <?= e($viaggio['nome']) ?>: prima bisogna arrivare.</p>
+      <p>Sei per strada verso <?= e($viaggio['nome']) ?>: prima bisogna arrivare.<?php
+        if (($viaggio['chiuso'] ?? null) !== null): ?> <?= e($viaggio['chiuso']) ?> ha chiuso, e ti hanno accompagnat<?= ($pg['sesso'] ?? 'm') === 'f' ? 'a' : 'o' ?> alla porta.<?php endif; ?></p>
     <?php elseif ($quanto !== null): ?>
       <p>
         Da <?= e(Luoghi::nome((string) $pg['luogo'])) ?> ci vogliono

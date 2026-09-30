@@ -270,6 +270,127 @@ final class Personaggio
         return ['ok' => true, 'minuti' => $minuti, 'arrivo' => $arrivo];
     }
 
+    // --- L'ora di chiusura ------------------------------------------------------------
+
+    /**
+     * Chi e' dentro un locale che ha appena chiuso viene accompagnato fuori.
+     *
+     * Gli orari si controllavano solo all'ingresso: chi c'era alla chiusura
+     * restava dentro la sala giochi a mezzanotte, a luci spente, finche' non
+     * decideva di andarsene. Adesso il gestore lo accompagna alla porta, e
+     * «fuori» vuol dire il luogo accanto — una strada, se ce n'e' una, e fra
+     * le strade la piu' vicina. Non e' un salto: si incammina come se fosse
+     * partito da se', con il suo tempo di strada, e arriva col battito come
+     * chiunque altro.
+     *
+     * Solo i giocatori. Gli abitanti hanno il loro giro, che i luoghi chiusi
+     * li scarta gia', e il Master sopra il bar ci dorme.
+     *
+     * Se nessun luogo accanto e' raggiungibile — la montagna a fine stagione,
+     * con la stazione chiusa di notte — si resta dove si e': meglio un
+     * rifugio chiuso che un salto in un posto dove non si arriva.
+     *
+     * `$solo` restringe a un personaggio: serve alle prove, che fingono
+     * un'ora di notte e non devono spostare chi gioca davvero.
+     */
+    public static function accompagnaFuori(?int $adesso = null, ?int $solo = null): int
+    {
+        $adesso ??= Orologio::lineare();
+        $chiusi = [];
+        foreach (Luoghi::tutti() as $k => $l) {
+            if (!Luoghi::accessibile($k, $adesso)[0]) {
+                $chiusi[] = $k;
+            }
+        }
+        if ($chiusi === []) {
+            return 0;
+        }
+
+        $n = 0;
+        foreach (Database::all(
+            'SELECT * FROM personaggi
+             WHERE png IS NULL AND verso IS NULL AND stato = ?
+               AND luogo IN (' . implode(', ', array_fill(0, count($chiusi), '?')) . ')'
+               . ($solo === null ? '' : ' AND id = ' . $solo),
+            ['attivo', ...$chiusi]
+        ) as $pg) {
+            $da    = (string) $pg['luogo'];
+            $fuori = self::portaDiUscita($da, $adesso);
+            if ($fuori === null) {
+                continue;
+            }
+            // Solo se e' ancora li' e fermo: se nel frattempo il giocatore e'
+            // partito da se', la sua scelta vale piu' di quella del gestore.
+            $fatto = Database::run(
+                'UPDATE personaggi SET verso = ?, arrivo_gts = ?
+                 WHERE id = ? AND luogo = ? AND verso IS NULL',
+                [$fuori['a'], $adesso + $fuori['minuti'] * 60, (int) $pg['id'], $da]
+            )->rowCount() === 1;
+            if (!$fatto) {
+                continue;
+            }
+            self::traccia($da, (int) $pg['id'], 'chiusura', accorda(sprintf(
+                '%s chiude, e %s viene accompagnat{o} alla porta, verso %s.',
+                Luoghi::nome($da), self::nomeCompleto($pg), mb_strtolower(Luoghi::nome($fuori['a']))
+            ), $pg), $adesso);
+            $n++;
+        }
+        return $n;
+    }
+
+    /**
+     * Dove si esce da un luogo chiuso: prima le strade, poi il resto; fra
+     * pari, il tragitto piu' corto. Mai in una casa — non si viene accompagnati
+     * a casa d'altri — e mai dove all'arrivo si troverebbe chiuso.
+     *
+     * @return array{a:string,minuti:int}|null
+     */
+    public static function portaDiUscita(string $da, ?int $adesso = null): ?array
+    {
+        $adesso ??= Orologio::lineare();
+        $buone = [];
+        foreach (Luoghi::archi()[$da] ?? [] as $arco) {
+            $l = Luoghi::uno($arco['a']);
+            if ($l === null || $l['privato'] || $l['tipo'] === 'casa') {
+                continue;
+            }
+            if (!Luoghi::accessibile($arco['a'], $adesso + $arco['minuti'] * 60)[0]) {
+                continue;
+            }
+            $buone[] = ['a' => $arco['a'], 'minuti' => $arco['minuti'], 'strada' => $l['tipo'] === 'strada'];
+        }
+        if ($buone === []) {
+            return null;
+        }
+        usort($buone, static fn (array $x, array $y): int
+            => [$y['strada'], $x['minuti'], $x['a']] <=> [$x['strada'], $y['minuti'], $y['a']]);
+        return ['a' => $buone[0]['a'], 'minuti' => $buone[0]['minuti']];
+    }
+
+    /**
+     * Se questo viaggio l'ha deciso la chiusura e non il giocatore, e allora
+     * da dove l'hanno accompagnato fuori — o null.
+     *
+     * @param array<string,mixed> $pg
+     */
+    public static function accompagnatoDa(array $pg): ?string
+    {
+        if ($pg['verso'] === null || $pg['arrivo_gts'] === null) {
+            return null;
+        }
+        $minuti = Luoghi::minuti((string) $pg['luogo'], (string) $pg['verso']);
+        if ($minuti === null) {
+            return null;
+        }
+        $r = Database::first(
+            "SELECT luogo FROM tracce
+             WHERE personaggio_id = ? AND tipo = 'chiusura' AND luogo = ? AND gts = ?
+             LIMIT 1",
+            [(int) $pg['id'], (string) $pg['luogo'], (int) $pg['arrivo_gts'] - $minuti * 60]
+        );
+        return $r === null ? null : (string) $r['luogo'];
+    }
+
     public static function segnaVisto(int $id): void
     {
         Database::run('UPDATE personaggi SET visto_gts = ? WHERE id = ?', [Orologio::lineare(), $id]);
