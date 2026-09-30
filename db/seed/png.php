@@ -40,6 +40,15 @@ declare(strict_types=1);
  * Il registro è in `docs/FONTI.md`.
  */
 
+// La fotografia di ciascun abitante, se ce n'e' una: vedi db/ritratti_abitanti.php.
+// Solo quando il file esiste davvero, perche' una riga che punta a un'immagine
+// assente mostrerebbe un riquadro rotto invece dell'iniziale.
+$fotografie = is_file(__DIR__ . '/../ritratti_abitanti.php') ? (array) require __DIR__ . '/../ritratti_abitanti.php' : [];
+$ritratto = static function (string $png) use ($fotografie): ?string {
+    $file = isset($fotografie[$png]) ? basename((string) $fotografie[$png]) : '';
+    return $file !== '' && is_file(__DIR__ . '/../../assets/img/ritratti/' . $file) ? $file : null;
+};
+
 $p = static fn (
     string $png, string $nome, string $cognome, string $sesso,
     string $sezione, int $anno, int $mese, int $giorno, int $annoNascita,
@@ -72,6 +81,9 @@ $p = static fn (
     // La compostezza è derivata come per i giocatori: 12 - candore, fra 2 e 10.
     'compostezza_max' => max(2, min(10, 12 - $sec[7])),
     'compostezza'     => max(2, min(10, 12 - $sec[7])),
+    'ritratto_file'   => $ritratto($png),
+    'ritratto_hash'   => $ritratto($png) === null ? null : basename((string) $ritratto($png), '.webp'),
+    'ritratto_at'     => $ritratto($png) === null ? null : date('Y-m-d H:i:s'),
 ];
 
 return [
@@ -82,7 +94,10 @@ return [
     // loro giro, e gli episodi muovono Compostezza, punti ferita e punti
     // potere anche a loro. Il seme scrive queste colonne solo quando la riga
     // nasce; tutto il resto — nomi, giro, abilita' — lo riallinea a ogni giro.
-    'solo_alla_nascita' => ['stato', 'luogo', 'pf', 'pp', 'compostezza'],
+    // Lo stesso vale per la fotografia: il seme la da' a chi nasce, e da li'
+    // in poi la cambia soltanto l'amministratore dal pannello.
+    'solo_alla_nascita' => ['stato', 'luogo', 'pf', 'pp', 'compostezza',
+                            'ritratto_file', 'ritratto_hash', 'ritratto_at'],
     'righe' => [
 
         // --- Il triangolo -----------------------------------------------------

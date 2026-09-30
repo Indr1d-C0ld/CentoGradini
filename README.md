@@ -261,7 +261,7 @@ progetto esiste.
 | **51** | manopole di configurazione, tutte lette da qualcuno |
 | **18** | migrazioni |
 | **83** | rotte |
-| **462** | verifiche su 16 file di prova (15 unitari + 1 end-to-end) |
+| **463** | verifiche su 16 file di prova (15 unitari + 1 end-to-end) |
 
 ### Le schermate
 
@@ -314,7 +314,13 @@ Negli elenchi la faccia è abbastanza grande da riconoscere qualcuno, e passando
 mouse se ne apre un'anteprima grande. Anche i **tredici abitanti** del canone possono averne
 una: si mette da `/admin/abitanti`, con lo stesso riquadro, un fotogramma della serie per
 ciascuno. Sono immagini dell'opera — character design di Akemi Takada, Studio Pierrot — e come
-le fotografie dei giocatori stanno solo sull'installazione viva e nel backup privato.
+le fotografie dei giocatori stanno solo sull'installazione viva e nel backup privato. Nel
+backup c'è anche **di chi è ciascuna**, in `db/ritratti_abitanti.php`: il seme la ridà a un
+abitante solo quando nasce e solo se il file c'è, così un'installazione rifatta dal backup
+ritrova ogni faccia al suo posto e un cambio fatto dal pannello non viene mai riscritto.
+Quell'elenco lo tiene allineato `deploy/04-fotografie.sh`, chiedendolo alla console
+dell'installazione viva (`ritratti:abitanti`); la copia pubblica non porta né le immagini né
+l'elenco, e lì gli abitanti hanno l'iniziale finché qualcuno non ne carica una.
 
 La faccia non resta sulla propria scheda: compare nell'elenco di **chi c'è adesso** in un
 luogo, sulla pagina di chi si incontra, nell'elenco dei **legami**, e su `/chi/{id}` — il

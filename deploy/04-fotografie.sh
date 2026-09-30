@@ -43,6 +43,24 @@ rsync -rt --delete "${PROVA[@]}" --itemize-changes \
   --exclude '.gitkeep' \
   "$VIVO/$CARTELLA"/ "$SORGENTE/$CARTELLA"/
 
+# Le fotografie degli abitanti non bastano da sole: bisogna sapere di chi e'
+# ciascuna, e quello lo sa solo il database dell'installazione viva. Lo si
+# chiede alla sua console e lo si mette per iscritto in db/ritratti_abitanti.php
+# (l'intestazione resta, le righe si rifanno), che e' da dove il seme lo
+# riprende quando un'installazione rinasce da questo repository.
+ELENCO="$SORGENTE/db/ritratti_abitanti.php"
+if [ -f "$ELENCO" ] && [ -f "$VIVO/bin/console.php" ]; then
+  if RIGHE=$(php "$VIVO/bin/console.php" ritratti:abitanti); then
+    if [ ${#PROVA[@]} -eq 0 ]; then
+      { sed '/^return \[$/q' "$ELENCO"; [ -n "$RIGHE" ] && printf '%s\n' "$RIGHE"; echo '];'; } > "$ELENCO.nuovo"
+      php -l "$ELENCO.nuovo" >/dev/null && mv "$ELENCO.nuovo" "$ELENCO"
+    fi
+    echo ">>> abitanti con la fotografia: $(printf '%s' "$RIGHE" | grep -c '=>' || true) (db/ritratti_abitanti.php)"
+  else
+    echo "!!! non riesco a chiedere alla console di $VIVO chi porta quale fotografia"
+  fi
+fi
+
 QUANTE=$(find "$SORGENTE/$CARTELLA" -type f ! -name '.gitkeep' | wc -l)
 PESO=$(du -sh "$SORGENTE/$CARTELLA" 2>/dev/null | cut -f1)
 echo ">>> in archivio: ${QUANTE} fotografie, ${PESO}."

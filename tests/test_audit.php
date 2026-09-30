@@ -646,6 +646,30 @@ prova('la faccia negli elenchi ha l\'anteprima grande, o l\'iniziale', function 
     vero(str_contains($senza, '>M<') && !str_contains($senza, 'faccia-grande'), 'senza fotografia: l\'iniziale, e nessuna anteprima vuota');
 });
 
+prova('le facce degli abitanti: il seme le da\' a chi nasce, e poi non le tocca piu\'', function () {
+    $radice = dirname(__DIR__);
+    $def = require $radice . '/db/seed/png.php';
+    $elenco = is_file($radice . '/db/ritratti_abitanti.php') ? require $radice . '/db/ritratti_abitanti.php' : [];
+    foreach ($def['righe'] as $r) {
+        $file = $elenco[$r['png']] ?? null;
+        $atteso = $file !== null && is_file($radice . '/assets/img/ritratti/' . $file) ? $file : null;
+        uguale($atteso, $r['ritratto_file'], $r['png'] . ': la fotografia se il file c\'e\', altrimenti niente');
+        uguale($atteso === null ? null : basename($atteso, '.webp'), $r['ritratto_hash'], $r['png'] . ': l\'impronta e\' il nome del file');
+    }
+    foreach (['ritratto_file', 'ritratto_hash', 'ritratto_at'] as $c) {
+        vero(in_array($c, $def['solo_alla_nascita'], true), "{$c}: il seme non deve riscrivere quello che l'amministratore cambia");
+    }
+    // E alla prova dei fatti: una faccia tolta dal pannello resta tolta anche
+    // dopo che il seme e' ripassato, come fa a ogni pubblicazione.
+    $m = abitante('master');
+    Database::run('UPDATE personaggi SET ritratto_file = NULL, ritratto_hash = NULL, ritratto_at = NULL WHERE id = ?', [(int) $m['id']]);
+    (new \App\Cli\Seeder($radice))->all();
+    $dopo = abitante('master');
+    Database::run('UPDATE personaggi SET ritratto_file = ?, ritratto_hash = ?, ritratto_at = ? WHERE id = ?',
+        [$m['ritratto_file'], $m['ritratto_hash'], $m['ritratto_at'], (int) $m['id']]);
+    uguale(null, $dopo['ritratto_file'], 'il seme ha rimesso una fotografia che era stata tolta');
+});
+
 // --- pulizia ------------------------------------------------------------------
 pulisci();
 riepilogo();

@@ -355,6 +355,19 @@ try {
                 : '  ATTENZIONE, irraggiungibili: ' . implode(', ', $soli));
             break;
 
+        // --- Ritratti degli abitanti ----------------------------------------------
+        // Le righe di db/ritratti_abitanti.php come sono adesso nel database.
+        // Le usa deploy/04-fotografie.sh per tenere l'elenco allineato.
+        case 'ritratti:abitanti':
+            foreach (Database::all(
+                'SELECT png, ritratto_file FROM personaggi
+                 WHERE png IS NOT NULL AND ritratto_file IS NOT NULL ORDER BY png'
+            ) as $r) {
+                riga(sprintf('    %-10s => %s,', var_export((string) $r['png'], true),
+                    var_export(basename((string) $r['ritratto_file']), true)));
+            }
+            break;
+
         // --- Bilanciamento -------------------------------------------------------
         case 'config:get':
             if (isset($args[0])) {
@@ -386,6 +399,7 @@ try {
             riga('    seed                           carica i dati di ambientazione da db/seed/');
             riga('    bilancio --conferma            rapporto di bilanciamento su schede, poteri, folla');
             riga('    status                         stato di configurazione, schema, utenti, battito, posta');
+            riga('    ritratti:abitanti              quale fotografia porta ciascun abitante (per db/ritratti_abitanti.php)');
             riga('');
             riga('  Account');
             riga('    user:list                      elenco degli utenti');
