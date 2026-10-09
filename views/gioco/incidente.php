@@ -14,7 +14,7 @@ use App\Sim\Luoghi;
 
 <div class="carta scena">
   <p class="sommario">
-    Hai usato <strong><?= e($potere['nome']) ?></strong> <?= e(Luoghi::nome((string) $incidente['luogo'])) ?>,
+    Hai usato <strong><?= e(mb_strtolower((string) $potere['nome'])) ?></strong> <?= e(Luoghi::dove((string) $incidente['luogo'])) ?>,
     e <?= count($testimoni) === 1 ? 'una persona se n\'è accorta' : count($testimoni) . ' persone se ne sono accorte' ?>.
   </p>
   <ul class="elenco-persone">

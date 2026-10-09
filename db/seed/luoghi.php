@@ -199,6 +199,19 @@ return [
             'apre' => null, 'chiude' => null, 'ordine' => 115,
         ],
 
+        // La casa di Akane e Kazuya, coi loro genitori. Che stia a pochi minuti
+        // a piedi dai Kasuga lo dice l'OAV (FAQ 50); il punto preciso della
+        // carta è nostro, e la casa non ha una fotografia.
+        [
+            'lkey' => 'casa_zii', 'dove' => 'dagli zii', 'nome' => 'La casa degli zii',
+            'sottotitolo' => 'Dove abitano Akane e Kazuya, con i genitori',
+            'descrizione' => 'Una casa a due piani in una traversa sotto la collina, con le scarpe '
+                . 'di tutti ammucchiate nell\'ingresso e un televisore sempre acceso che nessuno guarda. '
+                . 'I genitori sono spesso fuori, e allora la casa è di Akane, che ci invita chi vuole, '
+                . 'e di Kazuya, che sa già chi sta per suonare prima che suoni.',
+            'tipo' => 'casa', 'x' => 470, 'y' => 520, 'privato' => 1, 'ordine' => 105,
+        ],
+
         [
             'lkey' => 'casa_ayukawa', 'dove' => 'da Ayukawa', 'nome' => 'Casa Ayukawa',
             'sottotitolo' => 'Grande, ordinata e quasi sempre vuota',

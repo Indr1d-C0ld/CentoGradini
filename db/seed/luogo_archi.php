@@ -38,6 +38,10 @@ $biDirezionali = [
     // L'area giochi sta subito a destra arrivando in cima, e i giardini
     // pensili sono sul versante, a mezza discesa: si raggiungono dalla
     // scalinata e da nient'altro.
+    // La casa degli zii: a pochi minuti dai Kasuga (FAQ 50), giù verso il parco.
+    ['casa_zii',    'casa_kasuga', 5],
+    ['casa_zii',    'parco',       4],
+
     ['area_giochi', 'casa_kasuga', 3],
     ['area_giochi', 'giardini',    2],
     ['giardini',    'casa_kasuga', 4],

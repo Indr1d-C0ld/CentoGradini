@@ -75,7 +75,20 @@ use App\Sim\Scuola;
       Hai capito. Quello che ne fai è affare tuo: puoi tenertelo, puoi dirglielo in faccia,
       puoi raccontarlo in giro. Sappi solo che a forza di gente che capisce, una famiglia
       trasloca.
+      <?php if (($g['atteggiamento'] ?? '') !== ''): ?>
+        <br><span class="tenue">Per ora hai scelto: <?= e(mb_strtolower(\App\Game\Segreto::ATTEGGIAMENTI[$g['atteggiamento']])) ?>.</span>
+      <?php endif; ?>
     </p>
+    <div class="scelte-sospetto">
+      <?php foreach (\App\Game\Segreto::ATTEGGIAMENTI as $come => $nome): ?>
+        <form method="post" action="<?= e(url('/taccuino/scegli')) ?>">
+          <?= csrf_field() ?>
+          <input type="hidden" name="soggetto" value="<?= (int) $s['id'] ?>">
+          <input type="hidden" name="come" value="<?= e($come) ?>">
+          <button type="submit" class="secondario"><?= e($nome) ?></button>
+        </form>
+      <?php endforeach; ?>
+    </div>
   <?php elseif (!$g['basta']): ?>
     <p class="aiuto">Ti serve qualche annotazione in più prima di poterci ragionare sopra.</p>
   <?php endif; ?>

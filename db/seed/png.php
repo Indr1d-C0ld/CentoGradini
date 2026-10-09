@@ -23,8 +23,10 @@ declare(strict_types=1);
  * che è il modo in cui le voci attraversano la mappa.
  *
  * **La prima tappa è dove si dorme**, e la notte ci si torna: la usa
- * `Abitanti::dove()`. I Kasuga e Akane stanno alla palazzina in cima alla
- * collina, Madoka a casa sua in fondo ai gradini, e **Hikaru pure**: la
+ * `Abitanti::dove()`. I Kasuga stanno alla palazzina in cima alla collina,
+ * Akane e Kazuya dai loro genitori a pochi minuti a piedi (`casa_zii`, dal
+ * 9/10/2026: prima dormivano dai Kasuga, e la famiglia di Kyosuke è di
+ * quattro persone), Madoka a casa sua in fondo ai gradini, e **Hikaru pure**: la
  * ricostruzione del grande escalier (CANONE §7-ter) dice che le case di
  * Madoka e di Hikaru, l'ABCB e la scuola stanno tutte nel quartiere sotto la
  * scalinata, e dal 19/09/2026 `casa_hiyama` è sulla mappa.
@@ -107,7 +109,9 @@ return [
         // compostezza che ne deriva è 3. È il motore della storia.
         $p('kyosuke', 'Kyosuke', 'Kasuga', 'm', 'superiori', 3, 11, 15, 1969, true,
            'gradini', 'casa_kasuga,gradini,liceo,abcb,parco,viale',
-           [6, 7, 7, 10], [4, 4, 3, 5, 6, 5, 4, 9], 9, 10,
+           // Nuoto 1: non sa nuotare (capp. 66 e 115; al 143 sguazza ancora
+           // nella vasca dei bambini). Prima era 6.
+           [6, 7, 7, 10], [4, 4, 3, 5, 1, 5, 4, 9], 9, 10,
            'Un ragazzo del terzo anno con l\'aria di chi sta per dire qualcosa e poi non la dice.',
            'Capelli scuri spettinati, giacca della scuola sempre aperta, mani in tasca.'),
 
@@ -127,42 +131,55 @@ return [
            'liceo', 'casa_hiyama,liceo,abcb,sala_giochi,parco,gradini',
            [5, 7, 13, 12], [5, 8, 3, 7, 6, 6, 5, 8], 8, 0,
            'Una del primo anno che ti chiama «darling» in mezzo al corridoio.',
-           'Capelli corti scuri, fermaglio rosso, non sta ferma un attimo.'),
+           'Capelli corti castani da maschiaccio, un neo sotto l\'occhio destro, non sta ferma un attimo.'),
 
         // --- I Kasuga ---------------------------------------------------------
         // Manami è la maggiore delle gemelle, quella con gli occhiali e la
         // testa a posto (CANONE §2.4: il regolamento del 1990 le aveva
         // scambiate). È lei che tiene in piedi la casa.
-        $p('manami', 'Manami', 'Kasuga', 'f', 'medie', 3, 9, 8, 1972, true,
+        //
+        // **Le gemelle sono gemelle.** Prima avevano compleanni diversi (8/9/1972
+        // e 3/7/1973) e stavano in anni diversi delle medie. Il canone le fa
+        // compagne di classe di Hikaru, due anni sotto Kyosuke (voce giapponese:
+        // «恭介、まどかとは2学年下でまなみとくるみの同級生»; FAQ 16), nate nel
+        // gennaio 1972 (FAQ 1, stima): nel 1987 sono al primo anno delle
+        // superiori. Il giorno, il 20, è nostro — il canone non lo dice.
+        $p('manami', 'Manami', 'Kasuga', 'f', 'superiori', 1, 1, 20, 1972, true,
            'casa_kasuga', 'casa_kasuga,commerciale,liceo,abcb',
            [5, 11, 10, 9], [6, 5, 3, 6, 5, 5, 9, 4], 7, 9,
-           'Una delle medie con gli occhiali, che ti saluta per prima e si ricorda il tuo nome.',
+           'Una del primo anno con gli occhiali, che ti saluta per prima e si ricorda il tuo nome.',
            'Coda di cavallo, occhiali tondi, borsa della spesa.'),
 
         // Kurumi: la minore, poteri d'istinto e l'ipnosi — che nel canone si
         // impara (FAQ 42), non si nasce sapendola.
-        $p('kurumi', 'Kurumi', 'Kasuga', 'f', 'medie', 2, 7, 3, 1973, true,
+        // Cucina 1: in cucina è un disastro (voce giapponese, «壊滅的»: mette
+        // le verdure nello stufato senza tagliarle). Prima era 4.
+        $p('kurumi', 'Kurumi', 'Kasuga', 'f', 'superiori', 1, 1, 20, 1972, true,
            'casa_kasuga', 'casa_kasuga,sala_giochi,parco,commerciale',
-           [7, 7, 11, 8], [4, 9, 3, 6, 7, 5, 4, 7], 8, 9,
-           'Una delle medie che sta sempre correndo dietro a qualcosa.',
+           [7, 7, 11, 8], [4, 9, 3, 6, 7, 5, 1, 7], 8, 9,
+           'Una del primo anno che sta sempre correndo dietro a qualcosa.',
            'Capelli semilunghi, ginocchia sbucciate, sorriso di chi le ha appena combinate.'),
 
         // Kazuya: otto anni, telepate — l'unico della famiglia (CANONE §2 e
         // FAQ). Ed è più forte di Kyosuke. Sta alle elementari, che è il
         // motivo per cui la sezione «elementari» esiste.
+        // Lui e Akane non abitano dai Kasuga — la famiglia di Kyosuke è di
+        // quattro persone (voce giapponese) — ma con i loro genitori, a pochi
+        // minuti a piedi (FAQ 50): `casa_zii`.
         $p('kazuya', 'Kazuya', 'Kasuga', 'm', 'elementari', 3, 4, 20, 1978, true,
-           'parco', 'casa_kasuga,parco,luna_park,sala_giochi',
+           'parco', 'casa_zii,parco,luna_park,sala_giochi',
            [3, 9, 9, 7], [2, 6, 1, 4, 5, 3, 2, 8], 5, 11,
            'Un bambino che risponde a domande che non hai fatto ad alta voce.',
-           'Otto anni, berretto, un gatto grasso sempre fra i piedi.'),
+           'Otto anni, berretto calato sugli occhi, e l\'aria di sapere già cosa stai per dire.'),
 
         // Akane: la cugina, e il suo potere è apparire come un'altra persona —
-        // un solo bersaglio per volta nel manga (CANONE).
-        $p('akane', 'Akane', 'Kasuga', 'f', 'superiori', 2, 8, 12, 1970, true,
-           'stazione', 'casa_kasuga,stazione,commerciale,abcb,liceo,dischi',
+        // un solo bersaglio per volta nel manga (CANONE). Ha l'età di Kyosuke
+        // (cap. 57; FAQ 51, 1969): prima stava al secondo anno.
+        $p('akane', 'Akane', 'Kasuga', 'f', 'superiori', 3, 8, 12, 1969, true,
+           'stazione', 'casa_zii,stazione,commerciale,abcb,liceo,dischi',
            [9, 10, 12, 7], [7, 7, 6, 9, 6, 7, 6, 5], 9, 10,
-           'Una del secondo anno che sembra sempre sul punto di ridere di te.',
-           'Capelli raccolti, andatura sicura, cambia espressione troppo in fretta.'),
+           'Una del terzo anno che sembra sempre sul punto di ridere di te.',
+           'Capelli corti, quasi sempre in pantaloni, andatura sicura, cambia espressione troppo in fretta.'),
 
         // --- La scuola --------------------------------------------------------
         // Yusaku fa karate perché da bambino Hikaru gli disse che se fosse
@@ -179,15 +196,16 @@ return [
         // narrativo: sono quelli che fanno correre le voci.
         $p('komatsu', 'Seiji', 'Komatsu', 'm', 'superiori', 3, 6, 19, 1969, false,
            'liceo', 'commerciale,liceo,sala_giochi,abcb,dischi,parco,stazione',
-           [6, 6, 12, 6], [4, 6, 4, 4, 6, 5, 3, 8], 8, 0,
+           // Nuoto 1: non sa nuotare nemmeno lui (cap. 31). Prima era 6.
+           [6, 6, 12, 6], [4, 6, 4, 4, 1, 5, 3, 8], 8, 0,
            'Uno del terzo anno che sa già tutto di tutti, e te lo racconta.',
-           'Basso, occhi piccoli, ride prima di finire la frase.'),
+           'Capelli ricci di natura, qualche brufolo, ride prima di finire la frase.'),
 
         $p('hatta', 'Kazuya', 'Hatta', 'm', 'superiori', 3, 2, 28, 1970, false,
            'liceo', 'commerciale,liceo,sala_giochi,abcb,dischi',
            [6, 7, 11, 6], [5, 5, 4, 4, 5, 6, 3, 8], 8, 0,
            'Uno del terzo anno che sta sempre a un passo dietro Komatsu.',
-           'Alto e magro, capelli lisci, macchina fotografica al collo.'),
+           'Occhiali, paffuto, sempre mezzo passo dietro Komatsu.'),
 
         // --- Le complicazioni -------------------------------------------------
         // Trovate rileggendo i 156 riassunti (CANONE §7-bis): erano fra le
@@ -204,7 +222,7 @@ return [
            'commerciale', 'commerciale,liceo,abcb,dischi,stazione,sala_giochi',
            [7, 12, 14, 6], [7, 6, 5, 10, 6, 6, 6, 2], 8, 0,
            'Una del secondo anno che ti sorride come se vi conosceste da sempre. Non e\' vero.',
-           'Curatissima, sempre a fuoco, e ti guarda un mezzo secondo piu\' del necessario.'),
+           'Codini, curatissima, e ti guarda un mezzo secondo piu\' del necessario.'),
 
         // Hiromi Sugi (capp. 83, 85): studentessa nuova, ex compagna di
         // classe di Kyosuke nella scuola di prima. Arriva con le fotografie
@@ -215,11 +233,15 @@ return [
            'liceo', 'liceo,commerciale,abcb,parco,gradini',
            [5, 13, 10, 8], [8, 5, 4, 6, 5, 5, 7, 6], 8, 0,
            'Una del terzo anno appena trasferita, che pero\' si ricorda di te.',
-           'Occhiali, quaderno sempre in mano, e un album di fotografie che non doveva portare.'),
+           'Capelli corti, sveglia, e un album di fotografie che non doveva portare.'),
 
         // --- Il quartiere -----------------------------------------------------
         // Il Master non esce mai dall'ABCB. Giro di un luogo solo: è il punto
         // fermo della mappa, e chi vuole sapere qualcosa passa da lui.
+        // **Questa è una scelta di gioco, non canone**: nel manga è sposato,
+        // vive con la moglie in una casa a due passi dal bar, ha una
+        // Volkswagen e porta i ragazzi al mare (voce giapponese, capp. 50,
+        // 87, 155). Qui la sua casa non è sulla mappa, e lui sta al bancone.
         // Si chiama «Master» e basta, com'è nel manga: niente cognome. Prima
         // era cognome «Master», nome «Il», e le liste — che mettono il cognome
         // davanti — scrivevano «Master Il».
@@ -227,6 +249,37 @@ return [
            'abcb', 'abcb',
            [10, 12, 6, 11], [8, 4, 8, 8, 4, 8, 10, 2], 12, 0,
            'L\'uomo dietro il bancone dell\'ABCB. Non chiede niente e sente tutto.',
-           'Baffi, grembiule, un bicchiere che lucida da mezz\'ora.'),
+           'Capelli ricci, baffi e barba, grembiule, un bicchiere che lucida da mezz\'ora.'),
+
+        // --- Aggiunti dal controllo del 9 ottobre 2026 --------------------------
+        // Takashi Kasuga, il padre (capp. 14, 51-52, 62, 103, 127; TV8, TV15):
+        // fotografo di paesaggi, vedovo, senza poteri — vengono dal ramo della
+        // madre (FAQ 55) — ma al corrente di tutto. Sulla quarantina (FAQ 57).
+        // La camera oscura e' gia' nella descrizione della palazzina. Il
+        // compleanno e' nostro: il canone non lo da'.
+        $p('takashi', 'Takashi', 'Kasuga', 'm', 'adulti', 0, 10, 2, 1944, false,
+           'casa_kasuga', 'casa_kasuga,gradini,argine,parco,tempio,stazione',
+           [6, 11, 9, 12], [6, 4, 7, 5, 5, 5, 4, 6], 10, 0,
+           'Un uomo con la macchina fotografica al collo, che aspetta la luce giusta come si aspetta l\'autobus.',
+           'Giacca stropicciata, borsa da fotografo a tracolla, l\'aria gentile di chi si distrae.'),
+
+        // Umao e Ushiko (capp. 38, 62; FAQ 58-59): la coppietta che compare
+        // dappertutto, sempre abbracciata, e che si dice le battute di Romeo
+        // e Giulietta. I nomi sono un cavallo e una mucca. Nel gioco servono
+        // a una cosa precisa: sono testimoni, e ogni volta che qualcuno fa
+        // qualcosa di strano al parco, loro erano li' e non hanno visto
+        // niente — o forse si'. Dove abitino non si sa: li mettiamo sopra un
+        // negozio della via, come Yusaku, ed e' una scelta nostra.
+        $p('umao', 'Umao', '', 'm', 'adulti', 0, 6, 14, 1966, false,
+           'parco', 'commerciale,parco,albero,argine,luna_park,giardini',
+           [5, 6, 14, 13], [3, 5, 8, 4, 5, 5, 5, 2], 9, 0,
+           'Un ragazzo che chiama la fidanzata «Ushiko!» come se recitasse a teatro.',
+           'Pettinatura alla moda di qualche anno fa, e occhi solo per lei.'),
+
+        $p('ushiko', 'Ushiko', '', 'f', 'adulti', 0, 9, 3, 1966, false,
+           'parco', 'commerciale,parco,albero,argine,luna_park,giardini',
+           [4, 7, 14, 14], [3, 4, 5, 4, 5, 6, 6, 2], 8, 0,
+           'Una ragazza che risponde «Umao!» con la stessa enfasi, e non si accorge di nessun altro.',
+           'Vestito a fiori, e occhi solo per lui.'),
     ],
 ];

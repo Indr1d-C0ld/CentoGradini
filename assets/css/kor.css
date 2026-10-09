@@ -1051,3 +1051,10 @@ label.in_linea { display: inline-flex; align-items: center; gap: .4rem; }
   .illustrazione,
   .foto-luogo img { aspect-ratio: 4 / 3; }
 }
+
+/* --- Le scelte di chi ha capito, e quelle di chi è stato preso da parte ---- */
+.scelte-sospetto { display: flex; gap: .5rem; flex-wrap: wrap; margin-top: .6rem; }
+.scelte-sospetto form { margin: 0; }
+
+/* --- Un potere che chiede dove, o su chi --------------------------------- */
+.scelta-potere { display: block; margin-top: .35rem; width: 100%; min-width: 7rem; max-width: 16rem; font-size: .9rem; }

@@ -72,6 +72,13 @@ try {
     // luogo accanto. Dopo gli arrivi, perche' chi e' appena entrato conta.
     $accompagnati = $fase('chiusure', static fn (): int => Personaggio::accompagnaFuori(), 0);
 
+    // Le forze tornano: un punto ogni tanto durante il giorno, tutto con una
+    // notte di sonno (regolamento del 1990). Prima non tornavano mai.
+    $riposati = $fase('riposo', static fn (): int => \App\Game\Riposo::giro(), 0);
+
+    // I sogni premonitori arrivano da soli, all'alba: non hanno piu' un pulsante.
+    $sogni = $fase('sogni', static fn (): int => \App\Game\Poteri::sognaTutti(), 0);
+
     // Il quartiere dimentica: le tracce spente si buttano via.
     $tracce = $fase('tracce', static fn (): int => Personaggio::potaTracce(), 0);
 
@@ -90,11 +97,20 @@ try {
     // voce attraversa la mappa invece di restare dov'e' nata.
     $abitanti = $fase('abitanti', static fn (): int => Abitanti::muovi(), 0);
 
+    // E fanno gesti: a chi hanno davanti, scelti da quanto ci tengono. Poi chi
+    // ha deciso di affrontare un esper e lo trova, lo affronta.
+    $gestiAbitanti = $fase('gesti_abitanti', static fn (): int => Abitanti::gesti(), 0);
+    $affronti = $fase('affronti', static fn (): int => Segreto::abitantiAffrontano(), 0);
+
     // Gli incidenti che nessuno ha chiuso valgono come «non ho fatto niente»:
     // il silenzio e' una risposta, e il testimone si tiene l'anomalia. Va
     // DOPO gli abitanti e PRIMA delle voci: l'anomalia appena nata deve poter
     // entrare nel giro delle chiacchiere dello stesso battito.
     $incidenti = $fase('incidenti', static fn (): int => Segreto::incidentiScaduti(), 0);
+
+    // E gli abitanti che hanno visto abbastanza provano a mettere insieme
+    // quello che hanno visto. Prima le loro annotazioni restavano lettera morta.
+    $capiti = $fase('abitanti_collegano', static fn (): int => Segreto::abitantiCollegano(), 0);
 
     // Il quartiere chiacchiera: chi e' nello stesso posto si racconta le
     // cose, e le voci si deformano passando di bocca in bocca.
@@ -124,13 +140,18 @@ try {
             json_encode([
                 'arrivati'     => $arrivati,
                 'accompagnati_fuori' => $accompagnati,
+                'riposati'     => $riposati,
+                'sogni'        => $sogni,
                 'tracce_potate'=> $tracce,
                 'traslocati'   => $partiti,
                 'oggetti_ritrovati' => $ritrovati,
                 'scene_chiuse' => $scene,
                 'episodi_nuovi'=> $nuovi,
                 'abitanti'     => $abitanti,
+                'gesti_abitanti' => $gestiAbitanti,
+                'affronti'     => $affronti,
                 'incidenti_scaduti' => $incidenti,
+                'abitanti_che_capiscono' => $capiti,
                 'voci'         => $ciarle,
                 'voci_potate'  => $vociPotate,
                 'avvisi_potati'=> $avvisi,

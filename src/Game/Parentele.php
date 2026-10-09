@@ -41,6 +41,15 @@ final class Parentele
         ['manami',  'kazuya', 'cugini'],
         ['kurumi',  'akane',  'cugini'],
         ['kurumi',  'kazuya', 'cugini'],
+        // Il padre, Takashi: «la famiglia di quattro persone» della voce
+        // giapponese. Senza poteri — vengono dal ramo della madre (FAQ 55) —
+        // e zio di Akane e Kazuya, figli della sorella di Akemi (FAQ 51).
+        // Qui le coppie sono orientate: il primo e' il genitore, o lo zio.
+        ['takashi', 'kyosuke', 'genitore'],
+        ['takashi', 'manami',  'genitore'],
+        ['takashi', 'kurumi',  'genitore'],
+        ['takashi', 'akane',   'zio'],
+        ['takashi', 'kazuya',  'zio'],
     ];
 
     /**
@@ -87,12 +96,31 @@ final class Parentele
     public static function come(array $di, array $altro): ?string
     {
         $donna = (string) ($altro['sesso'] ?? 'm') === 'f';
-        return match (self::fra($di, $altro)) {
+        $tipo  = self::fra($di, $altro);
+        // Le parentele orientate: chi e' $altro dipende da che parte della
+        // coppia sta. Il genitore e' il primo della coppia, il figlio il secondo.
+        $sopra = $tipo !== null && self::primo($altro, $di);
+        return match ($tipo) {
             'fratelli' => $donna ? 'sorella' : 'fratello',
             'gemelli'  => $donna ? 'sorella gemella' : 'fratello gemello',
             'cugini'   => $donna ? 'cugina' : 'cugino',
+            'genitore' => $sopra ? ($donna ? 'madre' : 'padre') : ($donna ? 'figlia' : 'figlio'),
+            'zio'      => $sopra ? ($donna ? 'zia' : 'zio') : 'nipote',
             default    => null,
         };
+    }
+
+    /** $a sta al primo posto della coppia che lo lega a $b? */
+    private static function primo(array $a, array $b): bool
+    {
+        $x = (string) ($a['png'] ?? '');
+        $y = (string) ($b['png'] ?? '');
+        foreach (self::FAMIGLIE as [$p, $q]) {
+            if ($p === $x && $q === $y) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

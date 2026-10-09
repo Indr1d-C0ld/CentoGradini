@@ -75,6 +75,7 @@ $luogo = $dati['luogo'];
           <span class="tenue">
             <?= e($p['classe']) ?> · <?= $p['sempre'] ? 'c\'è sempre' : 'da ' . e(Personaggio::quantoFa((int) $p['da_minuti'])) ?>
             <?php if ($p['compleanno']): ?> · <em>oggi è il suo compleanno</em><?php endif; ?>
+            <?php if (($p['addosso'] ?? '') !== ''): ?> · <?= e($p['addosso']) ?><?php endif; ?>
           </span>
         </li>
       <?php endforeach; ?>

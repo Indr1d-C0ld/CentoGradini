@@ -500,8 +500,9 @@ cinque e le otto di sera, si porta dietro il tramonto; uno che guarda a est ha l
 notte tutti dicono che al buio si intuisce appena. Dai Cento Gradini si vede la città fino
 alla ferrovia, e alle sette di sera il sole le va a finire dentro.
 
-**E il capitolo 45 è diventato un copione.** Ai giardini pensili Madoka dice a Kyosuke che se
-ne va in America; il copione `addio` è ambientato lì e non ha altra condizione che il luogo —
+**E l'episodio 45 è diventato un copione.** Ai giardini pensili Madoka dice a Kyosuke che se
+ne va in America (è l'episodio TV 45, «Un mauvais coup», Réflexion 16 — non il capitolo 45 del
+manga, che è la funivia sulla neve: lo si era scritto sbagliato fino al 9 ottobre 2026); il copione `addio` è ambientato lì e non ha altra condizione che il luogo —
 perché ai giardini non ci si capita, ci si viene, e chi ci convoca qualcuno ha già deciso cosa
 dirgli. Il problema è dirlo.
 
@@ -550,6 +551,8 @@ parenti nessuna di queste cose ha il significato che il gioco le dà.
 | Kyosuke, Manami, Kurumi | fratelli; Manami e Kurumi gemelle (Manami la maggiore) | §2.4, CANONE passim | **canone** |
 | Akane, Kazuya | sorella maggiore e fratello minore | madoka.ayukawa.free.fr, *koref05*: «soeur aînée de Kazuya et cousine de Kyosuke» | **documentato** |
 | Akane e Kazuya ↔ Kyosuke e le gemelle | cugini | capp. 35, 39, 43, 46 («il cugino»); *koref05* | **canone** |
+| Takashi ↔ Kyosuke, Manami, Kurumi | padre, vedovo di Akemi; senza poteri, che vengono dal ramo materno | voce giapponese («父の隆»); FAQ 52, 55 | **canone** |
+| Takashi ↔ Akane, Kazuya | zio (Akane e Kazuya sono figli della sorella di Akemi) | FAQ 51 (albero genealogico) | **documentato** |
 
 Nel gioco (`src/Game/Parentele.php`), fra parenti:
 
@@ -562,5 +565,35 @@ Nel gioco (`src/Game/Parentele.php`), fra parenti:
 
 I cognomi delle tre case del canone — **Kasuga, Ayukawa, Hiyama** — non si possono prendere per un
 personaggio nuovo: sarebbe un parente che l'opera non ha, e il gioco non saprebbe trattarlo da
-tale. Il nonno e la nonna Kasuga, e i genitori, esistono nell'opera ma non sono abitanti del
-quartiere: la tabella li aggiungerà se un giorno lo diventeranno.
+tale. Il nonno e la nonna Kasuga esistono nell'opera ma non sono abitanti del quartiere: la
+tabella li aggiungerà se un giorno lo diventeranno. **Takashi invece sì, dal 9 ottobre 2026**:
+la frase che c'era qui prima — «i genitori non abitano nel quartiere» — era sbagliata, perché la
+voce giapponese dice che i Kasuga sono «una famiglia di quattro persone», lui compreso.
+
+## 7-quinquies. Il controllo del 9 ottobre 2026
+
+Una rilettura completa dei 156 riassunti, delle sinossi TV della FAQ e della voce giapponese,
+messa a confronto con i semi. Quello che è stato corretto:
+
+| Cosa | Prima | Adesso | Fonte |
+|:---|:---|:---|:---|
+| **Le gemelle** | compleanni diversi (8/9/1972, 3/7/1973), terza e seconda media | gemelle, gennaio 1972, primo anno delle superiori nella classe di Hikaru | voce giapponese («恭介、まどかとは2学年下でまなみとくるみの同級生»); FAQ 1 («xx Janvier 1972 (estimation)»), FAQ 16. Il giorno, il 20, è nostro |
+| **Akane** | secondo anno, nata nel 1970 | terzo anno, nata nel 1969: ha l'età di Kyosuke | cap. 57; FAQ 51 |
+| **Dove dormono Akane e Kazuya** | dai Kasuga | dai loro genitori, a pochi minuti a piedi: luogo nuovo `casa_zii` | voce giapponese (i Kasuga sono quattro); FAQ 50 (l'OAV). Il punto della carta è nostro |
+| **Nuoto di Kyosuke e Komatsu** | 6 | 1 | capp. 66, 115, 143 (Kyosuke); cap. 31 (Komatsu) |
+| **Cucina di Kurumi** | 4 | 1 | voce giapponese: «家事炊事の腕前は壊滅的» |
+| **Aspetto** di Hikaru, Hatta, Komatsu, Hiromi, Sayuri, Master, Kazuya, Akane | — | come nella voce giapponese: il neo e i capelli castani di Hikaru, gli occhiali di Hatta, i ricci di Komatsu, i codini di Sayuri; il gatto non è di Kazuya (Jingoro è dei Kasuga, e solo nell'anime) | voce giapponese; FAQ 35 |
+| **Il copione `addio`** | «capitolo 45» | episodio TV 45 | Réflexion 16 |
+| **Il potere `natura`** | «era il potere di Akemi» | eredità del regolamento del 1990, nessuna fonte sull'opera lo conferma | FAQ 44 non lo nomina |
+
+E una scelta che resta, dichiarata: **il Master non esce mai dall'ABCB**. Nel manga è sposato,
+vive con la moglie in una casa a due passi dal bar e porta i ragazzi al mare con la sua
+Volkswagen (voce giapponese; capp. 50, 87, 155). Nel gioco è il punto fermo della carta, e la sua
+casa non c'è: è una scelta di gioco, non canone.
+
+Una risposta trovata per strada: la FAQ 84 parla dei «7 déménagements de Kyosuke», e la voce
+giapponese conferma che la famiglia arriva nel quartiere «al settimo trasloco» (7度目の転居).
+
+Tre abitanti nuovi, tutti con una fonte: **Takashi** (vedi sopra), e **Umao e Ushiko**, la
+coppietta che compare dappertutto (capp. 38, 62; FAQ 58-59: un cavallo e una mucca, e le battute
+di Romeo e Giulietta). Dove abitino non si sa: li mettiamo sopra un negozio della via.

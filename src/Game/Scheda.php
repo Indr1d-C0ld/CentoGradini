@@ -110,6 +110,11 @@ final class Scheda
         // Il Controllo è l'unica cosa che cresce: a 40 e a 80 si risparmia un
         // punto, e non si scende mai sotto zero.
         $sconto = ((int) $potere['controllo'] >= 40 ? 1 : 0) + ((int) $potere['controllo'] >= 80 ? 1 : 0);
+        // Il teletrasporto da secondario sposta oggetti, non persone: portarci
+        // sé stessi costa cinque punti (scheda del potere, dal regolamento).
+        if ((string) ($potere['pkey'] ?? '') === 'teletrasporto' && (int) $potere['primario'] !== 1) {
+            return 5;
+        }
         return max(0, $base - $sconto);
     }
 

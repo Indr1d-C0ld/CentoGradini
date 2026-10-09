@@ -54,13 +54,51 @@ $luogo = $qui['luogo'];
 <?php $pericolo = \App\Game\Segreto::pericolo($pg); ?>
 <?php if ($pericolo['stato'] !== 'quieto'): ?>
   <div class="avviso <?= $pericolo['stato'] === 'trasloco' ? 'errore' : 'attenzione' ?>">
-    <strong><?= $pericolo['scoperti'] ?> <?= $pericolo['scoperti'] === 1 ? 'persona ha' : 'persone hanno' ?> capito.</strong>
+    <?php if ($pericolo['scoperti'] > 0): ?>
+      <strong><?= $pericolo['scoperti'] ?> <?= $pericolo['scoperti'] === 1 ? 'persona ha' : 'persone hanno' ?> capito.</strong>
+    <?php else: ?>
+      <strong>Si parla di te.</strong>
+    <?php endif; ?>
     <?= e($pericolo['messaggio']) ?>
-    <?php if ($pericolo['stato'] !== 'trasloco'): ?>
+    <?php if ($pericolo['stato'] !== 'trasloco' && $pericolo['scoperti'] > 0): ?>
       Ne basta <?= $pericolo['soglia'] - $pericolo['scoperti'] ?> in più.
+    <?php endif; ?>
+    <?php if ($pericolo['dominio'] > 0): ?>
+      <span class="tenue">Sui tuoi poteri ne hanno sentito parlare in <?= (int) $pericolo['dominio'] ?>,
+        su <?= (int) $pericolo['soglia_dominio'] ?> che basterebbero a farne una cosa che sanno tutti.</span>
     <?php endif; ?>
   </div>
 <?php endif; ?>
+
+<?php $sogno = \App\Core\Database::first(
+    "SELECT testo FROM ricordi WHERE personaggio_id = ? AND episodio_id IS NULL AND titolo = 'Un sogno' AND gts > ?
+     ORDER BY gts DESC LIMIT 1", [(int) $pg['id'], \App\Sim\Orologio::lineare() - 12 * 3600]); ?>
+<?php if ($sogno !== null): ?>
+  <div class="nota calda">
+    <strong>Stanotte hai sognato.</strong> <?= e((string) $sogno['testo']) ?>
+    <span class="tenue">Lo trovi fra i <a href="<?= e(url('/ricordi')) ?>">ricordi</a>.</span>
+  </div>
+<?php endif; ?>
+
+<?php foreach (\App\Game\Segreto::affrontatoDa((int) $pg['id']) as $chi): ?>
+  <div class="avviso attenzione">
+    <strong><?= e(trim($chi['nome'] . ' ' . $chi['cognome'])) ?> ti ha pres<?= ($pg['sesso'] ?? 'm') === 'f' ? 'a' : 'o' ?> da parte.</strong>
+    Sa dei tuoi poteri, e te l'ha detto in faccia. Puoi fidarti — e allora diventa qualcuno che ti
+    copre — oppure guardarl<?= $chi['sesso'] === 'f' ? 'a' : 'o' ?> negli occhi e negare.
+    <div class="scelte-sospetto">
+      <form method="post" action="<?= e(url('/confida')) ?>" data-conferma="Dirgli tutto è irreversibile. Sicuro?">
+        <?= csrf_field() ?>
+        <input type="hidden" name="a" value="<?= (int) $chi['id'] ?>">
+        <button type="submit" class="secondario">Confidati</button>
+      </form>
+      <form method="post" action="<?= e(url('/nega')) ?>">
+        <?= csrf_field() ?>
+        <input type="hidden" name="chi" value="<?= (int) $chi['id'] ?>">
+        <button type="submit" class="secondario">Nega</button>
+      </form>
+    </div>
+  </div>
+<?php endforeach; ?>
 
 <?php if ($viaggio !== null): ?>
   <div class="in-viaggio" data-viaggio data-restano="<?= (int) $viaggio['restano'] ?>">
@@ -133,6 +171,7 @@ $luogo = $qui['luogo'];
           <span class="tenue">
             <?= e($p['classe']) ?> · <?= $p['sempre'] ? 'c\'è sempre' : 'da ' . e(Personaggio::quantoFa((int) $p['da_minuti'])) ?>
             <?php if ($p['compleanno']): ?> · <em>oggi è il suo compleanno</em><?php endif; ?>
+            <?php if (($p['addosso'] ?? '') !== ''): ?> · <?= e($p['addosso']) ?><?php endif; ?>
             <?php if (\App\Game\Segreto::sa((int) $pg['id'], (int) $p['id'])): ?>
               · <em>sa di te</em>
             <?php endif; ?>

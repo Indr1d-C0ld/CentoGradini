@@ -442,6 +442,15 @@ final class Voci
         $sezione = (string) ($r["s{$n}_sezione"] ?? Scuola::SUPERIORI);
         $anno    = (int) ($r["s{$n}_anno"] ?? 2);
         if ($p >= self::PETTEGOLEZZO) {
+            // Chi non va al Koryo non e' «uno del terzo anno»: prima il
+            // Master, degradato, diventava uno studente. Un adulto resta un
+            // adulto, e un bambino un bambino.
+            if ($sezione === 'adulti') {
+                return $donna ? 'una signora del quartiere' : 'un signore del quartiere';
+            }
+            if ($sezione === 'elementari') {
+                return $donna ? 'una bambina delle elementari' : 'un bambino delle elementari';
+            }
             $chi = $donna ? 'una' : 'uno';
             // «Uno di terza media», come si dice. La forma di prima, «uno delle
             // medie, di terzo anno», aveva una virgola dentro che spezzava la
@@ -455,6 +464,12 @@ final class Voci
         }
         // Niente forme spoglie («uno», «una»): da sole passano, ma in coppia
         // danno «uno e una stavano insieme», che non e' italiano.
+        if ($sezione === 'adulti') {
+            return $donna ? 'una donna' : 'un uomo';
+        }
+        if ($sezione === 'elementari') {
+            return $donna ? 'una bambina' : 'un bambino';
+        }
         return (string) ($rng->pick($donna
             ? ['una ragazza', 'una del liceo', 'una di quelle del liceo']
             : ['un ragazzo', 'uno del liceo', 'uno di quelli del liceo']) ?? 'qualcuno');
@@ -528,6 +543,8 @@ final class Voci
         'autoipnosi'      => 'si è ipnotizzat{o} da sol{o}',
         'natura'          => 'ha parlato con gli animali',
         'invisibilita'    => 'è diventat{o} invisibile',
+        // Non un fatto visto, ma un segreto detto in giro da chi l'ha capito.
+        'segreto'         => 'non è come gli altri: ha dei poteri, e c\'è chi l\'ha capito',
         'sesto_senso'     => 'ha sentito arrivare un guaio prima che succedesse',
         'voce'            => 'ha parlato con la voce di un altro',
         'blocco'          => 'ha spento il potere di qualcun altro',

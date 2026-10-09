@@ -508,6 +508,14 @@ Dopo F7 si aggiunge contenuto e comodità, non impalcatura. In ordine di arrivo:
 - **L'ora di chiusura** (30 settembre 2026): la via commerciale è una strada, sempre
   percorribile, e chi è dentro un locale quando chiude viene accompagnato nel luogo accanto
   (`Personaggio::accompagnaFuori`, fase `chiusure` del battito).
+- **Il controllo del 9 ottobre 2026** (migrazioni `0019`, `0020`). Correzioni: le forze che
+  tornano (`Riposo`), gli episodi che non si ripetono alla stessa persona, il triangolo che non
+  si scioglie, le case private, un calendario solo, e il canone rimesso a posto (CANONE
+  §7-quinquies). Profondità: i poteri che fanno qualcosa (`Poteri`), le tre strade di chi ha
+  capito (§7, finalmente tutte), il pubblico dominio della FAQ 26, la confidenza che si può
+  tradire, gli stati del 1990 (`Stati`: raffreddore, bende), i sogni premonitori all'alba, e
+  gli abitanti che fanno gesti, capiscono da soli e scelgono cosa farne. Tre abitanti nuovi:
+  Takashi, Umao e Ushiko.
 - **Le comunicazioni** (migrazione `0016`): filo diretto fra la gestione e un giocatore, nei
   due sensi, con avviso per posta che non ripete il messaggio. Non è finzione e non si
   traveste da tale — vedi la nota in testa a `src/Game/Comunicazioni.php`.

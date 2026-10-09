@@ -78,6 +78,228 @@ final class Abitanti
         'akane'   => ['musica'     => 'socio'],
     ];
 
+    /**
+     * I legami del canone fra gli abitanti: [da, a, affetto, fraintendimento, fermo].
+     *
+     * Prima non c'era nessuna riga: il triangolo esisteva solo nei commenti, e
+     * per il motore Kyosuke e Madoka erano due sconosciuti. I legami **fermi**
+     * sono lo sfondo immobile della decisione fondante 3 — il triangolo non si
+     * risolve e non si guasta, Umao e Ushiko non litigano mai — e il battito li
+     * rimette a posto se un gesto li ha spostati. Gli altri partono da qui e
+     * poi vivono la loro vita.
+     *
+     * Le fonti: il triangolo e Yusaku sono la storia stessa; Komatsu che
+     * «considera Madoka una teppista e non la sopporta» e il Master che le fa
+     * «da padre» sono della voce giapponese e della FAQ 56; Akane innamorata di
+     * Madoka e della voce giapponese; le gemelle divise fra «partito di
+     * Madoka» (Manami) e «partito di Hikaru» (Kurumi) anche.
+     *
+     * @var list<array{0:string,1:string,2:int,3:int,4:bool}>
+     */
+    private const LEGAMI = [
+        ['kyosuke', 'madoka',  85, 10, true],
+        ['madoka',  'kyosuke', 80, 10, true],
+        ['kyosuke', 'hikaru',  45,  0, true],
+        ['hikaru',  'kyosuke', 95,  0, true],
+        ['madoka',  'hikaru',  70,  0, true],
+        ['hikaru',  'madoka',  75,  0, true],
+        ['yusaku',  'hikaru',  90,  0, true],
+        ['umao',    'ushiko', 100,  0, true],
+        ['ushiko',  'umao',   100,  0, true],
+        ['hikaru',  'yusaku',  25,  0, false],
+        ['yusaku',  'kyosuke', -20, 30, false],
+        ['kyosuke', 'yusaku',  10,  0, false],
+        ['komatsu', 'kyosuke', 40,  0, false],
+        ['hatta',   'kyosuke', 40,  0, false],
+        ['kyosuke', 'komatsu', 35,  0, false],
+        ['kyosuke', 'hatta',   35,  0, false],
+        ['komatsu', 'hatta',   50,  0, false],
+        ['hatta',   'komatsu', 50,  0, false],
+        ['komatsu', 'madoka', -15, 40, false],
+        ['hatta',   'madoka',  -5, 20, false],
+        ['master',  'madoka',  70,  0, false],
+        ['madoka',  'master',  65,  0, false],
+        ['master',  'kyosuke', 40,  0, false],
+        ['akane',   'madoka',  60,  0, false],
+        ['akane',   'kyosuke', 40,  0, false],
+        ['manami',  'madoka',  40,  0, false],
+        ['kurumi',  'hikaru',  50,  0, false],
+        ['sayuri',  'kyosuke', 45,  0, false],
+        ['sayuri',  'madoka', -30, 20, false],
+        ['hiromi',  'kyosuke', 30,  0, false],
+        ['takashi', 'madoka',  30,  0, false],
+    ];
+
+    /**
+     * Mette a posto i legami del canone. I fermi si riportano al loro valore
+     * se qualcosa li ha spostati; gli altri si scrivono solo se mancano.
+     *
+     * @return int quante righe ha toccato
+     */
+    public static function assicuraLegami(): int
+    {
+        $id = [];
+        foreach (Database::all('SELECT id, png FROM personaggi WHERE png IS NOT NULL') as $r) {
+            $id[(string) $r['png']] = (int) $r['id'];
+        }
+        $gts = Orologio::lineare();
+        $n = 0;
+        foreach (self::LEGAMI as [$da, $a, $affetto, $fraint, $fermo]) {
+            if (!isset($id[$da], $id[$a])) {
+                continue;
+            }
+            $ora = Legami::fra($id[$da], $id[$a]);
+            if ($ora['esiste'] && (!$fermo || ($ora['affetto'] === $affetto && $ora['fraintendimento'] === $fraint))) {
+                continue;
+            }
+            Database::run(
+                'INSERT INTO legami (da_id, a_id, affetto, fraintendimento, conosciuti_gts, ultimo_gts)
+                 VALUES (?, ?, ?, ?, ?, ?)
+                 ON DUPLICATE KEY UPDATE affetto = VALUES(affetto), fraintendimento = VALUES(fraintendimento)',
+                [$id[$da], $id[$a], $affetto, $fraint, $gts, $gts]
+            );
+            $n++;
+        }
+        return $n;
+    }
+
+    // --- I gesti degli abitanti --------------------------------------------------
+
+    /**
+     * Che gesti fa un abitante, a seconda di quanto tiene a chi ha davanti:
+     * [gesto, affetto minimo]. «evitare» e' l'unico che va al contrario.
+     */
+    private const GESTI_PER_AFFETTO = [
+        ['parlare', -10], ['ascoltare', 10], ['ombrello', 25], ['accompagnare', 30],
+        ['invitare', 35], ['regalo', 40], ['difendere', 40], ['bento', 45],
+    ];
+
+    /**
+     * Gli abitanti fanno gesti.
+     *
+     * Prima ne ricevevano e basta: si poteva voler bene a Madoka per mesi e
+     * lei non ti rivolgeva mai la parola. Adesso, ogni tanto, un abitante che
+     * ha qualcuno davanti gli fa un gesto — scelto da quanto ci tiene — ed e'
+     * un gesto vero: passa per `Legami::compi()`, con le sue letture sbagliate,
+     * la gelosia di chi guarda e la voce che ne nasce. Hikaru che porta il
+     * bentō a Kyosuke davanti a Madoka non e' un effetto speciale: e' il
+     * motore che fa quello che fa per tutti.
+     *
+     * Il triangolo, verso chi gioca, resta gentile e basta: parlare,
+     * ascoltare, l'ombrello, difendere. Il resto lo tiene per se'.
+     *
+     * Dove c'e' un giocatore succede piu' spesso: e' li' che qualcuno guarda.
+     *
+     * @return int quanti gesti
+     */
+    public static function gesti(?int $gts = null): int
+    {
+        $gts ??= Orologio::lineare();
+        self::assicuraLegami();
+        $pct   = max(0, GameConfig::int('abitanti.gesto_pct', 4));
+        $pausa = max(0, GameConfig::int('abitanti.gesto_pausa_ore', 2)) * 3600;
+        $minuto = intdiv($gts, 240);
+        $n = 0;
+        foreach (self::tutti() as $png) {
+            if ($png['verso'] !== null) {
+                continue;
+            }
+            $presenti = Personaggio::presenti((string) $png['luogo'], (int) $png['id']);
+            if ($presenti === []) {
+                continue;
+            }
+            $conGiocatori = array_filter($presenti, static fn (array $p): bool => $p['png'] === null) !== [];
+            $rng = Rng::for(GameConfig::int('world.seed', 19870406), 'gesto-png', (int) $png['id'], $minuto);
+            $soglia = $conGiocatori ? $pct : max(1, intdiv($pct, 3));
+            if ($rng->int(1, 100) > $soglia) {
+                continue;
+            }
+            if (Database::first('SELECT 1 x FROM gesti_fatti WHERE attore_id = ? AND gts > ? LIMIT 1',
+                    [(int) $png['id'], $gts - $pausa]) !== null) {
+                continue;
+            }
+            $scelta = self::sceglieGesto($png, $presenti, $rng, $gts);
+            if ($scelta === null) {
+                continue;
+            }
+            [$verso, $gkey] = $scelta;
+            if (Legami::compi($png, $verso, $gkey)['ok']) {
+                $n++;
+            }
+        }
+        return $n;
+    }
+
+    /**
+     * A chi, e cosa. Si sceglie la persona pesando l'affetto, poi il gesto
+     * piu' caldo che quell'affetto consente fra quelli possibili adesso.
+     *
+     * @param list<array<string,mixed>> $presenti
+     * @return array{0:int,1:string}|null
+     */
+    private static function sceglieGesto(array $png, array $presenti, Rng $rng, int $gts): ?array
+    {
+        $pesi = [];
+        foreach ($presenti as $p) {
+            $aff = Legami::fra((int) $png['id'], (int) $p['id'])['affetto'];
+            $pesi[] = [$p, $aff, max(1, $aff + 20)];
+        }
+        $totale = array_sum(array_column($pesi, 2));
+        $dado = $rng->int(1, max(1, $totale));
+        $chi = null;
+        foreach ($pesi as [$p, $aff, $peso]) {
+            $dado -= $peso;
+            if ($dado <= 0) {
+                $chi = [$p, $aff];
+                break;
+            }
+        }
+        if ($chi === null) {
+            return null;
+        }
+        [$p, $aff] = $chi;
+
+        if ($aff <= -15) {
+            return [(int) $p['id'], 'evitare'];
+        }
+        $possibili = [];
+        foreach (Legami::disponibili($png, $gts) as $g) {
+            if ($g['possibile']) {
+                $possibili[(string) $g['gkey']] = true;
+            }
+        }
+        // Solo gesti gentili, e niente che si possa leggere come un corteggiamento:
+        // il triangolo verso chi gioca, e fra un adulto e un ragazzo. Il padre
+        // di Kyosuke che «accompagna a casa» Madoka darebbe una voce che il
+        // quartiere non deve poter raccontare.
+        $soloGentili = (in_array((string) $png['png'], Legami::TRIANGOLO, true) && $p['png'] === null)
+            || (((string) $png['sezione'] === 'adulti') !== ((string) $p['sezione'] === 'adulti'));
+        // Difendere qualcuno ha senso se c'e' chi ne parla male.
+        $qualcunoContro = Database::first(
+            'SELECT 1 x FROM legami l JOIN personaggi c ON c.id = l.da_id
+             WHERE l.a_id = ? AND l.affetto <= -10 AND c.luogo = ? AND c.verso IS NULL AND c.id <> ? LIMIT 1',
+            [(int) $p['id'], (string) $png['luogo'], (int) $png['id']]) !== null;
+        $candidati = [];
+        foreach (self::GESTI_PER_AFFETTO as [$gkey, $minimo]) {
+            if ($aff < $minimo || !isset($possibili[$gkey])) {
+                continue;
+            }
+            if ($soloGentili && !in_array($gkey, ['parlare', 'ascoltare', 'ombrello', 'difendere'], true)) {
+                continue;
+            }
+            if ($gkey === 'difendere' && !$qualcunoContro) {
+                continue;
+            }
+            $candidati[] = $gkey;
+        }
+        if ($candidati === []) {
+            return null;
+        }
+        // Fra quelli che l'affetto consente, uno a caso: chi vuole molto bene
+        // a qualcuno non gli porta un regalo ogni volta che lo vede.
+        return [(int) $p['id'], (string) $candidati[$rng->int(0, count($candidati) - 1)]];
+    }
+
     /** Controllo di partenza: i canonici usano i poteri da una vita. */
     private const CONTROLLO = 55;
 
@@ -86,7 +308,7 @@ final class Abitanti
      * `personaggi`: i poteri e le iscrizioni ai club. Idempotente: la chiama
      * la semina, e il battito la richiama senza fare danni.
      *
-     * @return array{poteri:int, club:int}
+     * @return array{poteri:int, club:int, legami:int}
      */
     public static function assicura(): array
     {
@@ -97,7 +319,7 @@ final class Abitanti
             'UPDATE personaggi SET arrivato_gts = ? WHERE png IS NOT NULL AND (arrivato_gts IS NULL OR arrivato_gts = 0)',
             [Orologio::lineare()]
         );
-        return ['poteri' => self::assicuraPoteri(), 'club' => self::assicuraClub()];
+        return ['poteri' => self::assicuraPoteri(), 'club' => self::assicuraClub(), 'legami' => self::assicuraLegami()];
     }
 
     /** Iscrive i canonici ai loro club. */

@@ -81,7 +81,7 @@ final class SegretoController
             return redirect('/quartiere');
         }
 
-        $res = Segreto::usa($pg, $request->str('potere'));
+        $res = Segreto::usa($pg, $request->str('potere'), $request->str('scelta'));
         if (!$res['ok']) {
             Session::flash('error', $res['error'] ?? 'Non è successo niente.');
             return redirect('/quartiere');
@@ -188,6 +188,34 @@ final class SegretoController
             Session::flash(($res['capito'] ?? false) ? 'success' : 'info', $res['racconto'] ?? '');
         }
         return redirect('/taccuino');
+    }
+
+    /** Chi ha capito sceglie cosa farne: affrontare, dirlo in giro, osservare. */
+    public function scegli(Request $request): Response
+    {
+        $pg = $this->mio();
+        if ($pg === null) {
+            return redirect('/quartiere');
+        }
+        $res = Segreto::scegli($pg, $request->int('soggetto'), $request->str('come'));
+        Session::flash($res['ok'] ? 'info' : 'error', $res['ok'] ? ($res['racconto'] ?? '') : ($res['error'] ?? 'Non si può.'));
+        return redirect('/taccuino');
+    }
+
+    /** L'esper preso da parte nega. */
+    public function nega(Request $request): Response
+    {
+        $pg = $this->mio();
+        if ($pg === null) {
+            return redirect('/quartiere');
+        }
+        $res = Segreto::nega($pg, $request->int('chi'));
+        if (!$res['ok']) {
+            Session::flash('error', $res['error'] ?? 'Non si può.');
+        } else {
+            Session::flash(($res['riuscito'] ?? false) ? 'success' : 'error', $res['racconto'] ?? '');
+        }
+        return redirect('/quartiere');
     }
 
     public function confida(Request $request): Response

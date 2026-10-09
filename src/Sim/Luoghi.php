@@ -80,6 +80,19 @@ final class Luoghi
         return $dove !== '' ? $dove : 'a ' . self::nome($lkey);
     }
 
+    /**
+     * Il nome dentro una frase: «il parco», non «Il parco». I nomi propri
+     * (ABCB, Nakagawa, Casa Ayukawa) restano come sono; si abbassa solo
+     * l'articolo iniziale.
+     */
+    public static function nomeInFrase(string $lkey): string
+    {
+        $n = self::nome($lkey);
+        return preg_match('/^(Il|Lo|La|I|Gli|Le|L\')(\s|(?<=\')\S)/u', $n) === 1
+            ? mb_strtolower(mb_substr($n, 0, 1)) . mb_substr($n, 1)
+            : $n;
+    }
+
     /** @return array<string,list<array{a:string,minuti:int,mezzo:string}>> */
     public static function archi(): array
     {

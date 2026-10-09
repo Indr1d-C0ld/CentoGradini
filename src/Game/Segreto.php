@@ -46,7 +46,7 @@ final class Segreto
      * @return array{ok:bool, error?:string, incidente?:int, testimoni?:list<array<string,mixed>>,
      *               notato?:bool, folla?:int, racconto?:string}
      */
-    public static function usa(array $pg, string $pkey): array
+    public static function usa(array $pg, string $pkey, string $scelta = ''): array
     {
         if (!(bool) $pg['esper']) {
             return ['ok' => false, 'error' => 'Non hai poteri.'];
@@ -64,14 +64,44 @@ final class Segreto
         if ($potere === null) {
             return ['ok' => false, 'error' => 'Questo potere non ce l\'hai.'];
         }
+        // I sogni premonitori «non si comandano» (lo dice la loro scheda):
+        // arrivano la notte. Prima avevano un pulsante, costavano zero e non
+        // si vedevano, e premerlo all'infinito faceva salire il Controllo
+        // gratis.
+        if ($pkey === 'sogni') {
+            return ['ok' => false, 'error' => 'Questo non si comanda: arriva quando vuole, di solito la notte.'];
+        }
+
+        $luogo = (string) $pg['luogo'];
+        $gts   = Orologio::lineare();
+
+        // Prima di spendere: la scelta deve stare in piedi. Un teletrasporto
+        // verso un posto che non conosci non parte, e non costa niente.
+        $errore = Poteri::valida($pg, $pkey, $scelta, $gts);
+        if ($errore !== null) {
+            return ['ok' => false, 'error' => $errore];
+        }
 
         $costo = Scheda::costo($potere);
         if ((int) $pg['pp'] < $costo) {
             return ['ok' => false, 'error' => 'Non hai abbastanza punti potere: te ne servono ' . $costo . '.'];
         }
 
-        $luogo = (string) $pg['luogo'];
-        $gts   = Orologio::lineare();
+        // Un esper malato non comanda i poteri: «teletrasporti casuali e
+        // problemi con la telecinesi» (regolamento del 1990, ESSERE MALATI).
+        // Si paga quello che si voleva fare, e succede un'altra cosa.
+        $voluto = null;
+        if (Stati::poteriSballati((int) $pg['id'], $gts)) {
+            $dado = Rng::for(GameConfig::int('world.seed', 19870406), 'sballa', (int) $pg['id'], $gts);
+            if ($dado->int(1, 100) <= GameConfig::int('stati.potere_sballa_pct', 40)) {
+                $altro = Poteri::sballa($pg, Scheda::poteri((int) $pg['id']), $pkey, $dado, $gts);
+                if ($altro !== null) {
+                    $voluto = (string) $potere['nome'];
+                    [$potere, $scelta] = $altro;
+                    $pkey = (string) $potere['pkey'];
+                }
+            }
+        }
 
         // Prima di tutto: c'è qualcuno qui che sa spegnere i poteri?
         // Va chiesto adesso, prima di aprire l'incidente, perché un potere
@@ -84,8 +114,15 @@ final class Segreto
 
         $vistosita = (int) $potere['vistosita'];
         $folla     = Folla::a($luogo, $gts);
-        // Chi è presente e NON sa già: chi sa non si stupisce più.
-        $presenti  = self::testimoniPossibili($pg, $luogo);
+        // Chi è presente e NON sa già: chi sa non si stupisce più. E chi
+        // viene ipnotizzato non vede niente: è proprio il punto.
+        $cieco     = Poteri::nonVede($pkey, $scelta);
+        $presenti  = array_values(array_filter(self::testimoniPossibili($pg, $luogo),
+            static fn (array $t): bool => (int) $t['id'] !== $cieco));
+        // Il calore del posto: dove girano storie la gente guarda (PROGETTO §7).
+        // E chi è invisibile si fa notare un quinto.
+        $calore    = self::calore($luogo, $gts);
+        $fattore   = Stati::ha((int) $pg['id'], 'invisibile', $gts) ? 0.2 : 1.0;
 
         Database::run(
             'INSERT INTO incidenti (attore_id, pkey, luogo, gts, vistosita, folla, stato)
@@ -107,7 +144,7 @@ final class Segreto
         // --- Il tiro di Nota, uno per testimone -----------------------------
         $notato = [];
         foreach ($presenti as $t) {
-            $p = self::probabilitaNota($vistosita, (int) $t['testa'], (int) $potere['controllo'], $gts);
+            $p = self::probabilitaNota($vistosita, (int) $t['testa'], (int) $potere['controllo'], $gts, $calore, $fattore);
             $visto = $rng->int(1, 100) <= $p;
             Database::run(
                 'INSERT INTO incidente_testimoni (incidente_id, personaggio_id, notato) VALUES (?, ?, ?)',
@@ -122,7 +159,7 @@ final class Segreto
         // Un passante non fa un'anomalia: fa una voce, e alza il calore.
         $vistoDallaFolla = false;
         if ($folla > 0 && $vistosita > 0) {
-            $uno = self::probabilitaNota($vistosita, 7, (int) $potere['controllo'], $gts) * 0.35 / 100;
+            $uno = self::probabilitaNota($vistosita, 7, (int) $potere['controllo'], $gts, $calore, $fattore) * 0.35 / 100;
             $almenoUno = 1.0 - pow(1.0 - min(0.9, $uno), $folla);
             $vistoDallaFolla = $rng->float() < $almenoUno;
         }
@@ -156,14 +193,47 @@ final class Segreto
             }
         }
 
+        // Chi ha capito e ha deciso di osservarti in silenzio non si stupisce
+        // più: annota. Ogni potere usato davanti a lui diventa una voce
+        // precisa, anche quando agli altri l'hai fatta passare liscia. È la
+        // strada che il progetto chiama «la peggiore».
+        $osservatori = self::osservatoriPresenti($pg, $luogo);
+        if ($osservatori !== [] && $vistosita > 0) {
+            Voci::nasce('potere', (int) $pg['id'], null, $luogo, $osservatori, $pkey, $gts);
+        }
+
+        // E adesso, quello che il potere fa davvero.
+        $effetto = Poteri::effetto($pg, $potere, $scelta, $gts);
+        $racconto = self::racconto($potere, $luogo, $notato, $vistoDallaFolla, $folla + count($presenti));
+        if ($voluto !== null) {
+            $racconto = accorda(sprintf('Hai la febbre, e il potere non risponde: volevi usare %s, ed è '
+                . 'partito tutt\'altro. ', mb_strtolower($voluto)), $pg) . $racconto;
+        }
+
         return [
             'ok'        => true,
             'incidente' => $incId,
             'testimoni' => $notato,
             'notato'    => $stato === 'aperto',
             'folla'     => $folla,
-            'racconto'  => self::racconto($potere, $luogo, $notato, $vistoDallaFolla, $folla),
+            'racconto'  => trim($racconto . ' ' . $effetto),
+            'potere'    => $pkey,
         ];
+    }
+
+    /**
+     * Chi, presente, ha capito il tuo segreto e ha deciso di osservarti.
+     *
+     * @return list<int>
+     */
+    public static function osservatoriPresenti(array $pg, string $luogo): array
+    {
+        return array_map(static fn (array $r): int => (int) $r['id'], Database::all(
+            "SELECT p.id FROM sanno s JOIN personaggi p ON p.id = s.chi_sa_id
+             WHERE s.esper_id = ? AND s.atteggiamento = 'osserva' AND s.come <> 'confidato'
+               AND p.luogo = ? AND p.verso IS NULL AND p.stato = 'attivo'",
+            [(int) $pg['id'], $luogo]
+        ));
     }
 
     /**
@@ -260,12 +330,17 @@ final class Segreto
      * precisione di chi lo usa. Non arriva mai a 100 né scende a 0: c'è
      * sempre quello distratto e c'è sempre quello che guardava proprio lì.
      */
-    public static function probabilitaNota(int $vistosita, int $testa, int $controllo, ?int $gts = null): int
-    {
+    public static function probabilitaNota(
+        int $vistosita, int $testa, int $controllo, ?int $gts = null, int $calore = 0, float $fattore = 1.0
+    ): int {
         if ($vistosita <= 0) {
             return 0;    // succede dentro la testa: non c'è niente da vedere
         }
-        $p = $vistosita * 9.0;
+        $p = $vistosita * 9.0 * $fattore;
+        // Dove girano storie, la gente guarda: il calore pieno alza la Nota
+        // della metà (manopola segreto.calore_nota_pct). Prima il calore era
+        // solo una frase sulla pagina del luogo.
+        $p *= 1.0 + (max(0, min(100, $calore)) / 100.0) * (GameConfig::int('segreto.calore_nota_pct', 50) / 100.0);
         $p *= 0.6 + 0.4 * ($testa / 15.0);          // chi è sveglio nota di più
         $p *= 1.0 - min(0.5, $controllo / 200.0);   // chi ha mano ferma si fa notare meno
 
@@ -536,12 +611,15 @@ final class Segreto
     private static function racconto(
         array $potere, string $luogo, array $notato, bool $vistoDallaFolla, int $folla
     ): string {
-        $dove = Luoghi::nome($luogo);
+        $dove = Luoghi::nomeInFrase($luogo);
         $che  = mb_strtolower((string) $potere['nome']);
 
+        // $folla qui e' tutta la gente che c'era: i passanti e chi si conosce.
+        // Contare solo i passanti faceva dire «non c'è anima viva» in un parco
+        // con tre persone sedute sulla panchina.
         if ($notato === [] && !$vistoDallaFolla) {
             return $folla === 0
-                ? "Usi {$che}. {$dove}: non c'è anima viva, e nessuno saprà mai che è successo."
+                ? "Usi {$che}. " . mb_strtoupper(mb_substr($dove, 0, 1)) . mb_substr($dove, 1) . ": non c'è anima viva, e nessuno saprà mai che è successo."
                 : "Usi {$che}. C'era gente, ma nessuno guardava dalla tua parte. Stavolta è andata.";
         }
 
@@ -613,6 +691,9 @@ final class Segreto
             $g['quante']  = count($g['anomalie']);
             $g['basta']   = $g['quante'] >= $servono;
             $g['fondato'] = self::sa($s, $osservatoreId);
+            $g['atteggiamento'] = (string) (Database::first(
+                'SELECT atteggiamento FROM sanno WHERE esper_id = ? AND chi_sa_id = ?', [$s, $osservatoreId]
+            )['atteggiamento'] ?? '');
             $out[] = $g;
         }
         usort($out, static fn (array $a, array $b): int => $b['quante'] <=> $a['quante']);
@@ -693,6 +774,247 @@ final class Segreto
         )];
     }
 
+    /**
+     * Anche gli abitanti mettono insieme quello che hanno visto.
+     *
+     * Prima annotavano le anomalie e basta: nessuno le guardava mai insieme,
+     * quindi un esper che usava i poteri solo davanti a loro non poteva essere
+     * scoperto da nessuno — e con due giocatori nel quartiere il Segreto non
+     * faceva paura. Adesso un abitante con abbastanza annotazioni su qualcuno
+     * prova a collegarle, con lo stesso tiro e le stesse regole di un
+     * giocatore: un tentativo per annotazione, e la TESTA che decide.
+     *
+     * Solo chi non ha poteri. I Kasuga sanno benissimo cos'e' un esper e
+     * l'ultima cosa che farebbero e' dirlo in giro: per loro il segreto di un
+     * altro della stirpe e' il loro stesso segreto.
+     *
+     * @return int quanti hanno capito
+     */
+    public static function abitantiCollegano(?int $adesso = null): int
+    {
+        $adesso  ??= Orologio::lineare();
+        $servono  = GameConfig::int('segreto.anomalie_per_sospetto', 3);
+        $finestra = GameConfig::int('segreto.finestra_giorni', 30) * 86400;
+        $capiti   = 0;
+        foreach (Database::all(
+            "SELECT a.osservatore_id, a.soggetto_id, COUNT(*) n, SUM(a.collegata) usate
+             FROM anomalie a
+             JOIN personaggi o ON o.id = a.osservatore_id
+             JOIN personaggi s ON s.id = a.soggetto_id
+             WHERE o.png IS NOT NULL AND o.esper = 0 AND o.stato = 'attivo'
+               AND s.png IS NULL AND s.stato = 'attivo' AND a.gts >= ?
+               AND NOT EXISTS (SELECT 1 FROM sanno x WHERE x.esper_id = a.soggetto_id AND x.chi_sa_id = a.osservatore_id)
+             GROUP BY a.osservatore_id, a.soggetto_id
+             HAVING n >= ? AND usate < n",
+            [$adesso - $finestra, $servono]
+        ) as $r) {
+            $chi = Database::first('SELECT * FROM personaggi WHERE id = ?', [(int) $r['osservatore_id']]);
+            if ($chi === null) {
+                continue;
+            }
+            $esito = self::collega($chi, (int) $r['soggetto_id']);
+            if (($esito['capito'] ?? false) === true) {
+                $capiti++;
+                self::abitanteDecide($chi, (int) $r['soggetto_id']);
+            }
+        }
+        return $capiti;
+    }
+
+    // --- Il sospetto fondato: cosa farne -------------------------------------------
+
+    /**
+     * Un abitante ha appena capito: sceglie la sua strada, e se la sua strada
+     * e' raccontarlo, lo racconta subito a chi ha intorno.
+     */
+    private static function abitanteDecide(array $chi, int $esperId): void
+    {
+        $come = self::ATTEGGIAMENTO_DEGLI_ABITANTI[(string) $chi['png']] ?? 'osserva';
+        $esper = Database::first('SELECT luogo, verso FROM personaggi WHERE id = ?', [$esperId]);
+        if ($come === 'affronta' && ($esper === null || (string) $esper['luogo'] !== (string) $chi['luogo'])) {
+            // Non e' qui: lo affrontera' appena lo vede. Intanto osserva.
+            Database::run("UPDATE sanno SET atteggiamento = 'affronta' WHERE esper_id = ? AND chi_sa_id = ?",
+                [$esperId, (int) $chi['id']]);
+            return;
+        }
+        // Gli abitanti non si stancano e non hanno vergogna: niente compostezza.
+        Database::run('UPDATE personaggi SET compostezza = GREATEST(compostezza, 1) WHERE id = ?', [(int) $chi['id']]);
+        self::scegli(Database::first('SELECT * FROM personaggi WHERE id = ?', [(int) $chi['id']]) ?? $chi, $esperId, $come);
+    }
+
+    /**
+     * Gli abitanti che hanno deciso di affrontarti, e ti trovano: lo fanno.
+     * Lo chiama il battito, dopo che gli abitanti si sono mossi.
+     */
+    public static function abitantiAffrontano(): int
+    {
+        $n = 0;
+        foreach (Database::all(
+            "SELECT s.esper_id, c.* FROM sanno s
+             JOIN personaggi c ON c.id = s.chi_sa_id
+             JOIN personaggi e ON e.id = s.esper_id
+             WHERE s.atteggiamento = 'affronta' AND s.affrontato_gts IS NULL AND s.come <> 'confidato'
+               AND c.png IS NOT NULL AND c.stato = 'attivo' AND e.stato = 'attivo'
+               AND e.luogo = c.luogo AND e.verso IS NULL AND c.verso IS NULL"
+        ) as $r) {
+            $esperId = (int) $r['esper_id'];
+            unset($r['esper_id']);
+            Database::run('UPDATE personaggi SET compostezza = GREATEST(compostezza, 1) WHERE id = ?', [(int) $r['id']]);
+            $r['compostezza'] = max(1, (int) $r['compostezza']);
+            if (self::scegli($r, $esperId, 'affronta')['ok']) {
+                $n++;
+            }
+        }
+        return $n;
+    }
+
+    /** Le tre strade di PROGETTO §7, come le legge chi deve sceglierne una. */
+    public const ATTEGGIAMENTI = [
+        'affronta' => 'Prenderlo da parte e dirglielo in faccia',
+        'dice'     => 'Raccontarlo in giro',
+        'osserva'  => 'Tenerselo per sé, e guardare',
+    ];
+
+    /**
+     * Chi ha capito da solo sceglie cosa farne.
+     *
+     *  - **affrontare**: si fa davanti a lui, costa un punto di compostezza, e
+     *    gli lascia una scelta — confidarsi, e allora chi ha capito diventa un
+     *    complice, oppure negare. È l'occasione di confidarsi del progetto;
+     *  - **dirlo in giro**: nasce una voce sul segreto, chiara, che parte da
+     *    chi l'ha detto e da chi era lì ad ascoltare, e il posto si scalda.
+     *    Una volta al giorno: ripeterlo non lo rende più vero;
+     *  - **osservare**: non succede niente, subito. Da lì in poi ogni potere
+     *    usato davanti a lui diventa una voce precisa (vedi `usa()`). È «il
+     *    peggiore», e infatti non si vede.
+     *
+     * @return array{ok:bool, error?:string, racconto?:string}
+     */
+    public static function scegli(array $chi, int $esperId, string $come): array
+    {
+        if (!isset(self::ATTEGGIAMENTI[$come])) {
+            return ['ok' => false, 'error' => 'Non so cosa vorresti fare.'];
+        }
+        $riga = Database::first("SELECT * FROM sanno WHERE esper_id = ? AND chi_sa_id = ? AND come <> 'confidato'",
+            [$esperId, (int) $chi['id']]);
+        if ($riga === null) {
+            return ['ok' => false, 'error' => 'Di quella persona non sai niente di certo.'];
+        }
+        $esper = Database::first('SELECT * FROM personaggi WHERE id = ?', [$esperId]);
+        if ($esper === null || (string) $esper['stato'] !== 'attivo') {
+            return ['ok' => false, 'error' => 'Non è più nel quartiere.'];
+        }
+        $gts = Orologio::lineare();
+        $nome = Personaggio::nomeCompleto($esper);
+
+        if ($come === 'affronta') {
+            if ((string) $esper['luogo'] !== (string) $chi['luogo'] || $esper['verso'] !== null) {
+                return ['ok' => false, 'error' => 'Per dirglielo in faccia deve essere qui.'];
+            }
+            if ((int) $chi['compostezza'] < 1) {
+                return ['ok' => false, 'error' => 'Non hai la faccia tosta, adesso. Riposati.'];
+            }
+            Database::run('UPDATE personaggi SET compostezza = GREATEST(0, compostezza - 1) WHERE id = ?', [(int) $chi['id']]);
+            Database::run("UPDATE sanno SET atteggiamento = 'affronta', affrontato_gts = ? WHERE esper_id = ? AND chi_sa_id = ?",
+                [$gts, $esperId, (int) $chi['id']]);
+            return ['ok' => true, 'racconto' => sprintf(
+                'Prendi %s da parte, dove nessuno sente, e glielo dici: lo so. Non aggiungi altro. '
+                . 'Adesso tocca a %s decidere se fidarsi di te o guardarti negli occhi e dire che non è vero.',
+                $nome, (string) $esper['sesso'] === 'f' ? 'lei' : 'lui')];
+        }
+
+        if ($come === 'dice') {
+            $gia = Database::first(
+                "SELECT 1 x FROM voci WHERE tipo = 'potere' AND dettaglio = 'segreto' AND soggetto_id = ? AND gts > ?
+                   AND id IN (SELECT voce_id FROM voci_versioni WHERE personaggio_id = ? AND da_id IS NULL) LIMIT 1",
+                [$esperId, $gts - 86400, (int) $chi['id']]);
+            if ($gia !== null) {
+                return ['ok' => false, 'error' => 'L\'hai già raccontato oggi. Ripeterlo non lo rende più vero.'];
+            }
+            $ascoltano = array_map(static fn (array $p): int => (int) $p['id'],
+                Personaggio::presenti((string) $chi['luogo'], (int) $chi['id']));
+            $ascoltano = array_values(array_filter($ascoltano, static fn (int $i): bool => $i !== $esperId));
+            Voci::nasce('potere', $esperId, null, (string) $chi['luogo'], [(int) $chi['id'], ...$ascoltano], 'segreto', $gts);
+            self::alzaCalore((string) $chi['luogo'], 8, $gts);
+            Database::run("UPDATE sanno SET atteggiamento = 'dice' WHERE esper_id = ? AND chi_sa_id = ?",
+                [$esperId, (int) $chi['id']]);
+            return ['ok' => true, 'racconto' => $ascoltano === []
+                ? sprintf('Non c\'è nessuno a cui dirlo, qui, ma la storia ce l\'hai pronta: la prossima persona che incontri saprà di %s.', $nome)
+                : sprintf('Lo racconti. Non tutto, e non subito: abbastanza perché chi ti ascolta cominci a guardare %s con altri occhi.', $nome)];
+        }
+
+        Database::run("UPDATE sanno SET atteggiamento = 'osserva', affrontato_gts = NULL WHERE esper_id = ? AND chi_sa_id = ?",
+            [$esperId, (int) $chi['id']]);
+        return ['ok' => true, 'racconto' => sprintf(
+            'Non dici niente a nessuno, nemmeno a %s. Guardi, e aspetti. Prima o poi lo rifarà, e tu ci sarai.', $nome)];
+    }
+
+    /**
+     * Chi ti ha preso da parte e aspetta una risposta.
+     *
+     * @return list<array<string,mixed>>
+     */
+    public static function affrontatoDa(int $esperId): array
+    {
+        return Database::all(
+            "SELECT p.id, p.nome, p.cognome, p.sesso, s.affrontato_gts FROM sanno s JOIN personaggi p ON p.id = s.chi_sa_id
+             WHERE s.esper_id = ? AND s.affrontato_gts IS NOT NULL AND s.come <> 'confidato' AND p.stato = 'attivo'
+             ORDER BY s.affrontato_gts",
+            [$esperId]
+        );
+    }
+
+    /**
+     * Negare, a chi ti ha preso da parte. Il tiro è la faccia tosta (KAKKO)
+     * contro la sua testa: riesce, e torna a non esserne sicuro — le sue
+     * annotazioni restano, ma il sospetto fondato no; non riesce, e adesso
+     * oltre a saperlo è anche offeso.
+     *
+     * @return array{ok:bool, error?:string, riuscito?:bool, racconto?:string}
+     */
+    public static function nega(array $esper, int $chiId): array
+    {
+        $riga = Database::first(
+            "SELECT s.*, p.testa, p.nome, p.sesso FROM sanno s JOIN personaggi p ON p.id = s.chi_sa_id
+             WHERE s.esper_id = ? AND s.chi_sa_id = ? AND s.affrontato_gts IS NOT NULL AND s.come <> 'confidato'",
+            [(int) $esper['id'], $chiId]);
+        if ($riga === null) {
+            return ['ok' => false, 'error' => 'Nessuno ti sta chiedendo niente.'];
+        }
+        if ((int) $esper['compostezza'] < 2) {
+            return ['ok' => false, 'error' => 'Non riusciresti a guardarl' . ((string) $riga['sesso'] === 'f' ? 'a' : 'o') . ' negli occhi, adesso.'];
+        }
+        $gts = Orologio::lineare();
+        Database::run('UPDATE personaggi SET compostezza = GREATEST(0, compostezza - 2) WHERE id = ?', [(int) $esper['id']]);
+        $prob = max(5, min(85, 30 + (int) $esper['kakko'] * 5 - (int) $riga['testa'] * 2));
+        $rng  = Rng::for(GameConfig::int('world.seed', 19870406), 'nega', (int) $esper['id'], $chiId, (int) $riga['affrontato_gts']);
+        if ($rng->int(1, 100) <= $prob) {
+            Database::run('DELETE FROM sanno WHERE esper_id = ? AND chi_sa_id = ?', [(int) $esper['id'], $chiId]);
+            return ['ok' => true, 'riuscito' => true, 'racconto' => sprintf(
+                'Ridi. Ridi nel modo giusto, né troppo né poco, e chiedi a %s se si sente bene. Funziona: '
+                . 'vedi il dubbio tornar%s in faccia. Non ha smesso di pensarci, ma non ne è più sicur%s.',
+                $riga['nome'], (string) $riga['sesso'] === 'f' ? 'le' : 'gli', (string) $riga['sesso'] === 'f' ? 'a' : 'o')];
+        }
+        Database::run('UPDATE sanno SET affrontato_gts = NULL, atteggiamento = ? WHERE esper_id = ? AND chi_sa_id = ?',
+            ['dice', (int) $esper['id'], $chiId]);
+        Legami::muovi($chiId, (int) $esper['id'], -6, 10, $gts);
+        return ['ok' => true, 'riuscito' => false, 'racconto' => sprintf(
+            'Neghi, e %s ti lascia finire. Poi ti guarda come si guarda qualcuno che ti ha appena mentito in '
+            . 'faccia, e se ne va senza dire niente. Adesso non lo sa soltanto: è anche offes%s, e non lo terrà per sé.',
+            $riga['nome'], (string) $riga['sesso'] === 'f' ? 'a' : 'o')];
+    }
+
+    /**
+     * Cosa fa un abitante quando capisce: dipende da chi è. Komatsu, Hatta e
+     * Sayuri lo raccontano; Hikaru e Yusaku te lo dicono in faccia; Madoka, il
+     * Master e Hiromi guardano e tacciono, che è il loro modo.
+     */
+    public const ATTEGGIAMENTO_DEGLI_ABITANTI = [
+        'komatsu' => 'dice', 'hatta' => 'dice', 'sayuri' => 'dice',
+        'hikaru' => 'affronta', 'yusaku' => 'affronta',
+        'madoka' => 'osserva', 'master' => 'osserva', 'hiromi' => 'osserva',
+    ];
+
     // --- Confidarsi ---------------------------------------------------------------
 
     /**
@@ -720,11 +1042,26 @@ final class Segreto
         if ($altro === null) {
             return ['ok' => false, 'error' => 'Quella persona non è qui.'];
         }
-        if (self::sa((int) $pg['id'], $aChi)) {
+        $gia = Database::first('SELECT come FROM sanno WHERE esper_id = ? AND chi_sa_id = ?', [(int) $pg['id'], $aChi]);
+        if ($gia !== null && (string) $gia['come'] === 'confidato') {
             return ['ok' => false, 'error' => 'Lo sa già.'];
         }
 
         $gts = Orologio::lineare();
+        if ($gia !== null) {
+            // Lo aveva capito da solo. Confidarsi adesso e' la valvola del
+            // progetto: «trasforma la minaccia piu' grande nell'alleato piu'
+            // forte». Chi lo sapeva come una scoperta lo sa adesso come una
+            // confidenza, e non conta piu' per il trasloco.
+            Database::run("UPDATE sanno SET come = 'confidato', atteggiamento = '', affrontato_gts = NULL, gts = ?
+                           WHERE esper_id = ? AND chi_sa_id = ?", [$gts, (int) $pg['id'], $aChi]);
+            Database::run('DELETE FROM anomalie WHERE osservatore_id = ? AND soggetto_id = ?', [$aChi, (int) $pg['id']]);
+            Legami::muovi($aChi, (int) $pg['id'], 8, -15, $gts);
+            return ['ok' => true, 'racconto' => sprintf(
+                'Lo sapeva già, e tu lo sapevi che lo sapeva. Ma adesso gliel\'hai detto tu, ed è un\'altra '
+                . 'cosa: %s non è più qualcuno che ti ha scoperto. È qualcuno a cui ti sei affidat%s.',
+                $altro['nome'], (string) $pg['sesso'] === 'f' ? 'a' : 'o')];
+        }
         Database::run('INSERT INTO sanno (esper_id, chi_sa_id, come, gts) VALUES (?, ?, ?, ?)',
             [(int) $pg['id'], $aChi, 'confidato', $gts]);
         // Le annotazioni non servono più: adesso ha la risposta, non gli indizi.
@@ -813,10 +1150,41 @@ final class Segreto
      */
     public static function quantiSanno(int $pgId, string $come = 'scoperto'): int
     {
+        if ($come === 'scoperto') {
+            // Chi ha capito da solo conta uno; chi era stato messo a parte e
+            // poi si e' guastato con te conta due: «il rischio torna,
+            // moltiplicato» (PROGETTO §7).
+            return (int) (Database::first(
+                "SELECT COALESCE(SUM(IF(s.come = 'tradito', 2, 1)), 0) n FROM sanno s JOIN personaggi p ON p.id = s.chi_sa_id
+                 WHERE s.esper_id = ? AND s.come IN ('scoperto', 'tradito') AND p.stato = 'attivo'",
+                [$pgId]
+            )['n'] ?? 0);
+        }
         return (int) (Database::first(
             "SELECT COUNT(*) n FROM sanno s JOIN personaggi p ON p.id = s.chi_sa_id
              WHERE s.esper_id = ? AND s.come = ? AND p.stato = 'attivo'",
             [$pgId, $come]
+        )['n'] ?? 0);
+    }
+
+    /**
+     * Quante persone, nel quartiere, hanno sentito una voce abbastanza chiara
+     * sui tuoi poteri da sapere di chi si parla.
+     *
+     * La FAQ 26 dice che i Kasuga traslocano quando il segreto diventa di
+     * pubblico dominio, non quando una persona in piu' ha capito. Le voci
+     * prima si leggevano e basta; adesso, oltre una soglia, pesano.
+     */
+    public static function dominio(int $pgId): int
+    {
+        $durata = GameConfig::int('voci.durata_giorni', 21) * 86400;
+        return (int) (Database::first(
+            "SELECT COUNT(DISTINCT vv.personaggio_id) n
+             FROM voci v JOIN voci_versioni vv ON vv.voce_id = v.id
+             JOIN personaggi p ON p.id = vv.personaggio_id
+             WHERE v.tipo = 'potere' AND v.soggetto_id = ? AND vv.personaggio_id <> ?
+               AND vv.precisione >= 55 AND v.gts >= ? AND p.stato = 'attivo'",
+            [$pgId, $pgId, Orologio::lineare() - $durata]
         )['n'] ?? 0);
     }
 
@@ -827,19 +1195,25 @@ final class Segreto
     {
         $soglia   = max(1, GameConfig::int('segreto.sospetti_per_trasloco', 2));
         $scoperti = self::quantiSanno((int) $pg['id']);
+        $sogliaD  = max(1, GameConfig::int('segreto.pubblico_dominio', 8));
+        $dominio  = self::dominio((int) $pg['id']);
+        $troppi   = $scoperti >= $soglia || $dominio >= $sogliaD;
 
         return [
             'stato'    => match (true) {
-                $scoperti >= $soglia => 'trasloco',
-                $scoperti > 0        => 'avviso',
-                default              => 'quieto',
+                $troppi                                => 'trasloco',
+                $scoperti > 0 || $dominio * 2 >= $sogliaD => 'avviso',
+                default                                => 'quieto',
             },
             'scoperti' => $scoperti,
             'soglia'   => $soglia,
+            'dominio'  => $dominio,
+            'soglia_dominio' => $sogliaD,
             'messaggio' => match (true) {
-                $scoperti >= $soglia => 'Tuo padre ha cominciato a guardare gli annunci. Non è una minaccia: è una constatazione.',
-                $scoperti > 0        => 'Qualcuno ha capito. A casa non se ne parla, ma il telefono squilla più del solito.',
-                default              => '',
+                $troppi       => 'Tuo padre ha cominciato a guardare gli annunci. Non è una minaccia: è una constatazione.',
+                $scoperti > 0 => 'Qualcuno ha capito. A casa non se ne parla, ma il telefono squilla più del solito.',
+                $dominio > 0  => 'In giro si parla di te più del solito, e non per i voti. Ancora un po\' e lo sapranno tutti.',
+                default       => '',
             },
         ];
     }

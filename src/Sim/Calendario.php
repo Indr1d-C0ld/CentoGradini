@@ -72,6 +72,12 @@ final class Calendario
     ];
 
     // --- Giorni che valgono un episodio -------------------------------------------
+    // Le date che compaiono anche fra gli eventi del quartiere (db/seed/eventi.php)
+    // devono coincidere con quelle: il 9 ottobre 2026 non coincidevano in cinque
+    // casi, e la testata di ogni pagina annunciava il festival d'estate per l'1
+    // agosto mentre le meccaniche lo facevano il 25 luglio. Le tiene allineate
+    // una prova (tests/test_audit.php). Sportivo e culturale cadono sulle due
+    // feste nazionali, il 10 ottobre e il 3 novembre.
     /** @var array<string,array{titolo:string,nota:string}> */
     private const EVENTI = [
         '04-06' => ['titolo' => 'Cerimonia d\'ingresso',      'nota' => 'Comincia l\'anno. Facce nuove, divise nuove, nessuno sa ancora niente di nessuno.'],
@@ -81,12 +87,12 @@ final class Calendario
         '06-15' => ['titolo' => 'Gita scolastica',             'nota' => 'Il pullman, le coppie sui sedili in fondo, il maestro che conta le teste.'],
         '07-07' => ['titolo' => 'Tanabata',                     'nota' => 'Desideri scritti su strisce di carta appese al bambù. Qualcuno legge quello degli altri.'],
         '07-20' => ['titolo' => 'Chiusura del primo trimestre','nota' => 'Pagelle. Poi due mesi di niente.'],
-        '08-01' => ['titolo' => 'Festival d\'estate',           'nota' => 'Yukata, bancarelle, pesca dei pesciolini rossi e fuochi d\'artificio sul fiume.'],
+        '07-25' => ['titolo' => 'Festival d\'estate',           'nota' => 'Yukata, bancarelle, pesca dei pesciolini rossi e fuochi d\'artificio sul fiume.'],
         '08-13' => ['titolo' => 'Obon',                         'nota' => 'Si torna al paese dei nonni. Chi resta in città trova il quartiere mezzo vuoto.'],
         '08-20' => ['titolo' => 'Ritiro del club',              'nota' => 'Quattro giorni in montagna a fare la stessa cosa dalla mattina alla sera.'],
         '09-01' => ['titolo' => 'Apertura del secondo trimestre','nota' => 'Tutti abbronzati e nessuno ha fatto i compiti.'],
-        '09-26' => ['titolo' => 'Festival sportivo',            'nota' => 'Corsa a tre gambe, tiro alla fune, fasce colorate in testa.'],
-        '10-24' => ['titolo' => 'Festival culturale',           'nota' => 'Le classi diventano caffè e case infestate. Due giorni in cui la scuola non è la scuola.'],
+        '10-10' => ['titolo' => 'Festival sportivo',            'nota' => 'Corsa a tre gambe, tiro alla fune, fasce colorate in testa.'],
+        '11-03' => ['titolo' => 'Festival culturale',           'nota' => 'Le classi diventano caffè e case infestate. Due giorni in cui la scuola non è la scuola.'],
         '11-20' => ['titolo' => 'Foglie rosse',                 'nota' => 'Il viale degli alberi diventa arancione, che è poi il colore di tutta questa storia.'],
         '12-14' => ['titolo' => 'Esami di fine trimestre',      'nota' => 'Gli ultimi prima delle feste.'],
         '12-24' => ['titolo' => 'Vigilia di Natale',            'nota' => 'In Giappone non è una festa di famiglia: è la sera in cui si esce con qualcuno. Chiunque abbia qualcosa da dire, la dice stasera.'],

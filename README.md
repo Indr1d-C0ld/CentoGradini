@@ -87,6 +87,43 @@ E se nel posto dove sei c'è qualcuno che sa **spegnere i poteri**, il tuo poter
 può semplicemente non partire. Nel canone lo sa fare un bambino di otto anni, ed
 è il motivo per cui è il più forte della famiglia.
 
+**Un potere fa qualcosa.** Il teletrasporto porta dove si è già stati, la
+supervelocità nel posto accanto, la chiaroveggenza fa vedere un altro luogo, la
+telepatia dice cosa pensa di te chi hai davanti — da secondaria, solo un'idea
+sfocata — e chi gli sta più a cuore, che è la parte che non volevi sapere.
+L'ipnosi fa dimenticare a una persona al giorno l'ultima cosa strana che ti ha
+visto fare, e la lascia furiosa; l'autoipnosi ridà compostezza e ti rende
+antipatico; l'invisibilità ti toglie dall'elenco dei presenti. Il sesto senso
+dice se qui qualcuno ti tiene d'occhio, i supersensi ti fanno origliare. I sogni
+premonitori non hanno un pulsante: arrivano all'alba, una notte su due, e dicono
+una cosa vera del giorno che viene — detta storta. I limiti sono quelli delle
+schede dei poteri, che vengono dal regolamento del 1990; la telecinesi, le
+illusioni, il cambio d'identità e la voce per ora si vedono e basta.
+
+**Chi ha capito sceglie cosa farne**, come nello schema del progetto: può
+prenderti da parte e dirtelo in faccia — e allora tocca a te confidarti, e farne
+un complice, o negare guardandolo negli occhi, con un tiro di faccia tosta —,
+può raccontarlo in giro, e nasce una voce chiara che scalda il posto, oppure può
+**osservarti in silenzio**, che è il peggio: da quel momento ogni potere che usi
+davanti a lui diventa una voce precisa. Gli abitanti scelgono secondo il
+carattere: Komatsu lo racconta, Hikaru te lo dice in faccia, Madoka e il Master
+guardano e tacciono. E ci arrivano da soli: chi ha raccolto tre anomalie su di
+te ci ragiona sopra, come farebbe un giocatore.
+
+Oltre a chi ha capito conta **quanti ne parlano**: quando abbastanza persone
+hanno sentito una voce chiara sui tuoi poteri, il segreto è di pubblico dominio,
+e la FAQ 26 dice che è allora che i Kasuga traslocano. E confidarsi non è più
+gratis: se chi conosce il tuo segreto per confidenza si guasta con te, «il
+rischio torna, moltiplicato» — conta doppio, e la prima cosa che fa è dirlo in giro.
+
+**Le forze tornano.** Punti potere, punti ferita e compostezza risalgono di un
+punto ogni tanto durante il giorno, e tutti con una notte di sonno, come nel
+regolamento del 1990. E ci sono gli stati che durano un po': il **raffreddore**,
+che ci si prende arrivando all'aperto sotto la pioggia senza che nessuno abbia
+diviso l'ombrello con te — e un esper malato non comanda i poteri, ne parte un
+altro —, le **bende** dopo una brutta giornata, l'invisibilità. Si vedono addosso
+a chi li ha, nell'elenco di chi c'è.
+
 **E dall'altra parte?** Chi non ha poteri non gioca una versione ridotta: gioca
 il lato opposto dello stesso sistema. Ha più punti abilità da distribuire e un
 tratto in più, l'**Intuizione** per collegare le anomalie che ha annotato, il
@@ -118,10 +155,15 @@ di *Kimagure Orange Road* dura diciotto volumi invece di due.
 
 Poi c'è la confessione, con due prove in fila — riuscire a dirlo, e la risposta —
 e il **cappello di paglia rosso**, che esiste in un esemplare solo per server e
-passa di mano.
+passa di mano (dato a un abitante, dopo qualche giorno lui lo riporta sui gradini).
 
-E c'è la **famiglia**. Kyosuke e le gemelle sono fratelli, Akane e Kazuya sono i
-loro cugini, e il gioco lo sa: fra parenti non ci si dichiara, il secondo bottone
+**Il triangolo non si scioglie.** È la terza decisione fondante: a Kyosuke, a
+Madoka e a Hikaru ci si può dichiarare — è una cosa che si fa, e costa — ma la
+risposta è quella dell'opera, ciascuno a modo suo. I loro legami fra loro sono
+fermi: il motore li rimette a posto se un gesto li sposta.
+
+E c'è la **famiglia**. Kyosuke e le gemelle sono fratelli, Takashi è il loro
+padre, Akane e Kazuya sono i loro cugini, e il gioco lo sa: fra parenti non ci si dichiara, il secondo bottone
 e il cappello non si danno, un gesto non si presta a equivoci e chi guarda non è
 geloso — ma ci si vuole bene come fra chiunque. I cognomi delle famiglie del
 canone non si possono prendere per un personaggio nuovo: sarebbe un parente che
@@ -129,11 +171,12 @@ l'opera non ha. Fonti in `docs/CANONE.md` §7-quater.
 
 ### 3. Il quartiere, e le voci
 
-Il quartiere è **ventidue luoghi** con orari, stagionalità e tempi di percorrenza
+Il quartiere è **ventitré luoghi** con orari, stagionalità e tempi di percorrenza
 veri, disegnati su una carta. Il liceo è chiuso in agosto, la spiaggia esiste
 solo d'estate, il luna park apre alle dieci, e la grande scalinata non la fa
 quasi nessuno — c'è una scaletta più comoda dietro la collina, ed è per questo
-che in cima si riesce sempre a stare da soli.
+che in cima si riesce sempre a stare da soli. Nelle **case private** si entra solo
+se qualcuno di casa è dentro e ti vuole abbastanza bene da farti entrare.
 
 Gli orari sono dei **locali**, non delle strade: la sera la via commerciale abbassa
 le saracinesche ma ci si passa lo stesso, perché è la strada per la stazione. E
@@ -161,12 +204,18 @@ Il nome se ne va per primo, ed è la perdita che fa più danno: da quel momento
 può essere chiunque del terzo anno. Il tono non torna mai verso lo zero — si
 polarizza, perché è così che funziona una scuola.
 
-Le voci hanno bisogno di gambe, e le gambe sono i **tredici abitanti canonici**
+Le voci hanno bisogno di gambe, e le gambe sono i **sedici abitanti canonici**
 che vivono nel quartiere per conto loro: Kyosuke, Madoka, Hikaru, le gemelle, il
-Master dell'ABCB e gli altri. Non sono comparse — sono personaggi come i
-giocatori, quindi vedono, annotano, ricevono gesti ed entrano nel cast degli
-episodi. Ognuno ha il suo giro, che il calendario scolastico interrompe quando è
-ora di lezione e il club interrompe nel pomeriggio.
+padre Takashi, il Master dell'ABCB, Umao e Ushiko e gli altri. Non sono comparse
+— sono personaggi come i giocatori, quindi vedono, annotano, ricevono gesti ed
+entrano nel cast degli episodi. Ognuno ha il suo giro, che il calendario
+scolastico interrompe quando è ora di lezione e il club interrompe nel pomeriggio.
+
+E **fanno gesti**. Ogni tanto un abitante che ha qualcuno davanti gli rivolge la
+parola, lo ascolta, divide l'ombrello, lo accompagna — scelto da quanto ci tiene,
+e passando per lo stesso motore dei giocatori, con le letture sbagliate e la
+gelosia di chi guarda. I legami del canone sono scritti: Hikaru per Kyosuke,
+Yusaku per Hikaru, Komatsu che non sopporta Madoka, il Master che le fa da padre.
 
 I **dieci club** sono il secondo canale di propagazione, e l'unico che non passa
 dalla geografia: due iscritti si parlano anche se non si incrociano mai. È così
@@ -256,18 +305,18 @@ progetto esiste.
 
 | | |
 |---:|:---|
-| **22** | luoghi, con **78** collegamenti, orari, stagionalità e vedute |
-| **13** | abitanti canonici che girano per il quartiere da soli |
+| **23** | luoghi, con **82** collegamenti, orari, stagionalità e vedute |
+| **16** | abitanti canonici che girano per il quartiere da soli, e fanno gesti |
 | **17** | poteri esper, con vistosità e Controllo |
 | **24** | tratti di personalità, riscritti nel Giappone del 1987 |
 | **10** | gesti fra personaggi, quasi tutti ambigui per costruzione |
 | **10** | club scolastici |
 | **14** | eventi stagionali di server |
 | **10** | copioni di episodi |
-| **51** | manopole di configurazione, tutte lette da qualcuno |
-| **18** | migrazioni |
-| **83** | rotte |
-| **467** | verifiche su 16 file di prova (15 unitari + 1 end-to-end) |
+| **69** | manopole di configurazione, tutte lette da qualcuno |
+| **20** | migrazioni |
+| **85** | rotte |
+| **507** | verifiche su 17 file di prova (16 unitari + 1 end-to-end) |
 
 ### Le schermate
 
@@ -287,7 +336,7 @@ Il pannello, per chi amministra: `/admin` il cruscotto · `/admin/utenti` e
 `/admin/utente/{id}` gli account, i personaggi e la moderazione ·
 `/admin/mappa` la carta con le presenze · `/admin/statistiche` ·
 `/admin/comunicazioni` i fili con i giocatori · `/admin/fotografie` il muro delle
-facce · `/admin/abitanti` i tredici del canone e i loro ritratti · `/admin/accessi` le provenienze · `/admin/impostazioni` le cinquantuno leve.
+facce · `/admin/abitanti` i sedici del canone e i loro ritratti · `/admin/accessi` le provenienze · `/admin/impostazioni` le sessantanove leve.
 
 È anche una **PWA**: si installa, e il service worker tiene in tasca il guscio
 del sito. Non mette mai in cache le pagine di gioco — il quartiere cambia ogni
@@ -317,7 +366,7 @@ non si accettano. Il nome del file è l'impronta sha256 del risultato, quindi no
 conseguenza che toglierla a uno non la toglie all'altro.
 
 Negli elenchi la faccia è abbastanza grande da riconoscere qualcuno, e passandoci sopra col
-mouse se ne apre un'anteprima grande. Anche i **tredici abitanti** del canone possono averne
+mouse se ne apre un'anteprima grande. Anche i **sedici abitanti** del canone possono averne
 una: si mette da `/admin/abitanti`, con lo stesso riquadro, un fotogramma della serie per
 ciascuno. Sono immagini dell'opera — character design di Akemi Takada, Studio Pierrot — e come
 le fotografie dei giocatori stanno solo sull'installazione viva e nel backup privato. Nel
@@ -758,6 +807,21 @@ Annotate qui perché non si ripetano.
    alla volta: per ogni ora del giorno, in un giorno di scuola, d'estate e in
    vacanza, controlla che quello che è aperto si raggiunga da qualunque posto
    passando solo per quello che è aperto.
+
+29. **Una risorsa che scende deve avere una strada per risalire.** Punti potere,
+   punti ferita e compostezza si spendevano e basta: nessuna riga del motore li
+   restituiva. Nessuna prova se ne accorgeva, perché ogni prova crea personaggi
+   nuovi, pieni. Se n'è accorto il quartiere: a una settimana dall'apertura i
+   due giocatori erano a compostezza zero, e coprire un incidente, chiarire un
+   malinteso o dichiararsi erano diventati impossibili per sempre. Le prove
+   vanno fatte anche su un personaggio stanco, non solo su uno appena nato.
+
+30. **Una condizione che una volta vera resta vera ripete la stessa storia.**
+   L'episodio «chiacchiere» si apriva se esisteva una voce passata per tre
+   bocche — e una volta che ne esisteva una, esisteva per sempre. In produzione
+   67 episodi su 67 erano quello. Ogni condizione va guardata chiedendosi come
+   torna falsa, e se non torna mai serve un limite a parte: qui, che la stessa
+   storia non torni alla stessa persona prima di dieci giorni.
 
 ## Licenza e diritti
 

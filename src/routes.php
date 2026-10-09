@@ -80,6 +80,8 @@ $router->post('/copri', [SegretoController::class, 'copri'], ['active', 'quartie
 $router->post('/confida', [SegretoController::class, 'confida'], ['active', 'quartiere', 'throttle']);
 $router->get('/taccuino', [SegretoController::class, 'taccuino'], ['active', 'quartiere']);
 $router->post('/taccuino/collega', [SegretoController::class, 'collega'], ['active', 'quartiere', 'throttle']);
+$router->post('/taccuino/scegli', [SegretoController::class, 'scegli'], ['active', 'quartiere', 'throttle']);
+$router->post('/nega', [SegretoController::class, 'nega'], ['active', 'quartiere', 'throttle']);
 
 // --- I legami ----------------------------------------------------------------------
 $router->get('/legami', [LegamiController::class, 'elenco'], ['active', 'quartiere']);

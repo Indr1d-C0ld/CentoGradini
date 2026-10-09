@@ -155,8 +155,9 @@ $p('autoipnosi', 'Autoipnosi', 'ヒュプノシス', null, 2, 75, 79, 3,
   . 'fretta.'),
 
 $p('natura', 'Comunicare con la natura', '自然との対話', null, 1, 80, 84, 4,
-  'Era il potere di Akemi, la madre di Kyosuke. Parlare con gli animali, e con il resto. Non '
-  . 'si comandano: si chiedono le cose, e metà delle volte ti ascoltano.',
+  'Parlare con gli animali, e con il resto. Non si comandano: si chiedono le cose, e metà delle '
+  . 'volte ti ascoltano. Il regolamento del 1990 lo dava ad Akemi, la madre di Kyosuke; nessuna '
+  . 'delle fonti sull\'opera lo conferma, e qui resta un potere della stirpe come gli altri.',
   'Animali sì, piante no. Mai un ordine: solo una richiesta, accolta una volta su due. '
   . 'Chi ha questo potere ha un rapporto con i posti che gli altri non capiscono.'),
 

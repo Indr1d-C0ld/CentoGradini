@@ -49,7 +49,7 @@ return [
            . 'si resta fino a buio: è l\'unico momento dell\'anno in cui stare seduti in un parco '
            . 'a non fare niente è una cosa che si fa apposta.'),
 
-        $e('reclutamento', 'Reclutamento dei club', 4, 20, 8, 'liceo', 70, 75, 30,
+        $e('reclutamento', 'Reclutamento dei club', 4, 10, 8, 'liceo', 70, 75, 30,
            'Banchetti nel corridoio, volantini, capitani che ti bloccano all\'uscita. Chi non si '
            . 'iscrive adesso non si iscrive più fino all\'anno prossimo.'),
 
@@ -97,7 +97,7 @@ return [
            'Un mese dopo, tocca ai ragazzi rispondere. Chi non risponde risponde lo stesso, e tutti '
            . 'lo sanno.'),
 
-        $e('diploma', 'Cerimonia di diploma', 3, 20, 1, 'liceo', 90, 75, 140,
+        $e('diploma', 'Cerimonia di diploma', 3, 15, 1, 'liceo', 90, 75, 140,
            'Il terzo anno se ne va. Bottoni della divisa staccati e regalati, lacrime nel cortile, '
            . 'e la certezza che ad aprile la scuola sarà la stessa con altre facce.'),
     ],

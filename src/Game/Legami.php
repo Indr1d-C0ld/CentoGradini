@@ -32,6 +32,29 @@ use App\Sim\Rng;
  */
 final class Legami
 {
+    /**
+     * Le tre persone il cui cuore e' gia' preso, per sempre: lo sfondo immobile
+     * su cui i giocatori scrivono la propria storia (PROGETTO §1, decisione 3).
+     */
+    public const TRIANGOLO = ['kyosuke', 'madoka', 'hikaru'];
+
+    /** Come rispondono, ciascuno a modo suo, a chi gli si dichiara. */
+    private const RISPOSTE_DEL_TRIANGOLO = [
+        'madoka' => 'Ti ascolta fino in fondo, senza interromperti, e per un momento ti sembra che '
+            . 'stia per dire qualcosa. Poi sorride — quel mezzo sorriso che non si capisce mai a chi '
+            . 'sia rivolto — e ti dice grazie. Lo dice sul serio. Ma mentre lo dice guarda verso i '
+            . 'gradini, e capisci che il posto che cercavi è già preso, da qualcuno che forse non lo '
+            . 'sa nemmeno.',
+        'kyosuke' => 'Diventa rosso fino alle orecchie, comincia tre frasi e non ne finisce '
+            . 'nessuna, e alla fine ti ringrazia come si ringrazia per un favore. Non è un no, e '
+            . 'non è nemmeno un sì: è uno che il cuore ce l\'ha già diviso in due, e non ha posto '
+            . 'per una terza metà. Ve ne andate ciascuno per la sua strada, imbarazzati uguali.',
+        'hikaru' => '«Ma io ho già il mio darling!» Lo dice ridendo, senza cattiveria, come si dice '
+            . 'una cosa ovvia. Poi ti dà una pacca sulla spalla e ti propone di andare tutti '
+            . 'all\'ABCB a prendere qualcosa. È fatta così: il suo cuore ha un indirizzo solo, e lo '
+            . 'sa tutto il quartiere tranne, forse, il destinatario.',
+    ];
+
     // --- Lettura -------------------------------------------------------------
 
     /**
@@ -148,7 +171,10 @@ final class Legami
             'neve'     => [$met['neve'], 'Non sta nevicando.'],
             'pranzo'   => [$cal['fase'] === 'pranzo', 'Si fa alla pausa pranzo.'],
             'sera'     => [in_array($cal['fase'], ['sera', 'notte'], true), 'Si fa di sera.'],
-            'diploma'  => [$cal['md'] === '03-15', 'Si fa il giorno del diploma, e basta.'],
+            // Il giorno del diploma e' quello del calendario degli eventi, non una
+            // data scritta qui: prima erano due date diverse (15 e 20 marzo).
+            'diploma'  => [in_array('diploma', array_column(Eventi::inCorso((int) $cal['gts']), 'ekey'), true),
+                           'Si fa il giorno del diploma, e basta.'],
             default    => [true, null],
         };
     }
@@ -210,6 +236,14 @@ final class Legami
             [(int) $pg['id'], $versoId, $gkey, $gts - 7 * 86400]
         )['n'] ?? 0);
         $resa = (int) round((int) $g['affetto'] * pow(0.55, $recenti));
+        // Il bentō lo si cucina, e conta come lo si cucina: e' la prima volta
+        // che l'abilita' CUCINA serve a qualcosa. Manami (9) lo fa come si
+        // deve; Kurumi (1) mette le verdure nello stufato senza tagliarle.
+        $disastro = false;
+        if ($gkey === 'bento') {
+            $resa = (int) round($resa * (0.4 + 0.06 * min(10, (int) ($pg['cucina'] ?? 5))));
+            $disastro = (int) ($pg['cucina'] ?? 5) <= 3;
+        }
         if ((int) $g['affetto'] > 0 && $resa < 1) {
             $resa = 0;
         }
@@ -254,6 +288,10 @@ final class Legami
             'visto_da'  => $fraintesi['visti'],
             'fraintesi' => $fraintesi['male'],
             'racconto'  => self::riempi((string) $g['lettura_vera'], $pg, $altro)
+                . ($disastro
+                    ? ' Il riso è scotto e la frittata è nera da una parte. ' . $altro['nome']
+                        . ' lo mangia lo stesso fino all\'ultimo chicco, e questo dice più del bentō.'
+                    : '')
                 . ($resa === 0 && (int) $g['affetto'] > 0
                     ? ' È la stessa cosa di sempre, e comincia a non voler più dire niente.'
                     : ''),
@@ -474,6 +512,20 @@ final class Legami
             sprintf('%s ha detto qualcosa a %s, a voce bassissima, e poi sono rimasti fermi tutti e due.',
                 Personaggio::nomeCompleto($pg), $altro['cognome'] . ' ' . $altro['nome']), $gts, 80);
 
+        // Il triangolo non si risolve: e' la terza decisione fondante
+        // (PROGETTO §1), «nessun giocatore puo' sposare Madoka, e nessuno puo'
+        // far confessare Kyosuke». Prima non lo diceva nessuna riga di codice:
+        // in produzione Kyosuke aveva gia' affetto 100 verso entrambi i
+        // giocatori e Madoka 93, e una dichiarazione a lei sarebbe stata
+        // accolta. Dichiararsi resta possibile — e' una cosa che si fa, e
+        // costa — ma la risposta e' quella dell'opera.
+        if (in_array((string) ($altro['png'] ?? ''), self::TRIANGOLO, true)) {
+            self::muovi($versoId, (int) $pg['id'], 2, 0, $gts);
+            self::vocedellaConfessione($pg, $versoId, $testimoni, $gts);
+            return ['ok' => true, 'detto' => true, 'esito' => 'altrove',
+                'racconto' => accorda(self::RISPOSTE_DEL_TRIANGOLO[(string) $altro['png']], $pg)];
+        }
+
         if ($loro['affetto'] >= $soglia) {
             self::muovi($versoId, (int) $pg['id'], 15, 0, $gts);
             self::muovi((int) $pg['id'], $versoId, 15, 0, $gts);
@@ -592,6 +644,27 @@ final class Legami
              WHERE (o.detentore_id IS NULL AND o.luogo IS NULL)
                 OR (o.detentore_id IS NOT NULL AND (p.id IS NULL OR p.stato <> 'attivo'))"
         );
+
+        // E un terzo, trovato dal controllo del 9 ottobre: dato a un abitante,
+        // l'oggetto restava da lui per sempre — gli abitanti non lo passano a
+        // nessuno. Dopo qualche giorno lo riportano dove si trova di solito,
+        // sui gradini, e chi lo cerca sa dove andare a guardarlo.
+        $giorni = max(1, GameConfig::int('oggetti.png_giorni', 3));
+        foreach (Database::all(
+            "SELECT o.okey, p.id, p.nome, p.cognome, p.sesso, p.luogo FROM oggetti_unici o
+             JOIN personaggi p ON p.id = o.detentore_id
+             WHERE p.png IS NOT NULL AND p.stato = 'attivo' AND o.gts <= ?",
+            [$gts - $giorni * 86400]
+        ) as $o) {
+            Database::run(
+                'UPDATE oggetti_unici SET detentore_id = NULL, luogo = ?, gts = ? WHERE okey = ?',
+                ['gradini', $gts, (string) $o['okey']]
+            );
+            Personaggio::traccia('gradini', (int) $o['id'], 'oggetto', accorda(sprintf(
+                '%s è salit{o} fin quassù e ha lasciato una cosa sul muretto, come si rimette a posto '
+                . 'una cosa che non è tua.', Personaggio::nomeCompleto($o)), $o), $gts, 70);
+            $persi[] = $o;
+        }
         foreach ($persi as $o) {
             $ultimo = Database::first(
                 'SELECT luogo FROM oggetti_passaggi WHERE okey = ? AND luogo IS NOT NULL ORDER BY id DESC LIMIT 1',
@@ -648,6 +721,37 @@ final class Legami
                                      ultimo_gts = VALUES(ultimo_gts)',
             [$da, $a, $affetto, $fraint, $gts, $gts]
         );
+
+        if ($dAffetto < 0 || $dFraint > 0) {
+            self::forseTradisce($da, $a, $affetto, $fraint, $gts);
+        }
+    }
+
+    /**
+     * «Ma se quel legame si guasta, il rischio torna, moltiplicato.»
+     *
+     * PROGETTO §7 lo diceva di chi conosce il tuo segreto perche' glielo hai
+     * confidato, e il codice non lo faceva: confidarsi era una mossa senza
+     * rovescio, quindi la migliore sempre. Adesso, se chi sapeva per
+     * confidenza scende sotto una soglia di affetto o sale sopra una di
+     * fraintendimento, il segreto smette di essere al sicuro: conta il doppio
+     * per il trasloco, e la prima cosa che fa e' raccontarlo.
+     */
+    private static function forseTradisce(int $chi, int $esper, int $affetto, int $fraint, int $gts): void
+    {
+        if ($affetto > GameConfig::int('legami.tradimento_affetto', -20)
+            && $fraint < GameConfig::int('legami.tradimento_fraint', 70)) {
+            return;
+        }
+        $riga = Database::first(
+            "SELECT 1 x FROM sanno WHERE esper_id = ? AND chi_sa_id = ? AND come = 'confidato'", [$esper, $chi]);
+        if ($riga === null) {
+            return;
+        }
+        Database::run("UPDATE sanno SET come = 'tradito', atteggiamento = 'dice', gts = ? WHERE esper_id = ? AND chi_sa_id = ?",
+            [$gts, $esper, $chi]);
+        $dove = (string) (Database::first('SELECT luogo FROM personaggi WHERE id = ?', [$chi])['luogo'] ?? 'gradini');
+        Voci::nasce('potere', $esper, null, $dove, [$chi], 'segreto', $gts);
     }
 
     private static function riempi(string $modello, array $a, array $b): string

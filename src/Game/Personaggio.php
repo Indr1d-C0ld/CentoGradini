@@ -214,8 +214,28 @@ final class Personaggio
 
         if ($fatto) {
             $pg = Database::first('SELECT * FROM personaggi WHERE id = ?', [$id]) ?? $pg;
+            // Arrivare all'aperto sotto la pioggia, senza ombrello: il raffreddore.
+            Stati::forseRaffreddore($pg, $destino, $arrivo);
         }
         return $pg;
+    }
+
+    /**
+     * Essere altrove adesso, senza strada in mezzo: il teletrasporto, la
+     * supervelocita'. Si chiude la presenza di qui e se ne apre una di la',
+     * come in un arrivo qualunque, e chi era per strada smette di esserlo.
+     *
+     * @param array<string,mixed> $pg
+     */
+    public static function spostaSubito(array $pg, string $dove, int $gts): void
+    {
+        $id = (int) $pg['id'];
+        Database::run('UPDATE presenze SET al_gts = ? WHERE personaggio_id = ? AND al_gts IS NULL', [$gts, $id]);
+        Database::run(
+            'UPDATE personaggi SET luogo = ?, arrivato_gts = ?, verso = NULL, arrivo_gts = NULL WHERE id = ?',
+            [$dove, $gts, $id]
+        );
+        Database::run('INSERT INTO presenze (personaggio_id, luogo, dal_gts) VALUES (?, ?, ?)', [$id, $dove, $gts]);
     }
 
     /** Tutti quelli rimasti per strada: lo chiama il battito. */
@@ -258,6 +278,10 @@ final class Personaggio
         [$aperto, $motivo] = Luoghi::accessibile($verso, $arrivo);
         if (!$aperto) {
             return ['ok' => false, 'error' => $motivo ?? 'Non ci si può andare adesso.'];
+        }
+        $porta = self::porta($pg, $verso);
+        if ($porta !== null) {
+            return ['ok' => false, 'error' => $porta];
         }
 
         Database::run(
@@ -391,6 +415,64 @@ final class Personaggio
         return $r === null ? null : (string) $r['luogo'];
     }
 
+    // --- Le case private ------------------------------------------------------------
+
+    /**
+     * Si puo' entrare in una casa privata? Null se si', altrimenti il perche'.
+     *
+     * La descrizione dei Kasuga lo diceva da sempre — «ci si entra solo se
+     * invitati» — e intanto ci si entrava alle tre di notte, e anche a casa di
+     * Madoka. Adesso alla porta serve qualcuno di casa, che sia dentro e a cui
+     * si stia abbastanza simpatici: l'invito non e' un pulsante, e' un legame.
+     * Chi abita in una casa e' l'abitante che ci dorme, cioe' quello per cui
+     * quella casa e' la prima tappa del giro.
+     *
+     * @param array<string,mixed> $pg
+     */
+    public static function porta(array $pg, string $lkey): ?string
+    {
+        $l = Luoghi::uno($lkey);
+        if ($l === null || !$l['privato']) {
+            return null;
+        }
+        $soglia = GameConfig::int('legami.soglia_invito', 30);
+        $diCasa = array_values(array_filter(
+            Database::all("SELECT * FROM personaggi WHERE png IS NOT NULL AND stato = 'attivo'"),
+            static fn (array $p): bool => (Abitanti::giro($p)[0] ?? null) === $lkey
+        ));
+        foreach ($diCasa as $p) {
+            if ((int) $p['id'] === (int) $pg['id']) {
+                return null;   // e' casa sua
+            }
+        }
+        foreach ($diCasa as $p) {
+            if ((string) $p['luogo'] === $lkey && $p['verso'] === null
+                && Legami::fra((int) $p['id'], (int) $pg['id'])['affetto'] >= $soglia) {
+                return null;
+            }
+        }
+        return 'È una casa privata: ci si entra se qualcuno di casa è dentro e ti fa entrare.';
+    }
+
+    /**
+     * Le uscite di un luogo come le vede questo personaggio: gli orari, e in
+     * piu' le porte delle case private.
+     *
+     * @param array<string,mixed> $pg
+     * @return list<array<string,mixed>>
+     */
+    public static function usciteDi(array $pg, string $lkey, ?int $gts = null): array
+    {
+        $out = Luoghi::uscite($lkey, $gts);
+        foreach ($out as &$u) {
+            if ($u['aperto'] && ($perche = self::porta($pg, (string) $u['a'])) !== null) {
+                $u['aperto'] = false;
+                $u['motivo'] = $perche;
+            }
+        }
+        return $out;
+    }
+
     public static function segnaVisto(int $id): void
     {
         Database::run('UPDATE personaggi SET visto_gts = ? WHERE id = ?', [Orologio::lineare(), $id]);
@@ -408,13 +490,17 @@ final class Personaggio
         $righe = Database::all(
             'SELECT id, nome, cognome, sesso, sezione, anno, anno_nascita, nato_mese, nato_giorno,
                     esper, arrivato_gts, png, png_nota, png_giro, ritratto_file
-             FROM personaggi
+             FROM personaggi p
              WHERE luogo = ? AND verso IS NULL AND id <> ? AND stato = ?
+               AND NOT EXISTS (SELECT 1 FROM stati s WHERE s.personaggio_id = p.id
+                               AND s.stato = ? AND s.fino_gts > ?)
              ORDER BY arrivato_gts',
-            [$lkey, $escludi ?? 0, 'attivo']
+            [$lkey, $escludi ?? 0, 'attivo', 'invisibile', Orologio::lineare()]
         );
         $adesso = Orologio::lineare();
         foreach ($righe as &$r) {
+            // Quello che gli si vede addosso: il raffreddore, i cerotti.
+            $r['addosso'] = Stati::addosso($r, $adesso);
             $r['da_minuti'] = (int) floor(($adesso - (int) $r['arrivato_gts']) / 60);
             // Un abitante il cui giro e' un posto solo non «e' li' da» un certo
             // tempo: c'e' sempre, ed e' quello che si dice di lui.

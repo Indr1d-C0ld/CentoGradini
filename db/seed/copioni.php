@@ -715,7 +715,7 @@ return [
  'premessa' => 'Ai giardini pensili non ci si capita: ci si viene. Sono quattro spiazzi '
      . 'quadrati a terrazze sul fianco della discesa, due panchine rivolte a sud, e da quaggiù '
      . 'si sente la gente parlare in fondo alla scalinata senza vederla. È il posto dove '
-     . 'Madoka, nel capitolo quarantacinque, dice a Kyosuke che se ne va in America. Chi '
+     . 'Madoka, nel quarantacinquesimo episodio della serie, dice a Kyosuke che se ne va in America. Chi '
      . 'convoca qualcuno qui ha già deciso cosa dirgli. Il problema è dirlo.',
  'luogo' => 'giardini',
  'condizione' => 'sempre',

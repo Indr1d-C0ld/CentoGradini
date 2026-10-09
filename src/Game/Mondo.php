@@ -109,7 +109,8 @@ final class Mondo
 
         return [
             'luogo'     => $luogo,
-            'uscite'    => Luoghi::uscite($lkey, $m['lineare']),
+            'uscite'    => $pg === null ? Luoghi::uscite($lkey, $m['lineare'])
+                : Personaggio::usciteDi($pg, $lkey, $m['lineare']),
             'presenti'  => Personaggio::presenti($lkey, $io),
             'passati'   => Personaggio::passatiDiRecente($lkey, $io),
             'tracce'    => Personaggio::tracce($lkey),

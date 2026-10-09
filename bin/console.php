@@ -98,8 +98,8 @@ try {
             // i poteri e le iscrizioni ai club. Vanno dopo la semina, perche'
             // hanno bisogno che i personaggi e i club esistano gia'.
             $a = App\Game\Abitanti::assicura();
-            riga(sprintf('%-22s %4d poteri, %d iscrizioni ai club  (abitanti canonici)',
-                'abitanti', $a['poteri'], $a['club']));
+            riga(sprintf('%-22s %4d poteri, %d iscrizioni ai club, %d legami rimessi a posto  (abitanti canonici)',
+                'abitanti', $a['poteri'], $a['club'], $a['legami']));
             break;
 
         case 'bilancio':

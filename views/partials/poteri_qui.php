@@ -20,6 +20,8 @@ if ($poteri === []) {
 }
 $testimoni = Segreto::testimoniPossibili($pg, (string) $pg['luogo']);
 $folla     = (int) $dati['folla'];
+$calore    = (int) ($dati['calore'] ?? 0);
+$fattore   = \App\Game\Stati::ha((int) $pg['id'], 'invisibile') ? 0.2 : 1.0;
 ?>
 <div class="carta">
   <p class="occhiello">Quello che potresti fare</p>
@@ -47,7 +49,7 @@ $folla     = (int) $dati['folla'];
       $peggio = 0;
       foreach ($testimoni as $t) {
           $peggio = max($peggio, Segreto::probabilitaNota(
-              (int) $p['vistosita'], (int) $t['testa'], (int) $p['controllo']));
+              (int) $p['vistosita'], (int) $t['testa'], (int) $p['controllo'], null, $calore, $fattore));
       }
       $invisibile = (int) $p['vistosita'] === 0;
     ?>
@@ -55,7 +57,25 @@ $folla     = (int) $dati['folla'];
         <td>
           <b><?= e($p['nome']) ?></b>
           <?php if ((int) $p['primario'] === 1): ?><em class="marchio-primario">principale</em><?php endif; ?>
-          <br><span class="tenue">controllo <?= (int) $p['controllo'] ?>%</span>
+          <br><span class="tenue">controllo <?= (int) $p['controllo'] ?>%<?=
+            in_array($p['pkey'], [...\App\Game\Poteri::CON_EFFETTO, 'sogni', 'blocco'], true) ? '' : ' · si vede, e basta' ?></span>
+          <?php
+            // La scelta (dove, su chi) sta sotto il nome e non accanto al
+            // pulsante: su un telefono la colonna del pulsante e' troppo
+            // stretta e la tendina mostrava una lettera sola. L'attributo
+            // `form` la lega al modulo che sta nell'ultima colonna.
+            $scelte = \App\Game\Poteri::scelte($pg, (string) $p['pkey']);
+            $serve  = \App\Game\Poteri::parametro((string) $p['pkey']);
+            $idForm = 'potere-' . $p['pkey'];
+          ?>
+          <?php if ($puoi && $serve !== null && $scelte !== []): ?>
+            <select name="scelta" form="<?= e($idForm) ?>" class="scelta-potere"
+                    aria-label="<?= $serve === 'luogo' ? 'Dove' : 'Su chi' ?>">
+              <?php foreach ($scelte as $s): ?>
+                <option value="<?= e($s['valore']) ?>"><?= e($s['nome']) ?></option>
+              <?php endforeach; ?>
+            </select>
+          <?php endif; ?>
         </td>
         <td style="text-align:right"><?= $costo ?></td>
         <td style="text-align:right">
@@ -68,12 +88,18 @@ $folla     = (int) $dati['folla'];
           <?php endif; ?>
         </td>
         <td style="text-align:right">
-          <?php if ($puoi): ?>
-            <form method="post" action="<?= e(url('/potere')) ?>">
+          <?php if ($p['pkey'] === 'sogni'): ?>
+            <span class="tenue">arrivano di notte</span>
+          <?php elseif ($puoi): ?>
+            <?php if ($serve !== null && $scelte === []): ?>
+              <span class="tenue"><?= $serve === 'luogo' ? 'nessun posto' : 'nessuno qui' ?></span>
+            <?php else: ?>
+            <form method="post" action="<?= e(url('/potere')) ?>" id="<?= e($idForm) ?>">
               <?= csrf_field() ?>
               <input type="hidden" name="potere" value="<?= e($p['pkey']) ?>">
               <button type="submit" class="secondario">usa</button>
             </form>
+            <?php endif; ?>
           <?php else: ?>
             <span class="tenue">senza forze</span>
           <?php endif; ?>

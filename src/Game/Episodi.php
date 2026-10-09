@@ -56,7 +56,7 @@ final class Episodi
                 continue;
             }
             foreach (self::luoghiCandidati($c) as $lkey) {
-                $cast = self::castDisponibile($lkey, (int) $c['max_cast'], $gts);
+                $cast = self::castDisponibile($lkey, (int) $c['max_cast'], $gts, (string) $c['ckey']);
                 if (count($cast) < (int) $c['min_cast']) {
                     continue;
                 }
@@ -166,13 +166,22 @@ final class Episodi
 
     /**
      * Chi può entrare: presenti, con la scheda chiusa, non già in un episodio,
-     * e che non ne abbiano appena finito uno.
+     * che non ne abbiano appena finito uno — e, se sono giocatori, che non
+     * abbiano già vissuto questa stessa storia di recente.
+     *
+     * L'ultima condizione è arrivata dopo che in produzione si erano aperti 67
+     * episodi, tutti di «chiacchiere»: la sua condizione resta vera per sempre
+     * appena una voce ha fatto tre passaggi, e chi giocava la rivedeva ogni
+     * quattro ore e mezza reali. Gli abitanti invece possono ripetere: sono il
+     * cast di contorno, e il Master che lucida bicchieri in tutte le storie
+     * dell'ABCB è giusto che ci sia.
      *
      * @return list<array<string,mixed>>
      */
-    private static function castDisponibile(string $lkey, int $max, int $gts): array
+    private static function castDisponibile(string $lkey, int $max, int $gts, string $ckey = ''): array
     {
-        $pausa = GameConfig::int('episodi.pausa_ore', 18) * 3600;
+        $pausa  = GameConfig::int('episodi.pausa_ore', 18) * 3600;
+        $stessa = max(0, GameConfig::int('episodi.stesso_copione_giorni', 10)) * 86400;
         return Database::all(
             "SELECT p.* FROM personaggi p
              WHERE p.luogo = ? AND p.verso IS NULL AND p.stato = 'attivo' AND p.scheda = 'completa'
@@ -180,9 +189,12 @@ final class Episodi
                  SELECT 1 FROM episodio_cast ec JOIN episodi e ON e.id = ec.episodio_id
                  WHERE ec.personaggio_id = p.id
                    AND (e.stato = 'aperto' OR e.chiuso_gts > ?))
+               AND (p.png IS NOT NULL OR NOT EXISTS (
+                 SELECT 1 FROM episodio_cast ec JOIN episodi e ON e.id = ec.episodio_id
+                 WHERE ec.personaggio_id = p.id AND e.ckey = ? AND e.aperto_gts > ?))
              ORDER BY (p.png IS NOT NULL), p.visto_gts DESC
              LIMIT ?",
-            [$lkey, $gts - $pausa, $max]
+            [$lkey, $gts - $pausa, $ckey, $gts - $stessa, $max]
         );
     }
 
@@ -473,9 +485,15 @@ final class Episodi
                 'compostezza' => Database::run(
                     'UPDATE personaggi SET compostezza = GREATEST(0, LEAST(compostezza_max, compostezza + ?))
                      WHERE id = ?', [$quanto, $id]),
-                'pf' => Database::run(
-                    'UPDATE personaggi SET pf = GREATEST(0, LEAST(pf_max, pf + ?)) WHERE id = ?',
-                    [$quanto, $id]),
+                'pf' => (function () use ($quanto, $id, $gts): void {
+                    Database::run('UPDATE personaggi SET pf = GREATEST(0, LEAST(pf_max, pf + ?)) WHERE id = ?',
+                        [$quanto, $id]);
+                    // Dopo una botta, con meno di meta' dei punti ferita: le
+                    // bende del regolamento del 1990.
+                    if ($quanto < 0) {
+                        Stati::forseBende($id, $gts);
+                    }
+                })(),
                 'pp' => Database::run(
                     'UPDATE personaggi SET pp = GREATEST(0, LEAST(pp_max, pp + ?)) WHERE id = ?',
                     [$quanto, $id]),
