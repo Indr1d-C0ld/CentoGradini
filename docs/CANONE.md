@@ -362,9 +362,18 @@ partono davvero (capp. 28, 31, 40, 48), quasi muto. Adesso gli abitanti hanno un
 **chiacchiera** a parte, scritta nel seme con la fonte (migrazione `0023`); per i giocatori
 resta DAI-SUKI.
 
-Resta aperta **l'età di Kazuya**: il seme gli dà otto anni (nato nel gennaio 1979, terza
-elementare), ma la sinossi TV 24 della FAQ dice «cinq ans plus jeune» di Kyosuke. È l'anime,
-non il manga, e il manga non lo dice: per ora resta com'è.
+**L'età di Kazuya, chiusa.** Il seme gli dà otto anni nell'aprile 1987 (nato il 25 gennaio
+1979, terza elementare), il regolamento del 1990 pure; ma il riassunto del cap. 35 dice «il
+cugino di 5 anni», e la sinossi TV 24 della FAQ «cinq ans plus jeune». Non si contraddicono:
+parlano di anni diversi. Il cap. 35 cade nell'autunno del 1984 — i capp. 30-31 sono la gita
+d'estate, il 36 è il 15 novembre in cui Kyosuke compie quindici anni, in terza media (la
+cronologia di Madoka, §6) — e lì Kazuya ha cinque anni: è nato fra la fine del 1978 e
+l'autunno del 1979, e nell'aprile 1987 ne ha sette o otto. Lo confermano le altre fonti
+francesi: «leur petit cousin qui n'a que cinq ans», il quiz di CyberFred («la différence
+d'âge entre Akane et Kazuya est de 10 ans», arrotondata da Kyosuke quindicenne), e
+l'episodio TV 24, in cui va all'asilo. Il «cinq ans plus jeune» della FAQ è una traduzione
+storpiata di «cinque anni». Il 25 gennaio 1979 sta dentro l'intervallo: resta com'è, ed è
+una data nostra con un vincolo canonico.
 
 ---
 

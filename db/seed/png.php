@@ -197,7 +197,9 @@ return [
            'Capelli semilunghi, ginocchia sbucciate, sorriso di chi le ha appena combinate.'),
 
         // Kazuya: otto anni, telepate — l'unico della famiglia (CANONE §2 e
-        // FAQ). Ed è più forte di Kyosuke. Sta alle elementari, che è il
+        // FAQ). Ed è più forte di Kyosuke. L'età ha un vincolo canonico: al
+        // cap. 35, nell'autunno 1984, ha cinque anni (CANONE §7, «L'età di
+        // Kazuya»), quindi nel 1987 sette o otto; il giorno è nostro. Sta alle elementari, che è il
         // motivo per cui la sezione «elementari» esiste.
         // Lui e Akane non abitano dai Kasuga — la famiglia di Kyosuke è di
         // quattro persone (voce giapponese) — ma con i loro genitori, a pochi
