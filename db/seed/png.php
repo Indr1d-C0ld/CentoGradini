@@ -51,6 +51,38 @@ $ritratto = static function (string $png) use ($fotografie): ?string {
     return $file !== '' && is_file(__DIR__ . '/../../assets/img/ritratti/' . $file) ? $file : null;
 };
 
+// I numeri delle quattro abilita' vengono dal canone (CANONE §7, verificata
+// il 13 ottobre 2026 su tutti i 156 riassunti, la FAQ e le voci giapponesi):
+// prima erano messi a occhio, e dicevano il contrario dell'opera — Kyosuke
+// con CUORE 10, Madoka con DAI-SUKI 8, Komatsu e Hatta fra i piu' affascinanti
+// del quartiere. La scala e' quella dei giocatori: 3-10 il tiro, 13-15
+// l'eccezione.
+//
+// **La chiacchiera non e' il fascino.** Le voci usavano DAI-SUKI come
+// loquacita', e con i numeri del canone Madoka — che sta per conto suo e i
+// segreti li tiene (FAQ 40; capp. 9, 155) — sarebbe diventata la piu'
+// pettegola del quartiere, e Komatsu, da cui le voci partono davvero (capp.
+// 28, 31, 40, 48), quasi muto. Per gli abitanti la loquacita' si scrive qui,
+// con la sua fonte; per i giocatori resta DAI-SUKI.
+$chiacchiera = [
+    'komatsu' => 13,  // «grazie a Komatsu si sparge la voce» (cap. 28; e 31, 40, 48)
+    'kurumi'  => 11,  // il megafono di casa: la voce del cap. 7, riferisce tutto a Hikaru (67, 82)
+    'sayuri'  => 11,  // fa girare le voci tramite le amiche (capp. 112, 155)
+    'hiromi'  => 10,  // le rivelazioni alla classe (capp. 83, 85)
+    'hikaru'  => 9,   // dice tutto, a tutti, subito; «ムードメーカー»
+    'kazuya'  => 9,   // ripete ad alta voce i pensieri altrui (cap. 35; TV 24)
+    'hatta'   => 7,   // va dietro a Komatsu: da solo non fa partire niente (cap. 48)
+    'akane'   => 6,
+    'kyosuke' => 5,
+    'takashi' => 5,
+    'manami'  => 4,   // le voci le smonta, non le fa girare (cap. 7)
+    'master'  => 4,   // sa tutto e tace; qualcosa lo lascia scappare per scherzo (47, 89, 97)
+    'madoka'  => 3,   // «孤高», «solitaire» (FAQ 40): i segreti li tiene
+    'yusaku'  => 3,   // quello che scopre se lo tiene
+    'umao'    => 2,   // non vedono nessun altro che l'altra persona (cap. 38)
+    'ushiko'  => 2,
+];
+
 $p = static fn (
     string $png, string $nome, string $cognome, string $sesso,
     string $sezione, int $anno, int $mese, int $giorno, int $annoNascita,
@@ -76,6 +108,7 @@ $p = static fn (
     'png_nota'     => $nota,
     'aspetto'      => $aspetto,
     'rissa'        => $ab[0], 'testa' => $ab[1], 'dai_suki' => $ab[2], 'cuore' => $ab[3],
+    'chiacchiera'  => $chiacchiera[$png] ?? null,
     'inglese'      => $sec[0], 'sport' => $sec[1], 'guida'  => $sec[2], 'kakko'   => $sec[3],
     'nuoto'        => $sec[4], 'musica' => $sec[5], 'cucina' => $sec[6], 'candore' => $sec[7],
     'pf_max'       => $pf, 'pf' => $pf,
@@ -111,7 +144,7 @@ return [
            'gradini', 'casa_kasuga,gradini,liceo,abcb,parco,viale',
            // Nuoto 1: non sa nuotare (cap. 66; al 143 sguazza ancora
            // nella vasca dei bambini). Prima era 6.
-           [6, 7, 7, 10], [4, 4, 3, 5, 1, 5, 4, 9], 9, 10,
+           [6, 6, 8, 3], [4, 2, 3, 3, 1, 5, 2, 9], 9, 10,
            'Un ragazzo del terzo anno con l\'aria di chi sta per dire qualcosa e poi non la dice.',
            'Capelli scuri spettinati, giacca della scuola sempre aperta, mani in tasca.'),
 
@@ -120,16 +153,19 @@ return [
         // Candore 3, quindi compostezza 9: è la sola che non perde la faccia.
         $p('madoka', 'Madoka', 'Ayukawa', 'f', 'superiori', 3, 5, 25, 1969, false,
            'abcb', 'casa_ayukawa,abcb,liceo,dischi,argine,gradini,moebius',
-           [13, 12, 8, 9], [9, 9, 7, 10, 8, 10, 9, 3], 11, 0,
+           [13, 14, 15, 4], [9, 9, 7, 10, 8, 10, 9, 3], 11, 0,
            'La ragazza che al bar sta dietro il bancone e non ti guarda finché non parli tu.',
            'Capelli lunghi castani, sguardo dritto, sigaretta che non accende più.'),
 
-        // Hikaru: tutta cuore e nessun filtro. Dai suki 13, fra i valori più
-        // alti del quartiere: si attacca alle persone, ed è il suo modo di
-        // stare al mondo, non un difetto.
+        // Hikaru: tutta cuore e nessun filtro. CUORE 13, il piu' alto del
+        // triangolo: «所構わず抱きつく», abbraccia ovunque. Rissa 7 perche' da
+        // bambina era lei a difendere Yusaku, e risponde per le rime (capp.
+        // 22, 57); Testa 4, i recuperi con Kurumi; e stonata (musica 2).
+        // Dai-suki 11: all'ABCB i clienti la preferiscono per la sua
+        // allegria (cap. 28).
         $p('hikaru', 'Hikaru', 'Hiyama', 'f', 'superiori', 1, 11, 15, 1971, false,
            'liceo', 'casa_hiyama,liceo,abcb,sala_giochi,parco,gradini',
-           [5, 7, 13, 12], [5, 8, 3, 7, 6, 6, 5, 8], 8, 0,
+           [7, 4, 11, 13], [5, 8, 3, 7, 6, 2, 5, 8], 8, 0,
            'Una del primo anno che ti chiama «darling» in mezzo al corridoio.',
            'Capelli corti castani da maschiaccio, un neo sotto l\'occhio destro, non sta ferma un attimo.'),
 
@@ -146,7 +182,7 @@ return [
         // superiori. Il giorno, il 20, è nostro — il canone non lo dice.
         $p('manami', 'Manami', 'Kasuga', 'f', 'superiori', 1, 1, 20, 1972, true,
            'casa_kasuga', 'casa_kasuga,commerciale,liceo,abcb',
-           [5, 11, 10, 9], [6, 5, 3, 6, 5, 5, 9, 4], 7, 9,
+           [5, 11, 9, 8], [6, 5, 3, 6, 5, 5, 9, 4], 7, 9,
            'Una del primo anno con gli occhiali, che ti saluta per prima e si ricorda il tuo nome.',
            'Coda di cavallo, occhiali tondi, borsa della spesa.'),
 
@@ -156,7 +192,7 @@ return [
         // le verdure nello stufato senza tagliarle). Prima era 4.
         $p('kurumi', 'Kurumi', 'Kasuga', 'f', 'superiori', 1, 1, 20, 1972, true,
            'casa_kasuga', 'casa_kasuga,sala_giochi,parco,commerciale',
-           [7, 7, 11, 8], [4, 9, 3, 6, 7, 5, 1, 7], 8, 9,
+           [7, 4, 8, 10], [4, 9, 3, 6, 7, 5, 1, 7], 8, 9,
            'Una del primo anno che sta sempre correndo dietro a qualcosa.',
            'Capelli semilunghi, ginocchia sbucciate, sorriso di chi le ha appena combinate.'),
 
@@ -168,7 +204,7 @@ return [
         // minuti a piedi (FAQ 50): `casa_zii`.
         $p('kazuya', 'Kazuya', 'Kasuga', 'm', 'elementari', 3, 1, 25, 1979, true,
            'parco', 'casa_zii,parco,luna_park,sala_giochi',
-           [3, 9, 9, 7], [2, 6, 1, 4, 5, 3, 2, 8], 5, 11,
+           [4, 12, 11, 9], [2, 6, 1, 4, 5, 3, 2, 4], 5, 11,
            'Un bambino che risponde a domande che non hai fatto ad alta voce.',
            'Otto anni, berretto calato sugli occhi, e l\'aria di sapere già cosa stai per dire.'),
 
@@ -177,33 +213,37 @@ return [
         // (cap. 57; FAQ 51, 1969): prima stava al secondo anno.
         $p('akane', 'Akane', 'Kasuga', 'f', 'superiori', 3, 8, 12, 1969, true,
            'stazione', 'casa_zii,stazione,commerciale,abcb,liceo,dischi,moebius,cinema',
-           [9, 10, 12, 7], [7, 7, 6, 9, 6, 7, 6, 5], 9, 10,
+           [11, 10, 12, 7], [7, 7, 6, 9, 6, 7, 6, 5], 9, 10,
            'Una del terzo anno che sembra sempre sul punto di ridere di te.',
            'Capelli corti, quasi sempre in pantaloni, andatura sicura, cambia espressione troppo in fretta.'),
 
         // --- La scuola --------------------------------------------------------
         // Yusaku fa karate perché da bambino Hikaru gli disse che se fosse
-        // diventato forte l'avrebbe sposato (FAQ 36). Rissa 11, candore 9:
-        // sa picchiare e non sa parlare.
+        // diventato forte l'avrebbe sposato (FAQ 36). Rissa 13 (secondo dan),
+        // CUORE 4, candore 9: sa picchiare e non sa parlare — «davanti a
+        // Hikaru diventa un vigliacco» (voce giapponese).
         $p('yusaku', 'Yusaku', 'Hino', 'm', 'superiori', 1, 10, 7, 1971, false,
            'liceo', 'commerciale,liceo,parco,gradini',
-           [11, 7, 5, 9], [4, 9, 3, 5, 6, 3, 4, 9], 10, 0,
+           [13, 6, 6, 4], [4, 9, 3, 5, 6, 3, 4, 9], 10, 0,
            'Uno del primo anno in tuta da karate, che arrossisce se lo guardi.',
            'Fascia in testa, spalle larghe, sguardo fisso a terra quando c\'è Hikaru.'),
 
-        // Komatsu e Hatta: i due amici. Dai suki alto, discrezione zero — sono
-        // i megafoni del quartiere, e in F6 è un ruolo meccanico oltre che
-        // narrativo: sono quelli che fanno correre le voci.
+        // Komatsu e Hatta: i due amici. Poco fascino — brufoli e capelli
+        // ricci l'uno, occhiali e pancetta l'altro, e le gemelle non li
+        // degnano (voce giapponese) — e nessuna vergogna: candore basso.
+        // Komatsu e' il megafono del quartiere (la chiacchiera e' sopra, a
+        // parte dal fascino), si dichiara a Sayuri davanti alla classe
+        // (cap. 112), e da bambino era il primo della classe (cap. 132).
         $p('komatsu', 'Seiji', 'Komatsu', 'm', 'superiori', 3, 6, 19, 1969, false,
            'liceo', 'commerciale,liceo,sala_giochi,abcb,dischi,parco,stazione,cinema',
            // Nuoto 1: non sa nuotare nemmeno lui (cap. 30). Prima era 6.
-           [6, 6, 12, 6], [4, 6, 4, 4, 1, 5, 3, 8], 8, 0,
+           [5, 7, 5, 9], [4, 3, 4, 4, 1, 5, 3, 3], 8, 0,
            'Uno del terzo anno che sa già tutto di tutti, e te lo racconta.',
            'Capelli ricci di natura, qualche brufolo, ride prima di finire la frase.'),
 
         $p('hatta', 'Kazuya', 'Hatta', 'm', 'superiori', 3, 2, 28, 1970, false,
            'liceo', 'commerciale,liceo,sala_giochi,abcb,dischi,cinema',
-           [6, 7, 11, 6], [5, 5, 4, 4, 5, 6, 3, 8], 8, 0,
+           [5, 6, 4, 6], [5, 5, 4, 4, 5, 6, 3, 5], 8, 0,
            'Uno del terzo anno che sta sempre a un passo dietro Komatsu.',
            'Occhiali, paffuto, sempre mezzo passo dietro Komatsu.'),
 
@@ -220,7 +260,7 @@ return [
         // sa benissimo quello che fa.
         $p('sayuri', 'Sayuri', 'Hirose', 'f', 'superiori', 2, 6, 3, 1970, false,
            'commerciale', 'commerciale,liceo,abcb,dischi,stazione,sala_giochi,cinema,moebius',
-           [7, 12, 14, 6], [7, 6, 5, 10, 6, 6, 6, 2], 8, 0,
+           [6, 12, 13, 4], [7, 6, 5, 10, 6, 6, 6, 2], 8, 0,
            'Una del secondo anno che ti sorride come se vi conosceste da sempre. Non è vero.',
            'Codini, curatissima, e ti guarda un mezzo secondo più del necessario.'),
 
@@ -231,7 +271,7 @@ return [
         // ti ha conosciuto *prima* e' una minaccia con le gambe.
         $p('hiromi', 'Hiromi', 'Sugi', 'f', 'superiori', 3, 1, 22, 1970, false,
            'liceo', 'liceo,commerciale,abcb,parco,gradini',
-           [5, 13, 10, 8], [8, 5, 4, 6, 5, 5, 7, 6], 8, 0,
+           [6, 9, 9, 8], [8, 5, 4, 6, 5, 5, 7, 4], 8, 0,
            'Una del terzo anno che ti conosce da prima, e si ricorda di com\'eri.',
            'Capelli corti, sveglia, e un album di fotografie che non doveva portare.'),
 
@@ -247,7 +287,7 @@ return [
         // davanti — scrivevano «Master Il».
         $p('master', 'Master', '', 'm', 'adulti', 0, 1, 30, 1952, false,
            'abcb', 'abcb',
-           [10, 12, 6, 11], [8, 4, 8, 8, 4, 8, 10, 2], 12, 0,
+           [7, 13, 9, 12], [8, 4, 8, 8, 4, 8, 10, 2], 12, 0,
            'L\'uomo dietro il bancone dell\'ABCB. Non chiede niente e sente tutto.',
            'Capelli ricci, baffi e barba, grembiule, un bicchiere che lucida da mezz\'ora.'),
 
@@ -259,7 +299,7 @@ return [
         // compleanno e' nostro: il canone non lo da'.
         $p('takashi', 'Takashi', 'Kasuga', 'm', 'adulti', 0, 10, 2, 1944, false,
            'casa_kasuga', 'casa_kasuga,gradini,argine,parco,tempio,stazione',
-           [6, 11, 9, 12], [6, 4, 7, 5, 5, 5, 4, 6], 10, 0,
+           [7, 10, 9, 12], [6, 4, 7, 5, 5, 5, 4, 6], 10, 0,
            'Un uomo con la macchina fotografica al collo, che aspetta la luce giusta come si aspetta l\'autobus.',
            'Giacca stropicciata, borsa da fotografo a tracolla, l\'aria gentile di chi si distrae.'),
 
@@ -272,13 +312,13 @@ return [
         // negozio della via, come Yusaku, ed e' una scelta nostra.
         $p('umao', 'Umao', '', 'm', 'adulti', 0, 6, 14, 1966, false,
            'parco', 'commerciale,parco,albero,argine,luna_park,giardini,cinema',
-           [5, 6, 14, 13], [3, 5, 8, 4, 5, 5, 5, 2], 9, 0,
+           [6, 5, 6, 14], [3, 5, 8, 4, 5, 5, 5, 2], 9, 0,
            'Un ragazzo che chiama la fidanzata «Ushiko!» come se recitasse a teatro.',
            'Pettinatura alla moda di qualche anno fa, e occhi solo per lei.'),
 
         $p('ushiko', 'Ushiko', '', 'f', 'adulti', 0, 9, 3, 1966, false,
            'parco', 'commerciale,parco,albero,argine,luna_park,giardini,cinema',
-           [4, 7, 14, 14], [3, 4, 5, 4, 5, 6, 6, 2], 8, 0,
+           [6, 5, 6, 14], [3, 4, 5, 4, 5, 6, 6, 2], 8, 0,
            'Una ragazza che risponde «Umao!» con la stessa enfasi, e non si accorge di nessun altro.',
            'Vestito a fiori, e occhi solo per lui.'),
     ],

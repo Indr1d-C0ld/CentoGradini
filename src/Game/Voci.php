@@ -139,7 +139,7 @@ final class Voci
         $coppie = Database::all(
             'SELECT vv.voce_id, vv.personaggio_id AS da_id, b.id AS a_id,
                     vv.precisione, vv.tono, vv.passaggi, a.luogo,
-                    a.dai_suki AS loquacita, b.testa AS attenzione
+                    COALESCE(a.chiacchiera, a.dai_suki) AS loquacita, b.testa AS attenzione
              FROM voci_versioni vv
              JOIN personaggi a ON a.id = vv.personaggio_id AND a.stato = ? AND a.verso IS NULL
              JOIN personaggi b ON b.luogo = a.luogo AND b.id <> a.id AND b.stato = ? AND b.verso IS NULL
@@ -173,6 +173,9 @@ final class Voci
                 (int) $c['voce_id'], (int) $c['da_id'], (int) $c['a_id'], intdiv($gts, 3600));
 
             // Chi è socievole racconta di più; chi è sveglio capisce meglio.
+            // La loquacità è DAI-SUKI per i giocatori, e per gli abitanti
+            // quella scritta nel seme (`chiacchiera`): Madoka è bellissima e
+            // non racconta niente, Komatsu il contrario.
             $p = $prob * (0.6 + 0.08 * (int) $c['loquacita']);
             if (!$rng->chance(min(0.95, $p))) {
                 continue;
@@ -195,7 +198,7 @@ final class Voci
         $coppie = Database::all(
             'SELECT vv.voce_id, vv.personaggio_id AS da_id, m2.personaggio_id AS a_id,
                     vv.precisione, vv.tono, vv.passaggi, m1.ckey,
-                    a.dai_suki AS loquacita
+                    COALESCE(a.chiacchiera, a.dai_suki) AS loquacita
              FROM voci_versioni vv
              JOIN club_membri m1 ON m1.personaggio_id = vv.personaggio_id
              JOIN club_membri m2 ON m2.ckey = m1.ckey AND m2.personaggio_id <> m1.personaggio_id

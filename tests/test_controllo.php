@@ -16,6 +16,7 @@ require __DIR__ . '/_prova.php';
 
 use App\Core\Config;
 use App\Core\Database;
+use App\Core\GameConfig;
 use App\Game\Legami;
 use App\Game\Personaggio;
 use App\Game\Riposo;
@@ -1050,6 +1051,86 @@ prova('un biglietto si lascia solo a chi si è incontrato', function () {
     Legami::muovi((int) $a['id'], (int) $b['id'], 5, 0);
     vero(\App\Game\Bacheca::lascia(di($a), (int) $b['id'], 'Ciao!')['ok']);
     Database::run('DELETE FROM biglietti WHERE da_id = ?', [(int) $a['id']]);
+});
+
+// =============================================================================
+titolo('I numeri del canone');
+
+prova('il triangolo e\' nei numeri: Hikaru dice tutto, Kyosuke e Madoka no', function () {
+    // CANONE §7, verificata il 13 ottobre 2026 sui 156 riassunti: prima del
+    // controllo Kyosuke aveva CUORE 10 e Madoka 9, e il triangolo si sarebbe
+    // sciolto alla prima dichiarazione.
+    $ky = abitante('kyosuke'); $ma = abitante('madoka'); $hi = abitante('hikaru');
+    vero((int) $ky['cuore'] <= 4 && (int) $ma['cuore'] <= 4, 'Kyosuke e Madoka non dicono quello che provano');
+    vero((int) $hi['cuore'] > (int) $ky['cuore'] + 5 && (int) $hi['cuore'] > (int) $ma['cuore'] + 5,
+        'Hikaru e\' quella che lo dice a tutti');
+    $max = (int) Database::first('SELECT MAX(dai_suki) n FROM personaggi WHERE png IS NOT NULL')['n'];
+    uguale($max, (int) $ma['dai_suki'], 'nessuno nel quartiere e\' affascinante come Madoka');
+    vero((int) $hi['testa'] < (int) $ma['testa'] - 6, 'Hikaru non se ne accorge, Madoka si\'');
+});
+
+prova('la chiacchiera non e\' il fascino', function () {
+    $komatsu = abitante('komatsu'); $madoka = abitante('madoka');
+    vero((int) $komatsu['dai_suki'] < 7, 'Komatsu non e\' un rubacuori (voce giapponese)');
+    $max = (int) Database::first('SELECT MAX(chiacchiera) n FROM personaggi WHERE png IS NOT NULL')['n'];
+    uguale($max, (int) $komatsu['chiacchiera'], 'ma le voci partono da lui');
+    vero((int) $madoka['chiacchiera'] <= 4, 'e Madoka i segreti li tiene');
+    uguale(0, (int) Database::first(
+        'SELECT COUNT(*) n FROM personaggi WHERE png IS NOT NULL AND chiacchiera IS NULL')['n'],
+        'ogni abitante ha la sua, scritta nel seme con la fonte');
+});
+
+prova('a parita\' di fascino, chi chiacchiera fa girare le voci prima', function () {
+    // Due bocche con lo stesso DAI-SUKI e chiacchiera opposta, ciascuna in un
+    // luogo con un solo ascoltatore. Otto voci a testa: si conta in quante ore
+    // arrivano tutte. I tiri sono ancorati a voce, coppia e ora, e la
+    // differenza attesa e' larga (63% contro 27% all'ora).
+    //
+    // Isolata dal resto del quartiere in due modi, perche' dentro la suite il
+    // quartiere e' pieno: chi c'era in quei due luoghi va «per strada» (chi e'
+    // per strada non sente e non racconta) e poi torna com'era — spostarlo
+    // altrove lo faceva finire nei cast delle prove successive —; e il tetto
+    // di passaggi per battito si alza, se no le chiacchiere degli altri si
+    // prendono i posti.
+    $luoghi = ['giardini', 'area_giochi'];
+    $marcatori = "'" . implode("','", $luoghi) . "'";
+    $erano = Database::all("SELECT id, verso, arrivo_gts FROM personaggi WHERE luogo IN ({$marcatori}) AND verso IS NULL");
+    $tetto = (string) GameConfig::get('voci.per_battito', '40');
+    try {
+        foreach ($erano as $r) {
+            Database::run('UPDATE personaggi SET verso = ?, arrivo_gts = ? WHERE id = ?', ['parco', Orologio::lineare() + 30 * 86400, (int) $r['id']]);
+        }
+        GameConfig::set('voci.per_battito', '2000');
+        $ore = [];
+        foreach (['pettegolo' => 15, 'muto' => 2] as $chi => $quanto) {
+            $l = array_shift($luoghi);
+            $bocca = persona(ucfirst($chi), $l);
+            Database::run('UPDATE personaggi SET dai_suki = 9, chiacchiera = ? WHERE id = ?', [$quanto, (int) $bocca['id']]);
+            $orecchio = persona('Orecchio' . $chi, $l);
+            $voci = [];
+            for ($i = 0; $i < 8; $i++) {
+                $soggetto = persona('Soggetto' . $chi . $i, 'stazione');
+                $voci[] = \App\Game\Voci::nasce('potere', (int) $soggetto['id'], null, $l, [(int) $bocca['id']], 'telecinesi');
+            }
+            $g = Orologio::lineare();
+            $arrivate = 0;
+            for ($h = 0; $h < 48 && $arrivate < count($voci); $h++) {
+                \App\Game\Voci::giro($g + $h * 3600);
+                $arrivate = (int) Database::first(
+                    'SELECT COUNT(*) n FROM voci_versioni WHERE personaggio_id = ? AND voce_id IN (' . implode(',', $voci) . ')',
+                    [(int) $orecchio['id']])['n'];
+                $ore[$chi] = $h + 1;
+            }
+            uguale(count($voci), $arrivate, "le voci del {$chi} arrivano tutte, prima o poi");
+        }
+        vero($ore['pettegolo'] < $ore['muto'],
+            "il pettegolo ci mette meno: {$ore['pettegolo']} ore contro {$ore['muto']}");
+    } finally {
+        GameConfig::set('voci.per_battito', $tetto);
+        foreach ($erano as $r) {
+            Database::run('UPDATE personaggi SET verso = NULL, arrivo_gts = ? WHERE id = ?', [$r['arrivo_gts'], (int) $r['id']]);
+        }
+    }
 });
 
 pulisci();

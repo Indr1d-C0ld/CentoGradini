@@ -56,9 +56,11 @@ final class Abitanti
     /**
      * I club dei canonici.
      *
-     * Solo Yusaku e' canone — fa karate, e ha cominciato perche' da bambino
+     * Due sono canone. Yusaku fa karate, e ha cominciato perche' da bambino
      * Hikaru gli aveva detto che se fosse diventato forte l'avrebbe sposato
-     * (FAQ 36). Il resto e' nostra ricostruzione e sta scritto in FONTI.md.
+     * (FAQ 36). Akane e' nel club di atletica e si allena ogni mattina prima
+     * delle lezioni (cap. 114): prima la mettevamo in quello di musica. Il
+     * resto e' nostra ricostruzione e sta scritto in FONTI.md.
      *
      * **Madoka non compare in questo elenco, e non e' una dimenticanza.** La
      * FAQ 40 e' esplicita: e' nota a molte bande, non ha mai aderito a
@@ -75,7 +77,7 @@ final class Abitanti
         'komatsu' => ['giornalino' => 'socio'],
         'manami'  => ['cucina'     => 'socio'],
         'kurumi'  => ['tennis'     => 'socio'],
-        'akane'   => ['musica'     => 'socio'],
+        'akane'   => ['atletica'   => 'socio'],
     ];
 
     /**
@@ -352,6 +354,14 @@ final class Abitanti
                 );
                 $fatti++;
             }
+            // Un club tolto da qui va tolto anche dal quartiere: prima l'INSERT
+            // aggiungeva e basta, e Akane sarebbe rimasta anche nel club di
+            // musica dopo essere passata a quello di atletica.
+            $marcatori = implode(',', array_fill(0, count($club), '?'));
+            Database::run(
+                "DELETE FROM club_membri WHERE personaggio_id = ? AND ckey NOT IN ({$marcatori})",
+                array_merge([(int) $pg['id']], array_keys($club))
+            );
         }
         return $fatti;
     }

@@ -343,9 +343,9 @@ progetto esiste.
 | **26** | copioni di episodi, sedici presi dall'opera |
 | **4** | oggetti unici, uno per server |
 | **71** | manopole di configurazione, tutte lette da qualcuno |
-| **22** | migrazioni |
+| **23** | migrazioni |
 | **86** | rotte |
-| **538** | verifiche su 18 file di prova (17 unitari + 1 end-to-end) |
+| **541** | verifiche su 18 file di prova (17 unitari + 1 end-to-end) |
 
 ### Le schermate
 
@@ -923,6 +923,14 @@ Annotate qui perché non si ripetano.
    prova su un abitante che non ce l'ha, le tracce si cercano per il nome del
    personaggio di prova, e in produzione la prova non lancia un battito accanto a
    quello del cron.
+
+38. **Un numero con due mestieri ne fa male almeno uno.** DAI-SUKI è il fascino, e il motore
+   la usava anche come loquacità nelle voci. Finché i numeri degli abitanti erano messi a
+   occhio non si vedeva; rimessi al canone, Madoka — la più bella del quartiere, e quella
+   che i segreti li tiene — sarebbe diventata la più pettegola, e Komatsu, il megafono della
+   scuola, quasi muto. Quando una grandezza comincia a servire a due cose, va chiesto se le
+   due cose vanno sempre insieme: qui no, e la chiacchiera degli abitanti adesso è un numero
+   suo, con la fonte accanto.
 
 ## Licenza e diritti
 

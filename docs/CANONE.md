@@ -318,27 +318,53 @@ statistica che in questa storia decide qualcosa.
 CUORE 3, 4 e 13. Chi ha il coraggio di parlare è quella che non può essere ricambiata. La
 storia dura diciotto volumi per questo, e adesso il sistema lo dice con i numeri.
 
-> **Nota del 13 ottobre 2026.** Questa tabella è la prima stesura, ed è rimasta qui com'era.
-> I numeri in uso sono in `db/seed/png.php`, ritarati con F2 sulla stessa scala delle schede
-> dei giocatori (che distribuiscono punti, e non arrivano a 13-15 su tutto):
->
-> | Personaggio | RISSA | TESTA | DAI-SUKI | CUORE |
-> |:---|:---:|:---:|:---:|:---:|
-> | Kyosuke | 6 | 7 | 7 | 10 |
-> | Madoka | 13 | 12 | 8 | 9 |
-> | Hikaru | 5 | 7 | 13 | 12 |
-> | Manami | 5 | 11 | 10 | 9 |
-> | Kurumi | 7 | 7 | 11 | 8 |
-> | Yūsaku | 11 | 7 | 5 | 9 |
-> | Kazuya | 3 | 9 | 9 | 7 |
-> | Akane | 9 | 10 | 12 | 7 |
-> | Il Master | 10 | 12 | 6 | 11 |
->
-> Il triangolo regge in parte: fra i tre Hikaru ha ancora il CUORE più alto e Madoka il più
-> basso. L'indecisione di Kyosuke, invece, non la porta più il CUORE ma il **candore**, che
-> nella scheda di oggi è un'abilità secondaria: il suo, 9, è il più alto del quartiere alla
-> pari con quello di Yūsaku, e la compostezza che ne deriva è 3 — arrossisce e perde la faccia
-> prima di quasi tutti.
+### Rimessi al canone, il 13 ottobre 2026
+
+Questa tabella non era mai arrivata nel gioco. I numeri di `db/seed/png.php` erano nati con F6
+messi a occhio, e dicevano il contrario dell'opera: Kyosuke con CUORE 10, Madoka con DAI-SUKI 8
+e CUORE 9, Yūsaku con CUORE 9, Komatsu e Hatta fra i più affascinanti del quartiere. Il 13
+ottobre la tabella è stata **verificata** su tutti i 156 riassunti, la FAQ (1-99 e sinossi
+TV/OAV), la voce giapponese e le pagine del wiki giapponese di ciascuno, ed estesa ai sette
+abitanti che non c'erano. È quella che il gioco usa adesso. La scala è la stessa dei
+giocatori: 3-10 il tiro, 13-15 l'eccezione.
+
+| Personaggio | RISSA | TESTA | DAI-SUKI | CUORE | Cosa è cambiato rispetto a sopra, e perché |
+|:---|:---:|:---:|:---:|:---:|:---|
+| **Kyosuke** | 6 | 6 | **8** | 3 | «ごく普通の男子に見える», *sembra un ragazzo del tutto normale*; Sayuri lo nota «pur non essendo particolarmente avvenente» (cap. 88) |
+| **Madoka** | 13 | 14 | 15 | 4 | confermata |
+| **Hikaru** | **7** | 4 | **11** | 13 | da bambina difendeva Yūsaku, risponde per le rime (capp. 22, 57); all'ABCB i clienti la preferiscono per la sua allegria (cap. 28) |
+| **Manami** | 5 | 11 | 9 | 8 | confermata |
+| **Kurumi** | **7** | 4 | 8 | 10 | stende Kyosuke «come al solito» (capp. 49, 113) |
+| **Yūsaku** | 13 | 6 | **6** | 4 | nessun segno di fascino: il popolare fra i due rivali è Harada |
+| **Kazuya** | **4** | 12 | 11 | **9** | corpo di bambino (cap. 43); sui sentimenti suoi è bloccato come il cugino (cap. 53) |
+| **Akane** | 11 | **10** | 12 | 7 | organizza bene ma legge male le persone (capp. 60, 101) |
+| **Il Master** | 7 | 13 | 9 | 12 | confermata |
+| **Komatsu** | 5 | 7 | 5 | 9 | brufoli e capelli ricci, le gemelle non lo degnano (voce giapponese); primo della classe da bambino (cap. 132); si dichiara a Sayuri davanti alla classe (cap. 112) |
+| **Hatta** | 5 | 6 | 4 | 6 | occhiali e pancetta, «sporcaccione quanto Komatsu»; ma è l'unico che vede che Madoka è cambiata (cap. 155) |
+| **Sayuri** | 6 | 12 | 13 | 4 | bella e fiera di esserlo, piani studiati (capp. 88, 96, 106, 112); davanti ai ragazzi «fa la santarellina»: le mosse le fa, quello che prova non lo dice |
+| **Hiromi** | 6 | 9 | 9 | 8 | la testimone attenta (capp. 83, 85); il 13 di prima non aveva appoggio |
+| **Takashi** | 7 | 10 | 9 | 12 | chiede la mano ad Akemi il giorno in cui le isole si congiungono (cap. 150): l'opposto del figlio |
+| **Umao, Ushiko** | 6 | 5 | 6 | 14 | non fanno che dichiararsi, l'uno all'altra (cap. 38; FAQ 59); il DAI-SUKI 14 di prima li metteva alla pari con Madoka |
+
+**Il triangolo in una riga, di nuovo:** DAI-SUKI 8, 15 e 11; CUORE 3, 4 e 13.
+
+Con i numeri sono cambiate alcune abilità secondarie che il canone smentisce: Hikaru è stonata
+(musica 6 → 2, «音痴であり、歌がヘタ»), Kyosuke negato per lo sport, lo stile e la cucina
+(sport 4 → 2, kakko 5 → 3 — il regolamento del 1990 gli dà «un KAKKO di 3 o giù di lì» —,
+cucina 4 → 2: la zuppa del cap. 108), Komatsu sfacciato e negato per lo sport (candore 8 → 3,
+sport 6 → 3: non sa nuotare, bara alla maratona), Kazuya «マセていてエロガキ» (candore 8 → 4),
+Hatta e Hiromi meno timidi (candore 8 → 5 e 6 → 4).
+
+**La chiacchiera non è il fascino.** Il motore usava DAI-SUKI anche per quanto uno fa girare
+le voci, e con questi numeri Madoka — «孤高», «solitaire» (FAQ 40), una che i segreti li tiene
+(capp. 9, 155) — sarebbe diventata la più pettegola del quartiere, e Komatsu, da cui le voci
+partono davvero (capp. 28, 31, 40, 48), quasi muto. Adesso gli abitanti hanno una
+**chiacchiera** a parte, scritta nel seme con la fonte (migrazione `0023`); per i giocatori
+resta DAI-SUKI.
+
+Resta aperta **l'età di Kazuya**: il seme gli dà otto anni (nato nel gennaio 1979, terza
+elementare), ma la sinossi TV 24 della FAQ dice «cinq ans plus jeune» di Kyosuke. È l'anime,
+non il manga, e il manga non lo dice: per ora resta com'è.
 
 ---
 
@@ -372,7 +398,11 @@ mezzo, e quel mezzo gradino è la prima cosa che si sono detti.
 ### I club scolastici: nel manga non ci sono
 
 Questa è la risposta più netta, ed è una risposta negativa. Su 156 capitoli, le uniche
-occorrenze di un club sono tre:
+occorrenze di un club sono quattro:
+
+- **cap. 114** — **Akane** è nel *club di atletica* e si allena ogni mattina prima delle
+  lezioni. È l'unica iscrizione attestata (trovata il 13 ottobre 2026: prima la si era
+  saltata, e il gioco la metteva nel club di musica).
 
 - **cap. 117** — Toba invita **Madoka** a entrare nel *club di atletica*. Lei non entra: è la
   conferma a livello di capitolo di quello che la FAQ 40 dice in generale, cioè che Madoka
