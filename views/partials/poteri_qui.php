@@ -90,6 +90,8 @@ $fattore   = \App\Game\Stati::ha((int) $pg['id'], 'invisibile') ? 0.2 : 1.0;
         <td style="text-align:right">
           <?php if ($p['pkey'] === 'sogni'): ?>
             <span class="tenue">arrivano di notte</span>
+          <?php elseif ($p['pkey'] === 'blocco'): ?>
+            <span class="tenue">scatta da solo</span>
           <?php elseif ($puoi): ?>
             <?php if ($serve !== null && $scelte === []): ?>
               <span class="tenue"><?= $serve === 'luogo' ? 'nessun posto' : 'nessuno qui' ?></span>

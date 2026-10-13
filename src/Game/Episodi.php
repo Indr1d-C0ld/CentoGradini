@@ -56,7 +56,8 @@ final class Episodi
                 continue;
             }
             foreach (self::luoghiCandidati($c) as $lkey) {
-                $cast = self::castDisponibile($lkey, (int) $c['max_cast'], $gts, (string) $c['ckey']);
+                $cast = self::castDisponibile($lkey, (int) $c['max_cast'], $gts, (string) $c['ckey'],
+                    (string) ($c['esclusi'] ?? ''));
                 if (count($cast) < (int) $c['min_cast']) {
                     continue;
                 }
@@ -134,8 +135,10 @@ final class Episodi
             // Una giornata su dieci, la stessa per tutto il quartiere: per le
             // storie che non devono succedere spesso, come il mondo senza
             // Hikaru. Si ancora al giorno, quindi dura tutto il giorno.
+            // «giorno:12-24»: un giorno preciso del calendario, per le storie
+            // che hanno una data — la vigilia di Natale non dura due giorni.
             'raro'      => Rng::for(GameConfig::int('world.seed', 19870406), 'giorno-raro',
-                               intdiv($gts, 86400))->int(1, 10) === 1,
+                               Orologio::giornoDiTokyo($gts))->int(1, 10) === 1,
             default     => self::condizioneEvento($cond, $gts),
         };
     }
@@ -150,6 +153,9 @@ final class Episodi
      */
     private static function condizioneEvento(string $cond, int $gts): bool
     {
+        if (str_starts_with($cond, 'giorno:')) {
+            return Calendario::stato($gts)['md'] === substr($cond, 7);
+        }
         // «vigilia:esami»: l'evento comincia domani. La sera prima dell'esame
         // e' una storia; l'esame no. Il nome vale come prefisso, cosi'
         // «esami» copre gli esami di maggio, di luglio e di dicembre.
@@ -189,10 +195,17 @@ final class Episodi
         $righe = Database::all(
             "SELECT luogo, COUNT(*) n FROM personaggi
              WHERE verso IS NULL AND stato = 'attivo' AND scheda = 'completa' AND png IS NULL
-             GROUP BY luogo HAVING n >= 1 ORDER BY n DESC LIMIT 4",
+             GROUP BY luogo HAVING n >= 1 ORDER BY n DESC LIMIT 8",
             []
         );
-        return array_map(static fn (array $r): string => (string) $r['luogo'], $righe);
+        $luoghi = array_map(static fn (array $r): string => (string) $r['luogo'], $righe);
+        // Una storia di pioggia o di neve si apre dove piove: per strada, al
+        // parco, non al cinema o in casa di qualcuno (audit del 13/10/2026).
+        if (preg_match('/\b(pioggia|rovescio|neve)\b/', (string) $copione['condizione']) === 1) {
+            $luoghi = array_values(array_filter($luoghi,
+                static fn (string $l): bool => in_array((string) (Luoghi::uno($l)['tipo'] ?? ''), ['strada', 'natura'], true)));
+        }
+        return array_slice($luoghi, 0, 4);
     }
 
     /**
@@ -209,7 +222,7 @@ final class Episodi
      *
      * @return list<array<string,mixed>>
      */
-    private static function castDisponibile(string $lkey, int $max, int $gts, string $ckey = ''): array
+    private static function castDisponibile(string $lkey, int $max, int $gts, string $ckey = '', string $esclusi = ''): array
     {
         $pausa  = GameConfig::int('episodi.pausa_ore', 18) * 3600;
         $stessa = max(0, GameConfig::int('episodi.stesso_copione_giorni', 10)) * 86400;
@@ -223,9 +236,10 @@ final class Episodi
                AND (p.png IS NOT NULL OR NOT EXISTS (
                  SELECT 1 FROM episodio_cast ec JOIN episodi e ON e.id = ec.episodio_id
                  WHERE ec.personaggio_id = p.id AND e.ckey = ? AND e.aperto_gts > ?))
+               AND (p.png IS NULL OR FIND_IN_SET(p.png, ?) = 0)
              ORDER BY (p.png IS NOT NULL), p.visto_gts DESC
              LIMIT ?",
-            [$lkey, $gts - $pausa, $ckey, $gts - $stessa, $max]
+            [$lkey, $gts - $pausa, $ckey, $gts - $stessa, str_replace(' ', '', $esclusi), $max]
         );
     }
 
@@ -330,10 +344,15 @@ final class Episodi
             return ['ok' => false, 'error' => 'Hai già scelto per questa scena.'];
         }
 
-        Database::run(
-            'INSERT INTO episodio_scelte (episodio_id, scena, personaggio_id, opzione) VALUES (?, ?, ?, ?)',
+        // INSERT IGNORE: due clic da due sessioni arrivavano insieme al
+        // controllo qui sopra, e il secondo finiva in un errore 500 contro la
+        // chiave primaria. Adesso il secondo trova la scelta gia' fatta.
+        if (Database::run(
+            'INSERT IGNORE INTO episodio_scelte (episodio_id, scena, personaggio_id, opzione) VALUES (?, ?, ?, ?)',
             [$epId, (int) $ep['scena'], (int) $pg['id'], $opzione]
-        );
+        )->rowCount() !== 1) {
+            return ['ok' => false, 'error' => 'Hai già scelto per questa scena.'];
+        }
 
         // Se hanno scelto tutti, la scena si chiude senza aspettare il tempo.
         self::forseRisolvi($epId);
@@ -349,9 +368,16 @@ final class Episodi
      */
     public static function opzioniPer(array $pg, array $opzioni): array
     {
-        $miei = array_column(Scheda::poteri((int) $pg['id']), 'pkey');
+        $miei = [];
+        foreach (Scheda::poteri((int) $pg['id']) as $p) {
+            $miei[(string) $p['pkey']] = (int) $p['primario'] === 1;
+        }
+        // `solo_primario`: certe cose le fa solo chi ha quel potere come
+        // principale — portare con se' altre persone col teletrasporto, per
+        // esempio, che da secondario «sposta oggetti, non persone».
         return array_values(array_filter($opzioni,
-            static fn (array $o): bool => ($o['potere'] ?? '') === '' || in_array($o['potere'], $miei, true)));
+            static fn (array $o): bool => ($o['potere'] ?? '') === ''
+                || (isset($miei[$o['potere']]) && (!($o['solo_primario'] ?? false) || $miei[$o['potere']]))));
     }
 
     /** Risolve se tutti hanno scelto, oppure se la finestra è scaduta. */
@@ -397,7 +423,10 @@ final class Episodi
         foreach ($cast as $membro) {
             $pgId = (int) $membro['id'];
             $pg = Database::first('SELECT * FROM personaggi WHERE id = ?', [$pgId]);
-            if ($pg === null) {
+            // Chi ha traslocato nel frattempo non e' piu' nella scena: prima
+            // l'agente sceglieva per lui, e poteva perfino usare un potere dove
+            // il personaggio si era fermato.
+            if ($pg === null || (string) $pg['stato'] !== 'attivo') {
                 continue;
             }
             if (!isset($fatte[$pgId])) {
@@ -425,13 +454,21 @@ final class Episodi
             // scelta va come se fosse andata male.
             $potereUsato = null;
             if (($o['potere'] ?? '') !== '') {
-                $uso = Segreto::usa($pg, (string) $o['potere']);
+                // Il potere si usa nella scena: chi nel frattempo se n'e' andato,
+                // o e' per strada, non lo usa altrove davanti ad altri.
+                $uso = (string) $pg['luogo'] === (string) $ep['luogo'] && $pg['verso'] === null
+                    ? Segreto::usa($pg, (string) $o['potere'])
+                    : ['ok' => false];
                 $riuscita = $uso['ok'] && !($uso['spento'] ?? false);
                 $potereUsato = $uso;
             } else {
                 $riuscita = self::tira($pg, $o, $epId, $scenaN);
             }
-            $racconto = accorda($riuscita ? (string) $o['ok'] : (string) ($o['ko'] ?: $o['ok']), $pg);
+            $ko = (string) ($o['ko'] ?? '') !== '' ? (string) $o['ko']
+                : (($o['potere'] ?? '') !== ''
+                    ? 'Ci provi, e non succede niente: il potere non parte. Nessuno se ne accorge, per fortuna.'
+                    : (string) $o['ok']);
+            $racconto = accorda($riuscita ? (string) $o['ok'] : $ko, $pg);
             if ($potereUsato !== null && ($potereUsato['notato'] ?? false)) {
                 $racconto .= ' Qualcuno ha visto.';
             }

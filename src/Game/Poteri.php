@@ -172,6 +172,11 @@ final class Poteri
             return null;
         }
         $scelta = $scelte === [] ? '' : (string) $scelte[$rng->int(0, count($scelte) - 1)]['valore'];
+        // Anche un potere sballato rispetta i suoi limiti: l'ipnosi resta una
+        // persona al giorno.
+        if (self::valida($pg, (string) $p['pkey'], $scelta, $gts) !== null) {
+            return null;
+        }
         return [$p, $scelta];
     }
 
@@ -233,7 +238,7 @@ final class Poteri
             if ($gia !== null) {
                 continue;
             }
-            $giorno = intdiv($gts, 86400);
+            $giorno = Orologio::giornoDiTokyo($gts);
             $rng = Rng::for(GameConfig::int('world.seed', 19870406), 'sogno', (int) $pg['id'], $giorno);
             // Una notte su due; e la decisione e' una sola per notte, anche se
             // il battito passa dieci volte in quelle tre ore.
@@ -276,7 +281,7 @@ final class Poteri
                     [(int) $pg['id'], $titolo, $gts - 2 * 86400]) !== null) {
                 continue;
             }
-            $rng = Rng::for(GameConfig::int('world.seed', 19870406), 'hatsuyume', (int) $pg['id'], intdiv($gts, 86400));
+            $rng = Rng::for(GameConfig::int('world.seed', 19870406), 'hatsuyume', (int) $pg['id'], Orologio::giornoDiTokyo($gts));
             $testo = (string) $rng->pick([
                 'Sogni il monte Fuji, bianco, contro un cielo pulitissimo. Ti svegli e per un momento ti '
                     . 'sembra che l\'anno non possa andare male. È il primo dei tre sogni fortunati.',

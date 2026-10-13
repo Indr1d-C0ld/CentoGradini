@@ -37,6 +37,14 @@ LETTURA=$(php -r '
   echo App\Core\Config::sourceFile(), "|", App\Core\Config::get("app.env"), "|", $u;
 ' 2>/dev/null)
 CONFIG="${LETTURA%%|*}"; RESTO="${LETTURA#*|}"; AMBIENTE="${RESTO%%|*}"; UTENTI="${RESTO##*|}"
+TRASPORTO=$(php -r '
+  require "src/autoload.php"; require "src/Support/helpers.php";
+  $GLOBALS["__project_root"] = getcwd(); App\Core\Config::load(getcwd());
+  echo App\Core\Config::get("mail.transport", "log");
+' 2>/dev/null)
+# Le fotografie le scrive il server che risponde: in locale e' questa cartella,
+# in produzione e' l'installazione viva, non la copia di lavoro.
+if [[ "${AMBIENTE}" == "production" ]]; then SITO="${ORANGEROAD_HTML:-/var/www/orangeroad}"; else SITO="${RADICE}"; fi
 
 printf '\n\033[1;36mConfigurazione\033[0m\n'
 printf '  file     : %s\n  ambiente : %s\n  utenti   : %s\n' \
@@ -77,9 +85,14 @@ pulisci() {
         ["prova-e2e-%@example.invalid", "%prova-e2e-%", "%prova-e2e-%"]); } catch (Throwable) {}
     try { App\Core\Database::run("DELETE FROM rate_limits WHERE rkey LIKE ?", ["%127.0.0.1%"]); } catch (Throwable) {}
     // Le tracce sopravvivono al personaggio (ON DELETE SET NULL): senza
-    // questa riga il quartiere di prova resta pieno di fantasmi.
-    try { App\Core\Database::run("DELETE FROM tracce WHERE testo LIKE ?", ["%Prova%"]); } catch (Throwable) {}
-  ' >/dev/null 2>&1 || true
+    // questa riga il quartiere di prova resta pieno di fantasmi. Si cercano
+    // per il nome del personaggio di prova, non per «Prova»: il confronto non
+    // distingue le maiuscole, e in produzione si portava via anche le tracce
+    // vere della prova di coraggio.
+    if (($argv[1] ?? "") !== "") {
+      try { App\Core\Database::run("DELETE FROM tracce WHERE testo LIKE ?", ["%" . $argv[1] . "%"]); } catch (Throwable) {}
+    }
+  ' "${PGNOME}" >/dev/null 2>&1 || true
   [[ -n "${PID}" ]] && kill "${PID}" 2>/dev/null
   rm -f "${BISCOTTI}"
 }
@@ -132,6 +145,9 @@ titolo "Cento Gradini — prova end-to-end (${BASE})"
 # --- Pagine pubbliche ----------------------------------------------------------
 titolo "Pagine pubbliche"
 if contiene "${BASE}/salute" '"ok":true'; then verde "/salute risponde e il database e' raggiungibile"; else rosso "/salute"; fi
+# HEAD e' un GET senza corpo: chi sorveglia il servizio con HEAD riceveva 405.
+CODICE_HEAD=$(curl -s -o /dev/null -I -w '%{http_code}' "${BASE}/salute")
+if [[ "${CODICE_HEAD}" == "200" ]]; then verde "/salute risponde anche a HEAD"; else rosso "HEAD /salute -> ${CODICE_HEAD}"; fi
 if contiene "${BASE}/" 'Cento Gradini'; then verde "/ si apre"; else rosso "/"; fi
 if contiene "${BASE}/opera" 'Izumi Matsumoto'; then verde "/opera cita l'autore dell'opera"; else rosso "/opera"; fi
 CODICE=$(curl -sS -o /dev/null -w '%{http_code}' "${BASE}/questa-pagina-non-esiste")
@@ -640,13 +656,13 @@ curl -sS -o /dev/null -b "${BISCOTTI}" -c "${BISCOTTI}" \
 FILE=$(ritratto_di "${PGNOME}")
 if [[ -n "${FILE}" ]]; then verde "la fotografia risulta assegnata al personaggio"
 else rosso "dopo il caricamento il personaggio e' ancora senza fotografia"; fi
-if [[ -n "${FILE}" && -f "${RADICE}/assets/img/ritratti/${FILE}" ]]; then
+if [[ -n "${FILE}" && -f "${SITO}/assets/img/ritratti/${FILE}" ]]; then
   verde "e il file sta dove ci si aspetta"
 else rosso "il file ${FILE:-?} non c'e' in assets/img/ritratti/"; fi
 if [[ -n "${FILE}" ]] && php -r '
     $m = getimagesize($argv[1]);
     exit($m !== false && $m[0] === 320 && $m[1] === 320 && $m[2] === IMAGETYPE_WEBP ? 0 : 1);
-  ' "${RADICE}/assets/img/ritratti/${FILE}"; then
+  ' "${SITO}/assets/img/ritratti/${FILE}"; then
   verde "quello che si serve e' un WebP di 320 pixel, non il file caricato"
 else rosso "il file servito non e' stato riscritto come ci aspettavamo"; fi
 if contiene "${BASE}/personaggio" "img/ritratti/${FILE}"; then
@@ -849,9 +865,14 @@ if contiene "${BASE}/admin" "world.seed"; then
 # la coda resta vuota perche' Mailer in modalita' log risponde «riuscito» — ed
 # e' cosi' che le conferme d'iscrizione sono finite in un file per tre giorni
 # mentre chi si era iscritto aspettava.
-if contiene "${BASE}/admin" "La posta non parte"; then
-  verde "e avvisa che con questa configurazione la posta non parte"
-else rosso "il cruscotto non avvisa che il trasporto della posta e' spento"; fi
+# In produzione il trasporto e' acceso, e l'avviso non deve esserci.
+if [[ "${TRASPORTO}" == "log" ]]; then
+  if contiene "${BASE}/admin" "La posta non parte"; then
+    verde "e avvisa che con questa configurazione la posta non parte"
+  else rosso "il cruscotto non avvisa che il trasporto della posta e' spento"; fi
+elif contiene "${BASE}/admin" "La posta non parte"; then
+  rosso "il cruscotto dice che la posta non parte, ma il trasporto e' «${TRASPORTO}»"
+else verde "la posta e' accesa («${TRASPORTO}») e il cruscotto non da' l'allarme"; fi
 
 # Le tre schermate profonde.
 if contiene "${BASE}/admin/statistiche" "Il Segreto"; then verde "le statistiche si aprono"; else rosso "/admin/statistiche"; fi
@@ -983,27 +1004,36 @@ fi
 rm -f "${FOTO}"
 
 # --- I ritratti degli abitanti -------------------------------------------------
+# Si prova su un abitante che il ritratto NON ce l'ha: caricarne uno finto e
+# poi toglierlo, su uno che ce l'ha, cancella il suo vero. E' successo il 13
+# ottobre 2026 al Master, in produzione, ed e' stato ripristinato dal backup.
 if contiene "${BASE}/admin/abitanti" "Gli abitanti"; then verde "la pagina degli abitanti si apre"; else rosso "/admin/abitanti"; fi
-if contiene "${BASE}/admin/abitante/master" 'name="torna" value="/admin/abitante/master"'; then
-  verde "e quella di un abitante ha il riquadro, che poi riporta li'"
-else rosso "la pagina dell'abitante non porta il ritorno"; fi
-MID=$(php -r '
+SCOPERTO=$(php -r '
   require "src/autoload.php"; require "src/Support/helpers.php";
   $GLOBALS["__project_root"] = getcwd(); App\Core\Config::load(getcwd());
-  echo (int) App\Core\Database::first("SELECT id FROM personaggi WHERE png = ?", ["master"])["id"];')
+  $r = App\Core\Database::first("SELECT id, png FROM personaggi WHERE png IS NOT NULL AND ritratto_file IS NULL ORDER BY id LIMIT 1");
+  echo $r === null ? "" : $r["id"] . "|" . $r["png"];')
+if [[ -z "${SCOPERTO}" ]]; then
+  verde "tutti gli abitanti hanno un ritratto: il caricamento non si prova, per non toccarne uno vero"
+else
+MID="${SCOPERTO%%|*}"; ABIT="${SCOPERTO##*|}"
+if contiene "${BASE}/admin/abitante/${ABIT}" "name=\"torna\" value=\"/admin/abitante/${ABIT}\""; then
+  verde "e quella di un abitante ha il riquadro, che poi riporta li'"
+else rosso "la pagina dell'abitante non porta il ritorno"; fi
 FOTO_M="$(mktemp)".png
 php -r '$im = imagecreatetruecolor(400, 400); imagefilledrectangle($im, 0, 0, 399, 399, imagecolorallocate($im, 150, 120, 90)); imagepng($im, $argv[1]);' "${FOTO_M}"
-T=$(gettone "${BASE}/admin/abitante/master")
+T=$(gettone "${BASE}/admin/abitante/${ABIT}")
 DEST=$(curl -sS -o /dev/null -w '%{redirect_url}' -b "${BISCOTTI}" -c "${BISCOTTI}" \
-  -F "_token=${T}" -F "personaggio=${MID}" -F "torna=/admin/abitante/master" -F "foto=@${FOTO_M};type=image/png" \
+  -F "_token=${T}" -F "personaggio=${MID}" -F "torna=/admin/abitante/${ABIT}" -F "foto=@${FOTO_M};type=image/png" \
   -F "sx=0" -F "sy=0" -F "lato=400" "${BASE}/personaggio/profilo/foto")
-if [[ "${DEST}" == *"/admin/abitante/master" ]]; then verde "il ritratto di un abitante si carica, e si torna alla sua pagina"
+if [[ "${DEST}" == *"/admin/abitante/${ABIT}" ]]; then verde "il ritratto di un abitante si carica, e si torna alla sua pagina"
 else rosso "dopo il caricamento si finisce altrove: ${DEST}"; fi
 if contiene "${BASE}/admin/abitanti" "img/ritratti/"; then verde "e compare fra gli abitanti"; else rosso "il ritratto dell'abitante non compare"; fi
-T=$(gettone "${BASE}/admin/abitante/master")
+T=$(gettone "${BASE}/admin/abitante/${ABIT}")
 curl -sS -o /dev/null -b "${BISCOTTI}" -c "${BISCOTTI}" -d "_token=${T}" -d "personaggio=${MID}" \
-  -d "torna=/admin/abitante/master" "${BASE}/personaggio/profilo/foto/togli" >/dev/null
+  -d "torna=/admin/abitante/${ABIT}" "${BASE}/personaggio/profilo/foto/togli" >/dev/null
 rm -f "${FOTO_M}"
+fi
 
 # La gestione risponde nello stesso filo, e il giocatore lo rilegge.
 T=$(gettone "${BASE}/admin/comunicazioni/${UID_PROVA}")
@@ -1201,11 +1231,18 @@ if [[ "${DEST}" == *"/accesso" ]]; then verde "dopo l'uscita il quartiere e' di 
 
 # --- Battito ------------------------------------------------------------------------------------
 titolo "Battito"
-if php bin/tick.php; then verde "bin/tick.php gira senza errori"; else rosso "bin/tick.php fallisce"; fi
+# In produzione il battito lo fa il cron, ogni minuto, con il suo lucchetto:
+# lanciarne un altro da questa cartella (lucchetto diverso) li faceva girare
+# in due sullo stesso mondo. Li' si guarda soltanto com'e' andato l'ultimo.
+if [[ "${AMBIENTE}" == "production" ]]; then
+  verde "in produzione il battito lo fa il cron: si guarda l'ultimo"
+elif php bin/tick.php; then verde "bin/tick.php gira senza errori"; else rosso "bin/tick.php fallisce"; fi
 BATTITO=$(php -r '
   require "src/autoload.php"; require "src/Support/helpers.php";
   $GLOBALS["__project_root"]=getcwd(); App\Core\Config::load(getcwd());
-  $t = App\Core\Database::first("SELECT ok FROM tick_runs ORDER BY id DESC LIMIT 1");
+  // Solo i battiti finiti: in produzione gira anche quello del cron, e una
+  // riga appena aperta ha ancora ok = 0.
+  $t = App\Core\Database::first("SELECT ok FROM tick_runs WHERE finished_at IS NOT NULL ORDER BY id DESC LIMIT 1");
   echo $t === null ? "mai" : (string) (int) $t["ok"];
 ')
 if [[ "${BATTITO}" == "1" ]]; then verde "il battito si registra come riuscito"; else rosso "ultimo battito: '${BATTITO}'"; fi

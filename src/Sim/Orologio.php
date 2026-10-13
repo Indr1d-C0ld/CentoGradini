@@ -168,6 +168,16 @@ final class Orologio
             + (int) floor(($tsReale - self::epocaReale()) * self::compressione());
     }
 
+    /**
+     * Il numero del giorno di calendario di Tokyo che contiene questo istante.
+     * Serve a chi deve cambiare «giorno» a mezzanotte: intdiv per 86400 sul
+     * timestamp lo cambierebbe alle nove del mattino, che e' la mezzanotte UTC.
+     */
+    public static function giornoDiTokyo(int $gts): int
+    {
+        return intdiv($gts + self::fuso()->getOffset(new DateTimeImmutable('@' . $gts)), 86400);
+    }
+
     /** Istante di gioco, avvolto nel ciclo: e' l'ora che si legge in gioco. */
     public static function gts(?int $tsReale = null): int
     {

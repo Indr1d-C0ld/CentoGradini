@@ -321,23 +321,39 @@ final class Personaggio
     {
         $adesso ??= Orologio::lineare();
         $chiusi = [];
+        $private = [];
         foreach (Luoghi::tutti() as $k => $l) {
             if (!Luoghi::accessibile($k, $adesso)[0]) {
                 $chiusi[] = $k;
+            } elseif ($l['privato']) {
+                $private[] = $k;
             }
         }
-        if ($chiusi === []) {
-            return 0;
+        $filtro = $solo === null ? '' : ' AND id = ' . $solo;
+
+        $daMandareFuori = $chiusi === [] ? [] : Database::all(
+            'SELECT * FROM personaggi
+             WHERE png IS NULL AND verso IS NULL AND stato = ?
+               AND luogo IN (' . implode(', ', array_fill(0, count($chiusi), '?')) . ')' . $filtro,
+            ['attivo', ...$chiusi]
+        );
+        // E le case private, quando chi ti ha fatto entrare se ne va: nessuno
+        // resta a casa d'altri da solo. Persona per persona, con la stessa
+        // regola della porta (controllo del 13/10/2026).
+        if ($private !== []) {
+            foreach (Database::all(
+                'SELECT * FROM personaggi WHERE png IS NULL AND verso IS NULL AND stato = ?
+                   AND luogo IN (' . implode(', ', array_fill(0, count($private), '?')) . ')' . $filtro,
+                ['attivo', ...$private]
+            ) as $ospite) {
+                if (self::porta($ospite, (string) $ospite['luogo']) !== null) {
+                    $daMandareFuori[] = $ospite;
+                }
+            }
         }
 
         $n = 0;
-        foreach (Database::all(
-            'SELECT * FROM personaggi
-             WHERE png IS NULL AND verso IS NULL AND stato = ?
-               AND luogo IN (' . implode(', ', array_fill(0, count($chiusi), '?')) . ')'
-               . ($solo === null ? '' : ' AND id = ' . $solo),
-            ['attivo', ...$chiusi]
-        ) as $pg) {
+        foreach ($daMandareFuori as $pg) {
             $da    = (string) $pg['luogo'];
             $fuori = self::portaDiUscita($da, $adesso);
             if ($fuori === null) {
@@ -353,8 +369,10 @@ final class Personaggio
             if (!$fatto) {
                 continue;
             }
+            $privata = (bool) (Luoghi::uno($da)['privato'] ?? false);
             self::traccia($da, (int) $pg['id'], 'chiusura', accorda(sprintf(
-                '%s chiude, e %s viene accompagnat{o} alla porta, verso %s.',
+                $privata ? 'Chi era di casa se n\'è andato, e %2$s ha salutato ed è uscit{o}, verso %3$s.'
+                         : '%1$s chiude, e %2$s viene accompagnat{o} alla porta, verso %3$s.',
                 Luoghi::nome($da), self::nomeCompleto($pg), mb_strtolower(Luoghi::nome($fuori['a']))
             ), $pg), $adesso);
             $n++;

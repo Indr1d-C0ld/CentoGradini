@@ -102,7 +102,7 @@ final class Scheda
     }
 
     /** Costo in PP di un potere per questo personaggio, Controllo compreso. */
-    public static function costo(array $potere): int
+    public static function costo(array $potere, bool $seStessi = true): int
     {
         $base = (int) $potere['primario'] === 1
             ? (int) ($potere['costo_primario'] ?? $potere['costo_secondario'])
@@ -112,7 +112,7 @@ final class Scheda
         $sconto = ((int) $potere['controllo'] >= 40 ? 1 : 0) + ((int) $potere['controllo'] >= 80 ? 1 : 0);
         // Il teletrasporto da secondario sposta oggetti, non persone: portarci
         // sé stessi costa cinque punti (scheda del potere, dal regolamento).
-        if ((string) ($potere['pkey'] ?? '') === 'teletrasporto' && (int) $potere['primario'] !== 1) {
+        if ($seStessi && (string) ($potere['pkey'] ?? '') === 'teletrasporto' && (int) $potere['primario'] !== 1) {
             return 5;
         }
         return max(0, $base - $sconto);

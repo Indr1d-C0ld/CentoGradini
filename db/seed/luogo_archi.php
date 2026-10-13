@@ -53,6 +53,13 @@ $biDirezionali = [
     ['area_giochi', 'giardini',    2],
     ['giardini',    'casa_kasuga', 4],
 
+    // Il sentiero del tempio: dal cortile di ghiaia si scende lungo il
+    // crinale fino all'area giochi in cima ai gradini. Senza, il tempio si
+    // raggiungeva solo dal liceo, dal luna park e da casa Ayukawa: di notte
+    // il liceo e il luna park sono chiusi e la casa e' privata, e a
+    // Capodanno al tempio non arrivava nessuno (audit del 13 ottobre).
+    ['tempio',      'area_giochi', 6],
+
     // La scaletta di dietro: e' la strada vera del quartiere. Parte dalla
     // palazzina, gira dall'altra parte e scende dove scendono tutti.
     ['scaletta',    'casa_kasuga', 3],

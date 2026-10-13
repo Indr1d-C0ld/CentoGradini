@@ -52,7 +52,7 @@ final class Segreto
             return ['ok' => false, 'error' => 'Non hai poteri.'];
         }
         if ($pg['verso'] !== null) {
-            return ['ok' => false, 'error' => 'Sei per strada: aspetta di essere arrivato.'];
+            return ['ok' => false, 'error' => 'Sei per strada: aspetta di arrivare.'];
         }
 
         $potere = Database::first(
@@ -71,6 +71,12 @@ final class Segreto
         if ($pkey === 'sogni') {
             return ['ok' => false, 'error' => 'Questo non si comanda: arriva quando vuole, di solito la notte.'];
         }
+        // Il blocco scatta da solo, quando qualcuno usa un potere davanti a chi
+        // ce l'ha (vedi chiSpegne()): accenderlo a vuoto spendeva punti e
+        // rischiava un incidente senza nessun effetto.
+        if ($pkey === 'blocco') {
+            return ['ok' => false, 'error' => 'Non si accende a mano: scatta da solo, quando qualcuno usa un potere davanti a te.'];
+        }
 
         $luogo = (string) $pg['luogo'];
         $gts   = Orologio::lineare();
@@ -82,8 +88,20 @@ final class Segreto
             return ['ok' => false, 'error' => $errore];
         }
 
-        $costo = Scheda::costo($potere);
+        // Il teletrasporto da secondario costa cinque solo se porta te: senza
+        // una destinazione sposta un oggetto, e costa il normale.
+        $costo = Scheda::costo($potere, $scelta !== '');
         if ((int) $pg['pp'] < $costo) {
+            return ['ok' => false, 'error' => 'Non hai abbastanza punti potere: te ne servono ' . $costo . '.'];
+        }
+        // I punti si pagano qui, con una sola istruzione che li toglie solo se
+        // ci sono. Prima si controllava $pg — letto a inizio richiesta — e si
+        // sottraeva alla fine: sei richieste in parallelo da sei sessioni
+        // passavano tutte e sei, con PP per due usi. L'audit del 13/10/2026 l'ha
+        // riprodotto.
+        $pagato = Database::run('UPDATE personaggi SET pp = pp - ? WHERE id = ? AND pp >= ?',
+            [$costo, (int) $pg['id'], $costo])->rowCount() === 1 || $costo === 0;
+        if (!$pagato) {
             return ['ok' => false, 'error' => 'Non hai abbastanza punti potere: te ne servono ' . $costo . '.'];
         }
 
@@ -109,7 +127,7 @@ final class Segreto
         // successo, e non lascia testimoni né anomalie.
         $spento = self::chiSpegne($pg, $luogo, $gts, (int) $potere['controllo']);
         if ($spento !== null) {
-            return self::potereSpento($pg, $potere, $spento);
+            return self::potereSpento($pg, $potere, $spento, $costo);
         }
 
         $vistosita = (int) $potere['vistosita'];
@@ -170,7 +188,6 @@ final class Segreto
             $vistoDallaFolla = $rng->float() < $almenoUno;
         }
 
-        Database::run('UPDATE personaggi SET pp = GREATEST(0, pp - ?) WHERE id = ?', [$costo, (int) $pg['id']]);
         Database::run('UPDATE personaggio_poteri SET usi = usi + 1 WHERE personaggio_id = ? AND pkey = ?',
             [(int) $pg['id'], $pkey]);
 
@@ -203,7 +220,9 @@ final class Segreto
         // più: annota. Ogni potere usato davanti a lui diventa una voce
         // precisa, anche quando agli altri l'hai fatta passare liscia. È la
         // strada che il progetto chiama «la peggiore».
-        $osservatori = self::osservatoriPresenti($pg, $luogo);
+        // Col tempo fermo, o da invisibili, non vede niente nemmeno chi guarda
+        // apposta.
+        $osservatori = ($tempoFermo || $fattore < 1.0) ? [] : self::osservatoriPresenti($pg, $luogo);
         if ($osservatori !== [] && $vistosita > 0) {
             Voci::nasce('potere', (int) $pg['id'], null, $luogo, $osservatori, $pkey, $gts);
         }
@@ -302,12 +321,13 @@ final class Segreto
      * @param array<string,mixed> $chi
      * @return array<string,mixed>
      */
-    private static function potereSpento(array $pg, array $potere, array $chi): array
+    private static function potereSpento(array $pg, array $potere, array $chi, int $pagato = 0): array
     {
+        // Si era gia' pagato tutto; uno spento costa solo la spinta.
         $costo = max(0, GameConfig::int('blocco.costo_pp', 1));
-        if ($costo > 0) {
-            Database::run('UPDATE personaggi SET pp = GREATEST(0, pp - ?) WHERE id = ?',
-                [$costo, (int) $pg['id']]);
+        $resto = max(0, $pagato - $costo);
+        if ($resto > 0) {
+            Database::run('UPDATE personaggi SET pp = LEAST(pp_max, pp + ?) WHERE id = ?', [$resto, (int) $pg['id']]);
         }
         $nome = trim((string) $chi['nome'] . ' ' . (string) $chi['cognome']);
         return [
@@ -425,7 +445,7 @@ final class Segreto
             $prob = 0;
             if ($come !== 'niente') {
                 if ((int) $pg['compostezza'] < 1) {
-                    return ['ok' => false, 'error' => 'Sei troppo scosso per mettere insieme una frase.'];
+                    return ['ok' => false, 'error' => 'Hai i nervi troppo a pezzi per mettere insieme una frase.'];
                 }
                 $c = self::COPERTURE[$come];
                 $prob = $c['base'] + (int) $pg[$c['abilita']] * $c['per'];
@@ -434,7 +454,7 @@ final class Segreto
                     $prob += 25;
                 }
                 $prob = max(5, min(95, $prob));
-                Database::run('UPDATE personaggi SET compostezza = GREATEST(0, compostezza - 1) WHERE id = ?',
+                Database::run('UPDATE personaggi SET compostezza = GREATEST(compostezza, 1) - 1 WHERE id = ?',
                     [(int) $pg['id']]);
             }
 
@@ -744,8 +764,8 @@ final class Segreto
         // Un tentativo per anomalia raccolta: chi ha guardato di più ha più
         // probabilità, ma non si può insistere all'infinito sugli stessi indizi.
         $gia = (int) (Database::first(
-            'SELECT COUNT(*) n FROM anomalie WHERE osservatore_id = ? AND soggetto_id = ? AND collegata = 1',
-            [(int) $osservatore['id'], $soggettoId]
+            'SELECT COUNT(*) n FROM anomalie WHERE osservatore_id = ? AND soggetto_id = ? AND collegata = 1 AND gts >= ?',
+            [(int) $osservatore['id'], $soggettoId, $adesso - $finestra]
         )['n'] ?? 0);
         if ($gia >= $n) {
             return ['ok' => false, 'error' => 'Ci hai già pensato su abbastanza. Ti serve qualcosa di nuovo.'];
@@ -836,8 +856,7 @@ final class Segreto
     private static function abitanteDecide(array $chi, int $esperId): void
     {
         $come = self::ATTEGGIAMENTO_DEGLI_ABITANTI[(string) $chi['png']] ?? 'osserva';
-        $esper = Database::first('SELECT luogo, verso FROM personaggi WHERE id = ?', [$esperId]);
-        if ($come === 'affronta' && ($esper === null || (string) $esper['luogo'] !== (string) $chi['luogo'])) {
+        if ($come === 'affronta' && !self::presenteCon($chi, $esperId)) {
             // Non e' qui: lo affrontera' appena lo vede. Intanto osserva.
             Database::run("UPDATE sanno SET atteggiamento = 'affronta' WHERE esper_id = ? AND chi_sa_id = ?",
                 [$esperId, (int) $chi['id']]);
@@ -845,7 +864,15 @@ final class Segreto
         }
         // Gli abitanti non si stancano e non hanno vergogna: niente compostezza.
         Database::run('UPDATE personaggi SET compostezza = GREATEST(compostezza, 1) WHERE id = ?', [(int) $chi['id']]);
-        self::scegli(Database::first('SELECT * FROM personaggi WHERE id = ?', [(int) $chi['id']]) ?? $chi, $esperId, $come);
+        $esito = self::scegli(Database::first('SELECT * FROM personaggi WHERE id = ?', [(int) $chi['id']]) ?? $chi, $esperId, $come);
+        if (!$esito['ok']) {
+            // Se per qualunque ragione non e' riuscito adesso, la strada scelta
+            // resta segnata e il battito la riprende: prima restava vuota per
+            // sempre, e quel «scoperto» contava senza che l'esper potesse
+            // rispondere.
+            Database::run('UPDATE sanno SET atteggiamento = ? WHERE esper_id = ? AND chi_sa_id = ? AND atteggiamento = \'\'',
+                [$come, $esperId, (int) $chi['id']]);
+        }
     }
 
     /**
@@ -876,7 +903,7 @@ final class Segreto
 
     /** Le tre strade di PROGETTO §7, come le legge chi deve sceglierne una. */
     public const ATTEGGIAMENTI = [
-        'affronta' => 'Prenderlo da parte e dirglielo in faccia',
+        'affronta' => 'Prendere da parte la persona e dirglielo in faccia',
         'dice'     => 'Raccontarlo in giro',
         'osserva'  => 'Tenerselo per sé, e guardare',
     ];
@@ -897,6 +924,13 @@ final class Segreto
      * @return array{ok:bool, error?:string, racconto?:string}
      */
     public static function scegli(array $chi, int $esperId, string $come): array
+    {
+        return Lock::con('sospetto:' . $esperId . ':' . (int) $chi['id'],
+            static fn (): array => self::scegliOra($chi, $esperId, $come),
+            ['ok' => false, 'error' => 'Un momento: ci stai gia\' pensando.']);
+    }
+
+    private static function scegliOra(array $chi, int $esperId, string $come): array
     {
         if (!isset(self::ATTEGGIAMENTI[$come])) {
             return ['ok' => false, 'error' => 'Non so cosa vorresti fare.'];
@@ -920,7 +954,7 @@ final class Segreto
             if ((int) $chi['compostezza'] < 1) {
                 return ['ok' => false, 'error' => 'Non hai la faccia tosta, adesso. Riposati.'];
             }
-            Database::run('UPDATE personaggi SET compostezza = GREATEST(0, compostezza - 1) WHERE id = ?', [(int) $chi['id']]);
+            Database::run('UPDATE personaggi SET compostezza = GREATEST(compostezza, 1) - 1 WHERE id = ?', [(int) $chi['id']]);
             Database::run("UPDATE sanno SET atteggiamento = 'affronta', affrontato_gts = ? WHERE esper_id = ? AND chi_sa_id = ?",
                 [$gts, $esperId, (int) $chi['id']]);
             return ['ok' => true, 'racconto' => sprintf(
@@ -955,6 +989,14 @@ final class Segreto
             'Non dici niente a nessuno, nemmeno a %s. Guardi, e aspetti. Prima o poi lo rifarà, e tu ci sarai.', $nome)];
     }
 
+    /** Questa persona e' qui, ferma, adesso? */
+    public static function presenteCon(array $pg, int $altroId): bool
+    {
+        return Database::first(
+            "SELECT 1 x FROM personaggi WHERE id = ? AND luogo = ? AND verso IS NULL AND stato = 'attivo'",
+            [$altroId, (string) $pg['luogo']]) !== null;
+    }
+
     /**
      * Chi ti ha preso da parte e aspetta una risposta.
      *
@@ -987,11 +1029,18 @@ final class Segreto
         if ($riga === null) {
             return ['ok' => false, 'error' => 'Nessuno ti sta chiedendo niente.'];
         }
+        // Si nega guardando in faccia, come ci si confida: tutte e due le
+        // risposte vogliono la persona davanti. Prima «nega» funzionava a
+        // distanza e «confidati» no.
+        if (!self::presenteCon($esper, $chiId)) {
+            return ['ok' => false, 'error' => 'Per guardarl' . ((string) $riga['sesso'] === 'f' ? 'a' : 'o')
+                . ' negli occhi deve essere qui.'];
+        }
         if ((int) $esper['compostezza'] < 2) {
             return ['ok' => false, 'error' => 'Non riusciresti a guardarl' . ((string) $riga['sesso'] === 'f' ? 'a' : 'o') . ' negli occhi, adesso.'];
         }
         $gts = Orologio::lineare();
-        Database::run('UPDATE personaggi SET compostezza = GREATEST(0, compostezza - 2) WHERE id = ?', [(int) $esper['id']]);
+        Database::run('UPDATE personaggi SET compostezza = GREATEST(compostezza, 2) - 2 WHERE id = ?', [(int) $esper['id']]);
         $prob = max(5, min(85, 30 + (int) $esper['kakko'] * 5 - (int) $riga['testa'] * 2));
         $rng  = Rng::for(GameConfig::int('world.seed', 19870406), 'nega', (int) $esper['id'], $chiId, (int) $riga['affrontato_gts']);
         if ($rng->int(1, 100) <= $prob) {
@@ -1080,7 +1129,7 @@ final class Segreto
 
         return ['ok' => true, 'racconto' => sprintf(
             'Glielo dici. Non c\'è un modo elegante di dirlo, e infatti non lo trovi: lo dici e basta, '
-            . 'e poi stai zitto ad aspettare. %s adesso sa. È la cosa più pericolosa che tu abbia fatto, '
+            . 'e poi resti in silenzio ad aspettare. %s adesso sa. È la cosa più pericolosa che tu abbia fatto, '
             . 'ed è anche l\'unica che ti toglie un peso.',
             $altro['nome']
         )];
@@ -1157,11 +1206,15 @@ final class Segreto
     public static function quantiSanno(int $pgId, string $come = 'scoperto'): int
     {
         if ($come === 'scoperto') {
-            // Chi ha capito da solo conta uno; chi era stato messo a parte e
-            // poi si e' guastato con te conta due: «il rischio torna,
-            // moltiplicato» (PROGETTO §7).
+            // Chi ha capito da solo conta uno, e chi era stato messo a parte e
+            // poi si e' guastato con te pure. «Il rischio torna, moltiplicato»
+            // (PROGETTO §7) non vuol dire che conti doppio: con la soglia a due
+            // un solo confidente guastato faceva traslocare al battito dopo, e
+            // il fraintendimento cresce anche per gesti fatti da altri. Conta
+            // come chi ha capito da solo, e in piu' lo racconta (forseTradisce):
+            // il rischio si moltiplica nelle voci.
             return (int) (Database::first(
-                "SELECT COALESCE(SUM(IF(s.come = 'tradito', 2, 1)), 0) n FROM sanno s JOIN personaggi p ON p.id = s.chi_sa_id
+                "SELECT COUNT(*) n FROM sanno s JOIN personaggi p ON p.id = s.chi_sa_id
                  WHERE s.esper_id = ? AND s.come IN ('scoperto', 'tradito') AND p.stato = 'attivo'",
                 [$pgId]
             )['n'] ?? 0);
@@ -1184,12 +1237,21 @@ final class Segreto
     public static function dominio(int $pgId): int
     {
         $durata = GameConfig::int('voci.durata_giorni', 21) * 86400;
+        // Solo le voci nate dopo l'ultimo trasloco: chi rientra «e' un altro
+        // ragazzo in un'altra casa, e la voce e' vecchia» (rientra()). Prima le
+        // voci vecchie contavano ancora, e chi tornava veniva rispedito via al
+        // battito dopo. E solo quelle abbastanza nitide da sapere di chi si
+        // parla (precisione 80, il nome intero): con 55 bastava mezzo nome, e
+        // con sedici abitanti che chiacchierano la soglia si raggiungeva in tre
+        // giorni senza che nessuno avesse capito niente (simulazione del 13/10).
         return (int) (Database::first(
             "SELECT COUNT(DISTINCT vv.personaggio_id) n
              FROM voci v JOIN voci_versioni vv ON vv.voce_id = v.id
              JOIN personaggi p ON p.id = vv.personaggio_id
+             JOIN personaggi s ON s.id = v.soggetto_id
              WHERE v.tipo = 'potere' AND v.soggetto_id = ? AND vv.personaggio_id <> ?
-               AND vv.precisione >= 55 AND v.gts >= ? AND p.stato = 'attivo'",
+               AND vv.precisione >= 80 AND v.gts >= ? AND v.gts > COALESCE(s.ultimo_trasloco_gts, 0)
+               AND p.stato = 'attivo'",
             [$pgId, $pgId, Orologio::lineare() - $durata]
         )['n'] ?? 0);
     }
@@ -1201,7 +1263,7 @@ final class Segreto
     {
         $soglia   = max(1, GameConfig::int('segreto.sospetti_per_trasloco', 2));
         $scoperti = self::quantiSanno((int) $pg['id']);
-        $sogliaD  = max(1, GameConfig::int('segreto.pubblico_dominio', 8));
+        $sogliaD  = max(1, GameConfig::int('segreto.pubblico_dominio', 10));
         $dominio  = self::dominio((int) $pg['id']);
         $troppi   = $scoperti >= $soglia || $dominio >= $sogliaD;
 

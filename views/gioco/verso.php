@@ -77,8 +77,7 @@ $soglia = GameConfig::int('legami.soglia_confessione', 45);
 <div class="carta">
   <p class="occhiello">C'è qualcosa in mezzo</p>
   <p>
-    Ti sei accorto che <?= e($altro['nome']) ?> si è fatto un'idea sbagliata su qualcosa che ti
-    riguarda. Puoi provare a tirare fuori l'argomento — ma non è detto che vada bene: certe
+    Hai capito che <?= e($altro['nome']) ?> ha frainteso qualcosa che ti riguarda. Puoi provare a tirare fuori l'argomento — ma non è detto che vada bene: certe
     volte parlarne è proprio quello che peggiora le cose.
   </p>
   <form method="post" action="<?= e(url('/chiarisci')) ?>">

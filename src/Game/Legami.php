@@ -121,15 +121,15 @@ final class Legami
         $base = match (true) {
             $affetto >= 70  => 'Ci tieni più di quanto ammetteresti',
             $affetto >= 45  => 'Ci tieni, e comincia a vedersi',
-            $affetto >= 20  => 'Ti sta simpatico',
+            $affetto >= 20  => 'Ti va a genio',
             $affetto >= 5   => 'Vi conoscete',
             $affetto > -5   => 'Vi salutate e basta',
-            $affetto > -25  => 'Preferiresti evitarlo',
-            $affetto > -60  => 'Non lo sopporti',
+            $affetto > -25  => 'Preferiresti starne alla larga',
+            $affetto > -60  => 'Non ne sopporti la presenza',
             default         => 'Fra voi c\'è qualcosa di rotto',
         };
         $coda = match (true) {
-            $fraint >= 70 => ', ma sei convinto di una cosa su di lui che ti avvelena tutto il resto.',
+            $fraint >= 70 => ', ma hai in testa una cosa su questa persona che ti avvelena tutto il resto.',
             $fraint >= 40 => ', però c\'è una faccenda in mezzo che non vi siete mai chiariti.',
             $fraint >= 15 => ', con qualche malinteso che gira.',
             default       => '.',
@@ -203,6 +203,11 @@ final class Legami
             return ['ok' => false, 'error' => 'Quella persona non è qui.'];
         }
 
+        // Da invisibili un gesto non lo vede nessuno — nemmeno chi lo riceve.
+        if (Stati::ha((int) $pg['id'], 'invisibile')) {
+            return ['ok' => false, 'error' => 'Sei invisibile: nessuno vedrebbe quello che fai. Aspetta di tornare visibile.'];
+        }
+
         // Fra parenti un gesto e' un gesto, non un corteggiamento. Il secondo
         // bottone non si chiede a un fratello; tutto il resto si fa, ma senza
         // l'ambiguita' che fra estranei lo rende pericoloso — accompagnare a
@@ -271,8 +276,8 @@ final class Legami
         self::muovi((int) $pg['id'], $versoId, (int) round($resa / 3), 0, $gts);
 
         if ($costo > 0) {
-            Database::run('UPDATE personaggi SET compostezza = GREATEST(0, compostezza - ?) WHERE id = ?',
-                [$costo, (int) $pg['id']]);
+            Database::run('UPDATE personaggi SET compostezza = GREATEST(compostezza, ?) - ? WHERE id = ?',
+                [$costo, $costo, (int) $pg['id']]);
         }
 
         // --- Chi ha guardato ------------------------------------------------
@@ -442,7 +447,7 @@ final class Legami
         }
 
         $gts = Orologio::lineare();
-        Database::run('UPDATE personaggi SET compostezza = GREATEST(0, compostezza - 1) WHERE id = ?',
+        Database::run('UPDATE personaggi SET compostezza = GREATEST(compostezza, 1) - 1 WHERE id = ?',
             [(int) $pg['id']]);
 
         $prob = 25 + (int) $pg['cuore'] * 4 + ($loro['affetto'] > 20 ? 10 : 0)
@@ -506,7 +511,7 @@ final class Legami
 
         $gts  = Orologio::lineare();
         $loro = self::fra($versoId, (int) $pg['id']);
-        Database::run('UPDATE personaggi SET compostezza = GREATEST(0, compostezza - 2) WHERE id = ?',
+        Database::run('UPDATE personaggi SET compostezza = GREATEST(compostezza, 2) - 2 WHERE id = ?',
             [(int) $pg['id']]);
 
         $rng  = Rng::for(GameConfig::int('world.seed', 19870406), 'confessione',
@@ -610,9 +615,17 @@ final class Legami
         if ($o['pronto_gts'] !== null && (int) $o['pronto_gts'] > $gts) {
             return ['ok' => false, 'error' => 'Lo premi e non succede niente: va ancora ricaricato. Ci vogliono giorni.'];
         }
-        Stati::metti((int) $pg['id'], 'tempo_fermo', 2, $gts);
-        Database::run('UPDATE oggetti_unici SET pronto_gts = ? WHERE okey = ?',
-            [$gts + max(1, GameConfig::int('oggetti.orologio_giorni', 3)) * 86400, $okey]);
+        // Prima si scarica, e solo se era carico: premuto due volte insieme
+        // ferma il tempo una volta sola.
+        if (Database::run('UPDATE oggetti_unici SET pronto_gts = ? WHERE okey = ? AND detentore_id = ?
+                           AND (pronto_gts IS NULL OR pronto_gts <= ?)',
+                [$gts + max(1, GameConfig::int('oggetti.orologio_giorni', 3)) * 86400, $okey, (int) $pg['id'], $gts]
+            )->rowCount() !== 1) {
+            return ['ok' => false, 'error' => 'Lo premi e non succede niente: va ancora ricaricato. Ci vogliono giorni.'];
+        }
+        // Otto minuti di gioco: due minuti veri, il tempo di tornare alla pagina
+        // e di usare un potere. Due minuti di gioco erano trenta secondi.
+        Stati::metti((int) $pg['id'], 'tempo_fermo', 8, $gts);
         return ['ok' => true, 'racconto' => 'Premi il pulsante e il mondo si ferma: la gente a metà di un '
             . 'passo, un uccello appeso in aria, il rumore che sparisce. Hai un minuto in cui nessuno vede '
             . 'niente di quello che fai. Usalo bene: poi l\'orologio va ricaricato.'];
@@ -631,6 +644,9 @@ final class Legami
         if ((int) ($o['detentore_id'] ?? 0) !== (int) $pg['id']) {
             return ['ok' => false, 'error' => 'Non ce l\'hai tu.'];
         }
+        if ($versoId === (int) $pg['id']) {
+            return ['ok' => false, 'error' => 'Ce l\'hai già in mano.'];
+        }
         $altro = Database::first(
             'SELECT * FROM personaggi WHERE id = ? AND luogo = ? AND verso IS NULL AND stato = ?',
             [$versoId, (string) $pg['luogo'], 'attivo']
@@ -647,17 +663,32 @@ final class Legami
         }
 
         $gts = Orologio::lineare();
-        Database::run('UPDATE oggetti_unici SET detentore_id = ?, luogo = NULL, gts = ? WHERE okey = ?',
-            [$versoId, $gts, $okey]);
+        // Gia' passato fra questi due, nell'ultimo mese? Si guarda prima di
+        // scrivere il passaggio di adesso.
+        $giaDato = Database::first(
+            'SELECT 1 x FROM oggetti_passaggi WHERE okey = ? AND ((da_id = ? AND a_id = ?) OR (da_id = ? AND a_id = ?))
+               AND gts > ? LIMIT 1',
+            [$okey, (int) $pg['id'], $versoId, $versoId, (int) $pg['id'], $gts - 30 * 86400]);
+        // Solo se ce l'ha ancora: due passaggi simultanei verso due persone
+        // diverse davano l'oggetto a una e l'affetto a tutte e due.
+        if (Database::run('UPDATE oggetti_unici SET detentore_id = ?, luogo = NULL, gts = ? WHERE okey = ? AND detentore_id = ?',
+                [$versoId, $gts, $okey, (int) $pg['id']])->rowCount() !== 1) {
+            return ['ok' => false, 'error' => 'Non ce l\'hai più.'];
+        }
         Database::run(
             'INSERT INTO oggetti_passaggi (okey, da_id, a_id, luogo, gts, nota) VALUES (?, ?, ?, ?, ?, ?)',
             [$okey, (int) $pg['id'], $versoId, (string) $pg['luogo'], $gts, null]
         );
-        self::muovi($versoId, (int) $pg['id'], 20, 0, $gts);
-        self::muovi((int) $pg['id'], $versoId, 10, 0, $gts);
+        // Dare una cosa dice qualcosa la prima volta. Ripassarsela avanti e
+        // indietro non dice niente, e prima dava +20 a ogni giro: due giocatori
+        // arrivavano ad affetto 100 in un minuto (controllo del 13/10/2026).
+        if ($giaDato === null) {
+            self::muovi($versoId, (int) $pg['id'], 20, 0, $gts);
+            self::muovi((int) $pg['id'], $versoId, 10, 0, $gts);
+        }
 
         Personaggio::traccia((string) $pg['luogo'], (int) $pg['id'], 'cappello',
-            sprintf('%s ha dato una cosa a %s senza dire niente, e quell\'altro se l\'è tenuta.',
+            sprintf('%s ha dato una cosa a %s senza dire niente, e l\'altra persona se l\'è tenuta.',
                 Personaggio::nomeCompleto($pg), $altro['cognome'] . ' ' . $altro['nome']), $gts, 90);
 
         return ['ok' => true, 'racconto' => 'Glielo metti in mano e non spieghi. Non c\'è niente da '
@@ -673,8 +704,12 @@ final class Legami
             return ['ok' => false, 'error' => 'Qui non c\'è.'];
         }
         $gts = Orologio::lineare();
-        Database::run('UPDATE oggetti_unici SET detentore_id = ?, luogo = NULL, gts = ? WHERE okey = ?',
-            [(int) $pg['id'], $gts, $okey]);
+        // Solo se e' ancora per terra: chi arriva secondo trova il posto vuoto.
+        if (Database::run('UPDATE oggetti_unici SET detentore_id = ?, luogo = NULL, gts = ?
+                           WHERE okey = ? AND detentore_id IS NULL AND luogo = ?',
+                [(int) $pg['id'], $gts, $okey, (string) $pg['luogo']])->rowCount() !== 1) {
+            return ['ok' => false, 'error' => 'Qualcuno è stato più svelto di te.'];
+        }
         Database::run('INSERT INTO oggetti_passaggi (okey, da_id, a_id, luogo, gts) VALUES (?, ?, ?, ?, ?)',
             [$okey, null, (int) $pg['id'], (string) $pg['luogo'], $gts]);
         return ['ok' => true, 'racconto' => 'Te lo ritrovi in mano senza aver deciso di raccoglierlo.'];
@@ -742,6 +777,10 @@ final class Legami
             );
             $dove = (string) ($o['dove_era'] ?? '') !== '' ? (string) $o['dove_era']
                 : (string) ($ultimo['luogo'] ?? ((string) ($o['dimora'] ?? '') !== '' ? $o['dimora'] : 'gradini'));
+            // Mai in una casa privata, da cui nessuno potrebbe riprenderlo.
+            if ((Luoghi::uno($dove)['privato'] ?? false) === true) {
+                $dove = (string) ($o['dimora'] ?? '') !== '' ? (string) $o['dimora'] : 'gradini';
+            }
             // Nessuna riga in oggetti_passaggi: quella tabella registra chi DA' a
             // chi, e qui non riceve nessuno (a_id non ammette NULL, e una prima
             // versione che ci provava faceva fallire il trasloco intero).

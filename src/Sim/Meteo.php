@@ -138,7 +138,12 @@ final class Meteo
         // perche' a Tokyo l'inverno e' secco e sereno.
         $soglia = match (true) {
             Calendario::dentro($md, '06-08', '07-20') => 0.56,   // tsuyu
-            in_array($mese, [12, 1, 2], true)          => 0.86,   // inverno secco
+            // Inverno secco, ma non senza pioggia: la nuvolosita' invernale
+            // arriva al massimo a 0,615 (base bassa piu' fronti), e una soglia a
+            // 0,86 faceva un inverno senza una goccia e senza neve, quindi un
+            // copione e un gesto che non potevano succedere mai (controllo del
+            // 13/10/2026). A 0,52 piove il 5-11% del tempo e nevica 3-6 giorni.
+            in_array($mese, [12, 1, 2], true)          => 0.52,
             $mese === 8                                => 0.78,   // temporali di calore
             default                                    => 0.74,
         };
@@ -171,7 +176,8 @@ final class Meteo
             ? $t + ($umidita - 0.6) * 6.0
             : $t - max(0.0, $vento - 2.0) * 0.45;
 
-        $neve = $t <= 2.0 && $pioggia > 0.0;
+        // A Tokyo la neve cade anche un po' sopra lo zero.
+        $neve = $t <= 3.0 && $pioggia > 0.0;
 
         return [
             'temperatura' => round($t, 1),

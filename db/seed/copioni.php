@@ -44,6 +44,7 @@ return [
      . 'la verità». Probabilmente era una battuta.',
  'luogo' => 'abcb',
  'condizione' => 'autunno',
+ 'esclusi' => 'master',
  'min_cast' => 2, 'max_cast' => 5, 'finestra' => 1500,
  'scene' => $scene(
    [
@@ -64,7 +65,7 @@ return [
       ['k' => 'avvisa', 'testo' => 'Dire ad alta voce che quei funghi non vi convincono',
        'prova' => 'dai_suki', 'difficolta' => 45,
        'ok' => 'Lo dici ridendo e metà tavolo posa il cucchiaio. Il Master si offende un pochino.',
-       'ko' => 'Lo dici, e ti rispondono che sei il solito. Mangiano tutti, tu compreso.',
+       'ko' => 'Lo dici, e ti rispondono che esageri come sempre. Mangiano tutti, tu compres{o}.',
        'effetti_ok' => ['affetto_cast' => -1], 'effetti_ko' => ['compostezza' => -1],
        'peso' => ['dai_suki' => 2]],
     ],
@@ -92,7 +93,7 @@ return [
        'peso' => ['testa' => 2, 'candore' => -1]],
       ['k' => 'sposta', 'testo' => 'Far parlare qualcun altro',
        'prova' => 'dai_suki', 'difficolta' => 40,
-       'ok' => 'Fai una domanda innocente alla persona giusta e il tavolo si volta da quella parte. Salvo.',
+       'ok' => 'Fai una domanda innocente alla persona giusta e il tavolo si volta da quella parte. Salv{o}.',
        'ko' => 'La domanda innocente apre una faccenda che non andava aperta, e adesso guardano te.',
        'effetti_ok' => ['affetto_cast' => 2],
        'effetti_ko' => ['malinteso_cast' => 6],
@@ -158,11 +159,11 @@ return [
       ['k' => 'parla', 'testo' => 'Riempire il silenzio',
        'prova' => 'dai_suki', 'difficolta' => 30,
        'ok' => 'Attacchi a parlare di niente e funziona: dieci minuti passano in fretta.',
-       'ko' => 'Parli troppo e si vede che è per non stare zitto. Qualcuno guarda altrove.',
+       'ko' => 'Parli troppo e si vede che è per non stare zitt{o}. Qualcuno guarda altrove.',
        'effetti_ok' => ['affetto_cast' => 4],
        'effetti_ko' => ['affetto_cast' => -1, 'compostezza' => -1],
        'peso' => ['dai_suki' => 3]],
-      ['k' => 'zitto', 'testo' => 'Stare zitto e guardare la pioggia',
+      ['k' => 'zitto', 'testo' => 'Restare in silenzio a guardare la pioggia',
        'prova' => 'nessuna', 'difficolta' => 0,
        'ok' => 'Guardi l\'acqua che rimbalza sull\'asfalto. È una cosa che si può fare anche in compagnia.',
        'ko' => '', 'effetti_ok' => ['compostezza' => 1], 'effetti_ko' => [],
@@ -175,7 +176,7 @@ return [
         . 'accesa. Sono cinquanta metri di diluvio.',
     'opzioni' => [
       ['k' => 'corri', 'testo' => 'Correre fino al bar, tutti insieme',
-       'prova' => 'rissa', 'difficolta' => 30,
+       'prova' => 'sport', 'difficolta' => 30,
        'ok' => 'Partite di corsa ridendo come scemi e arrivate fradici e felici.',
        'ko' => 'Scivoli a metà strada e arrivi peggio degli altri, con la divisa da buttare.',
        'effetti_ok' => ['affetto_cast' => 6],
@@ -236,7 +237,7 @@ return [
     ],
    ],
    [
-    'testo' => 'Comunque sia andata, adesso siete in tre o quattro in un\'aula vuota, con una '
+    'testo' => 'Comunque sia andata, adesso siete in pochi in un\'aula vuota, con una '
         . 'cosa non detta sospesa in mezzo. Fuori dalla finestra il cortile è deserto. Uno di voi '
         . 'dovrà decidere come si esce da qui.',
     'opzioni' => [
@@ -272,9 +273,13 @@ return [
  'premessa' => 'In Giappone il cioccolato di San Valentino lo regalano le ragazze, e non è '
      . 'una faccenda privata: è pubblica. Quello comprato si chiama giri-choko, cioccolato '
      . 'd\'obbligo, e si dà a tutti. Quello fatto in casa si chiama honmei-choko, e si dà a '
-     . 'una persona sola. La differenza la vedono tutti, e tutti la commentano.',
+     . 'una persona sola. La differenza la vedono tutti, e tutti la commentano. Quest\'anno il '
+     . 'quattordici cade di domenica, e allora tutto succede il sabato, a scuola.',
  'luogo' => 'liceo',
- 'condizione' => 'evento:san_valentino',
+ // Nel ciclo del gioco il 14 febbraio cade sempre nel 1988, ed e' una
+ // domenica: il cioccolato, a scuola, si da' il sabato. La condizione e'
+ // quindi la vigilia, in un giorno di scuola (audit del 13/10/2026).
+ 'condizione' => 'vigilia:san_valentino+scuola',
  'min_cast' => 2, 'max_cast' => 6, 'finestra' => 1800,
  'scene' => $scene(
    [
@@ -286,10 +291,9 @@ return [
     'opzioni' => [
       ['k' => 'apri', 'testo' => 'Aprirlo subito, lì, davanti a tutti',
        'prova' => 'nessuna', 'difficolta' => 0,
-       'ok' => 'È fatto in casa. Si vede dalla forma, che non è una forma: è quello che viene '
-           . 'quando si versa il cioccolato in uno stampo di carta. Mezza classe ha smesso di '
-           . 'parlare. Tu non hai idea di chi sia stato, e adesso non hai nemmeno la possibilità '
-           . 'di far finta di niente.',
+       'ok' => 'È fatto in casa: si vede dalla forma, che non è una forma. Mezza classe ha '
+           . 'smesso di parlare. Non hai idea di chi sia stato, e adesso non puoi nemmeno far '
+           . 'finta di niente.',
        'ko' => '', 'effetti_ok' => ['compostezza' => -2, 'affetto_cast' => 1], 'effetti_ko' => [],
        'peso' => ['dai_suki' => 3, 'kakko' => 1]],
       ['k' => 'tasca', 'testo' => 'Farlo sparire in borsa senza guardarlo',
@@ -354,7 +358,7 @@ return [
      . 'stesso posto: ci sono i compagni di classe, i professori in borghese, la gente dei '
      . 'negozi, e chiunque tu stia evitando da tre settimane.',
  'luogo' => 'tempio',
- 'condizione' => 'evento:festival_estate',
+ 'condizione' => 'evento:festival_estate+sera',
  'min_cast' => 2, 'max_cast' => 6, 'finestra' => 1800,
  'scene' => $scene(
    [
@@ -373,7 +377,7 @@ return [
       ['k' => 'grida', 'testo' => 'Metterti a gridare il punto di ritrovo sopra la folla',
        'prova' => 'dai_suki', 'difficolta' => 30,
        'ok' => 'Urli tre volte «al torii!» e si girano cinquanta persone, ma il gruppo ha capito. '
-           . 'Sei rosso, funziona.',
+           . 'Sei ross{o}, ma funziona.',
        'ko' => 'Urli, e la tua voce sparisce dentro il tamburo che ha appena cominciato. '
            . 'Nessuno ti ha sentito, e adesso siete sparpagliati.',
        'effetti_ok' => ['affetto_cast' => 2, 'compostezza' => -1],
@@ -382,7 +386,7 @@ return [
       ['k' => 'lato', 'testo' => 'Sgusciare fuori dalla calca per il sentiero laterale',
        'prova' => 'kakko', 'difficolta' => 40,
        'ok' => 'Conosci un passaggio dietro le bancarelle. Sbuchi sopra la salita con il fiato '
-           . 'a posto mentre gli altri arrancano, e per un momento sei l\'unico che sa dov\'è tutti.',
+           . 'a posto mentre gli altri arrancano, e per un momento sei l\'unic{o} che sa dove sono tutti.',
        'ko' => 'Il sentiero è chiuso da un furgone delle bancarelle. Torni indietro contro '
            . 'corrente, e contro corrente con lo yukata è un\'impresa.',
        'effetti_ok' => ['affetto_cast' => 1],
@@ -396,22 +400,22 @@ return [
         . 'fa oh, e in quel silenzio la persona accanto a te dice qualcosa che non capisci '
         . 'perché arriva il secondo colpo.',
     'opzioni' => [
-      ['k' => 'richiedi', 'testo' => 'Chiederle di ripetere',
+      ['k' => 'richiedi', 'testo' => 'Chiedere di ripetere',
        'prova' => 'nessuna', 'difficolta' => 0,
-       'ok' => 'Lei scuote la testa e dice «niente, niente». E guarda in alto. Ma non era niente, '
+       'ok' => 'Scuote la testa e dice «niente, niente». E guarda in alto. Ma non era niente, '
            . 'e lo sapete tutti e due.',
        'ko' => '', 'effetti_ok' => ['affetto_cast' => 2, 'malinteso_cast' => 3], 'effetti_ko' => [],
        'peso' => ['testa' => 2, 'cuore' => 1]],
       ['k' => 'rispondi', 'testo' => 'Rispondere come se avessi capito',
        'prova' => 'kakko', 'difficolta' => 50,
        'ok' => 'Dici una cosa abbastanza generica da andare bene per qualunque frase, e per '
-           . 'fortuna va bene anche per quella. Lei sorride.',
+           . 'fortuna va bene anche per quella. Ti sorride.',
        'ko' => 'Rispondi a una domanda che non era una domanda. Adesso lei pensa una cosa che tu '
            . 'non hai detto, e tu non sai nemmeno quale.',
        'effetti_ok' => ['affetto_cast' => 4],
        'effetti_ko' => ['malinteso_cast' => 12],
        'peso' => ['kakko' => 4]],
-      ['k' => 'guarda', 'testo' => 'Stare zitto e guardare i fuochi',
+      ['k' => 'guarda', 'testo' => 'Restare in silenzio a guardare i fuochi',
        'prova' => 'nessuna', 'difficolta' => 0,
        'ok' => 'Ce ne sono ancora per dieci minuti. Nessuno dei due dice più niente, e non è '
            . 'imbarazzante: è una delle poche volte in cui non parlare è la cosa giusta.',
@@ -439,7 +443,7 @@ return [
     'testo' => 'Alla lavagna ci sono tre parole: BAR, FANTASMI, BAND. Chi ha proposto il bar dice '
         . 'che è sicuro. Chi ha proposto i fantasmi dice che è l\'unico che si ricorderà '
         . 'qualcuno. Chi ha proposto la band non ha proposto niente: ha solo detto che sa '
-        . 'suonare, e adesso guarda fuori dalla finestra come se la cosa non lo riguardasse.',
+        . 'suonare, e adesso guarda fuori dalla finestra come se la cosa non la riguardasse.',
     'opzioni' => [
       ['k' => 'bar', 'testo' => 'Stare col bar: funziona sempre e non si fa figuracce',
        'prova' => 'testa', 'difficolta' => 30,
@@ -477,7 +481,7 @@ return [
     'opzioni' => [
       ['k' => 'affronta', 'testo' => 'Andare lì e dirgli di smettere',
        'prova' => 'rissa', 'difficolta' => 45,
-       'ok' => 'Non serve alzare le mani: basta arrivare vicino, restare fermo, e non abbassare '
+       'ok' => 'Non serve alzare le mani: basta arrivare vicino, restare ferm{o}, e non abbassare '
            . 'gli occhi per il tempo che serve. Se ne vanno borbottando.',
        'ko' => 'Uno ti dà una spinta, tu ne dai una indietro, e adesso c\'è un capannello. '
            . 'Finisce in niente, ma ti fa male una spalla e il banchetto è per terra.',
@@ -496,7 +500,7 @@ return [
        'ok' => 'Dai a quello più grosso un grembiule e gli dici che serve uno all\'ingresso. '
            . 'Ci casca. Fanno il turno, si divertono, e a fine giornata uno chiede se domani '
            . 'può tornare.',
-       'ko' => 'Provi a fare lo spiritoso e passi per quello che li prende in giro. '
+       'ko' => 'Provi a fare l{o} spiritos{o} e passi per quell{o} che li prende in giro. '
            . 'Peggiora tutto.',
        'effetti_ok' => ['affetto_cast' => 7, 'compostezza' => 1],
        'effetti_ko' => ['pf' => -2, 'compostezza' => -2],
@@ -516,7 +520,7 @@ return [
      . 'vede il fiato, e c\'è un chiosco che vende amazake caldo a metà strada. Alla fine si '
      . 'tira la corda, si battono le mani due volte, e si chiede una cosa sola.',
  'luogo' => 'tempio',
- 'condizione' => 'evento:capodanno',
+ 'condizione' => 'evento:capodanno+notte',
  'min_cast' => 2, 'max_cast' => 6, 'finestra' => 1800,
  'scene' => $scene(
    [
@@ -650,7 +654,7 @@ return [
         . 'con la bocca aperta come si fa a sei anni, e si sta lì. Poi qualcuno raccoglie della '
         . 'neve e la stringe in mano, senza ancora aver deciso cosa farne.',
     'opzioni' => [
-      ['k' => 'tira', 'testo' => 'Tirargliela addosso per primo',
+      ['k' => 'tira', 'testo' => 'Tirarla addosso a qualcuno, prima di tutti',
        'prova' => 'sport', 'difficolta' => 30,
        'ok' => 'Centro in pieno, sulla spalla. Quello che segue è una guerra di dieci minuti in '
            . 'cui nessuno ha più diciassette anni.',
@@ -665,7 +669,7 @@ return [
            . 'sciarpa che qualcuno rivorrà indietro. Resterà lì fino a giovedì.',
        'ko' => '', 'effetti_ok' => ['affetto_cast' => 4], 'effetti_ko' => [],
        'peso' => ['candore' => 3, 'cuore' => 2]],
-      ['k' => 'guarda', 'testo' => 'Restare fermo a guardare, senza toccare niente',
+      ['k' => 'guarda', 'testo' => 'Fermarsi a guardare, senza toccare niente',
        'prova' => 'nessuna', 'difficolta' => 0,
        'ok' => 'Il quartiere così non lo hai mai visto e non lo rivedrai uguale, perché domani '
            . 'sarà fango. Uno del gruppo si ferma accanto a te e guarda dove guardi tu, e non '
@@ -719,6 +723,7 @@ return [
      . 'convoca qualcuno qui ha già deciso cosa dirgli. Il problema è dirlo.',
  'luogo' => 'giardini',
  'condizione' => 'sempre',
+ 'esclusi' => 'umao,ushiko',
  'min_cast' => 2, 'max_cast' => 4, 'finestra' => 1800,
  'scene' => $scene(
    [
@@ -729,7 +734,7 @@ return [
     'opzioni' => [
       ['k' => 'comincia', 'testo' => 'Cominciare tu, senza girarci intorno',
        'prova' => 'cuore', 'difficolta' => 35,
-       'ok' => 'Lo dici in cinque parole e poi stai zitto. È il modo giusto: le cose difficili '
+       'ok' => 'Lo dici in cinque parole e poi stai zitt{o}. È il modo giusto: le cose difficili '
            . 'dette in fretta lasciano il tempo di reggere il colpo. Nessuno ti interrompe.',
        'ko' => 'Cominci, e a metà della seconda frase ti accorgi che stai spiegando il contesto '
            . 'invece di dire la cosa. Ti fermi. Adesso sanno che c\'è qualcosa e non sanno cosa.',
@@ -776,7 +781,7 @@ return [
        'effetti_ok' => ['affetto_cast' => 7],
        'effetti_ko' => ['affetto_cast' => -5, 'malinteso_cast' => 10, 'compostezza' => -2],
        'peso' => ['dai_suki' => 3, 'cuore' => 2]],
-      ['k' => 'scendi', 'testo' => 'Alzarti e scendere per primo',
+      ['k' => 'scendi', 'testo' => 'Alzarti e scendere prima degli altri',
        'prova' => 'kakko', 'difficolta' => 40,
        'ok' => 'Ti alzi, dici che si fa tardi, e scendi senza voltarti. È una cosa da vigliacchi '
            . 'e insieme una gentilezza: gli altri non devono decidere quando finirla.',

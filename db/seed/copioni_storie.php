@@ -49,7 +49,7 @@ return [
  'ckey' => 'doppio',
  'titolo' => 'Due appuntamenti alla stessa ora',
  'occhiello' => 'Un pomeriggio in via commerciale',
- 'premessa' => 'Sono le quattro, la via è piena di gente, e qualcuno di voi si è appena reso conto '
+ 'premessa' => 'La via è piena di gente, e qualcuno di voi si è appena reso conto '
      . 'di aver detto sì a due persone diverse, per lo stesso pomeriggio, a cinque minuti di '
      . 'distanza. Una aspetta davanti al negozio di dischi. L\'altra all\'ABCB. Nessuna delle due '
      . 'sa dell\'altra.',
@@ -58,12 +58,12 @@ return [
  'min_cast' => 2, 'max_cast' => 4, 'finestra' => 1500,
  'scene' => $scene(
    [
-    'testo' => 'L\'orologio della farmacia segna le quattro e due minuti. Fra il negozio di dischi '
+    'testo' => 'L\'orologio della farmacia dice che è già ora. Fra il negozio di dischi '
         . 'e l\'ABCB ci sono trecento metri e una folla di studenti. Chi è nei guai lo è fino al '
         . 'collo; chi non lo è guarda la scena con un interesse che non fa onore a nessuno.',
     'opzioni' => [
       $o('corri', 'Fare la spola fra i due posti, di corsa', 'sport', 45,
-         'Corri, arrivi, sorridi, inventi una commissione, riparti. Funziona per tre giri. Sei senza fiato e ancora vivo.',
+         'Corri, arrivi, sorridi, inventi una commissione, riparti. Funziona per tre giri. Sei senza fiato e ancora viv{o}.',
          'Al secondo giro inciampi davanti al fruttivendolo con mezza via a guardarti. Arrivi in ritardo da tutte e due le parti.',
          ['compostezza' => -1], ['compostezza' => -2, 'malinteso_cast' => 4], ['sport' => 3]),
       $o('confessa', 'Andare dalla prima e dirle la verità', 'cuore', 40,
@@ -76,11 +76,11 @@ return [
          ['affetto_cast' => 4], ['malinteso_cast' => 6], ['dai_suki' => 3]),
       $o('teletrasporto', 'Essere in due posti nello stesso momento', 'nessuna', 0,
          'Un vicolo, un attimo, e sei dall\'altra parte della via. Poi di nuovo indietro. È la cosa più comoda del mondo, finché qualcuno non conta i minuti.',
-         '', ['affetto_cast' => 2], [], ['dai_suki' => 1], 'teletrasporto'),
+         '', ['affetto_cast' => 2], [], ['dai_suki' => 1], 'teletrasporto') + ['solo_primario' => true],
     ],
    ],
    [
-    'testo' => 'Alle cinque meno un quarto succede quello che doveva succedere: le due persone si '
+    'testo' => 'Tre quarti d\'ora dopo succede quello che doveva succedere: le due persone si '
         . 'incontrano davanti alla vetrina del fotografo, e si guardano, e poi guardano voi.',
     'opzioni' => [
       $o('spiega', 'Spiegare tutto, dall\'inizio', 'cuore', 45,
@@ -113,6 +113,7 @@ return [
      . 'tutti. Lo sa anche il professore di educazione fisica, che è appena entrato a prendere un caffè.',
  'luogo' => 'abcb',
  'condizione' => 'sempre',
+ 'esclusi' => 'master',
  'min_cast' => 2, 'max_cast' => 4, 'finestra' => 1500,
  'scene' => $scene(
    [
@@ -138,7 +139,7 @@ return [
         . 'bancone con la faccia di chi sta facendo un conto. Il Master smette di asciugare il bicchiere.',
     'opzioni' => [
       $o('cliente', 'Togliersi il grembiule e fingersi un cliente', 'testa', 45,
-         'In tre secondi sei seduto a un tavolo con un menù in mano. Il professore paga e se ne va senza dire niente.',
+         'In tre secondi sei sedut{o} a un tavolo con un menù in mano. Il professore paga e se ne va senza dire niente.',
          'Il grembiule ti resta impigliato al collo. Il professore ti saluta per nome, con un sorriso che non promette niente di buono.',
          ['compostezza' => -1], ['calore' => 4, 'compostezza' => -2], ['testa' => 3]),
       $o('copri', 'Mettersi in mezzo e coprire gli altri', 'dai_suki', 45,
@@ -183,7 +184,7 @@ return [
          ['affetto_cast' => 3], ['compostezza' => -1], ['testa' => 3]),
       $o('chiacchiera', 'Lasciar andare la serata dove vuole', 'nessuna', 0,
          'Non studiate niente e ridete parecchio. Domani pagherete, ma stasera è stata una bella sera.',
-         '', ['affetto_cast' => 5, 'compostezza' => -1], [], ['dai_suki' => 3, 'testa' => -1]),
+         '', ['affetto_cast' => 2, 'compostezza' => -1], [], ['dai_suki' => 3, 'testa' => -1]),
       $o('spiega', 'Spiegare a qualcuno la cosa che non ha capito', 'cuore', 35,
          'Glielo spieghi tre volte, con tre esempi diversi, e alla terza fa quella faccia. Vi guardate e sorridete.',
          'Gliela spieghi così male che adesso non la capite più in due.',
@@ -203,7 +204,7 @@ return [
          'All\'alba non sai niente in più e ti si chiudono gli occhi. È stata una pessima idea.',
          ['compostezza' => -1], ['compostezza' => -2, 'pf' => -1], ['testa' => 2]),
       $o('chiaroveggenza', 'Guardare dentro l\'armadio della sala professori', 'nessuna', 0,
-         'Chiudi gli occhi e la busta è lì, aperta sul tavolo del professore che la sta finendo di correggere. Leggi la prima domanda. Poi ti vergogni un po\'.',
+         'Chiudi gli occhi e la busta è lì, aperta sul tavolo del professore che la sta finendo di preparare. Leggi la prima domanda. Poi ti vergogni un po\'.',
          '', ['compostezza' => -1], [], ['testa' => 1], 'chiaroveggenza'),
       $o('telepatia', 'Leggere nella testa di chi ha studiato', 'nessuna', 0,
          'Domani basterà sedersi vicino alla persona giusta e ascoltare. Stanotte, intanto, senti quello che pensa di te. Non è quello che credevi.',
@@ -226,6 +227,7 @@ return [
      . 'giura che lassù, l\'anno scorso, ha visto una cosa bianca. Hatta giura un sacco di cose.',
  'luogo' => 'tempio',
  'condizione' => 'estate+notte',
+ 'esclusi' => 'komatsu,hatta',
  'min_cast' => 2, 'max_cast' => 6, 'finestra' => 1800,
  'scene' => $scene(
    [
@@ -239,7 +241,7 @@ return [
          ['affetto_cast' => 5], ['malinteso_cast' => 3], ['cuore' => 3]),
       $o('fantasma', 'Proporti come fantasma: nasconderti lungo il sentiero', 'dai_suki', 40,
          'Ti nascondi dietro un pino con un lenzuolo. Le urla che senti valgono l\'intera estate.',
-         'Ti nascondi, e dopo dieci minuti al buio da sol{o} sei tu quello che ha paura.',
+         'Ti nascondi, e dopo dieci minuti al buio da sol{o} sei tu quell{o} che ha paura.',
          ['affetto_cast' => 2, 'calore' => 1], ['compostezza' => -2], ['dai_suki' => 3, 'kakko' => 1]),
       $o('defila', 'Trovare una scusa per restare al tempio', 'nessuna', 0,
          'Resti a guardare le lanterne con chi non ha voluto andare. Non succede niente, ed è piacevole lo stesso.',
@@ -255,7 +257,7 @@ return [
          'Allunghi la mano e prendi un ramo. Urli tu, e fai urlare anche l\'altro.',
          ['affetto_cast' => 7], ['compostezza' => -2, 'malinteso_cast' => 2], ['cuore' => 3]),
       $o('scappa', 'Urlare e correre giù fino al tempio', 'sport', 35,
-         'Arrivi giù prima di tutti, senza fiato, e sei il primo a ridere di te stess{o}.',
+         'Arrivi giù prima di tutti, senza fiato, e ridi di te stess{o} prima di chiunque altro.',
          'Inciampi su una radice al buio. Arrivi giù con un ginocchio sbucciato e la dignità a pezzi.',
          ['compostezza' => -1], ['pf' => -1, 'compostezza' => -2], ['sport' => 2, 'cuore' => -1]),
       $o('ridi', 'Ridere: è sicuramente Komatsu', 'kakko', 45,
@@ -271,8 +273,9 @@ return [
 ],
 
 // ─────────────────────────────────────────────────────────────────────────
-// I giochi di Komatsu (capp. 32, 50, 56, 144): l'asso di cuori, le carte con
-// la penitenza sotto i ciliegi, la scommessa sul bacio, la coppa dell'amore.
+// I giochi del gruppo: l'asso di cuori (cap. 32, lo propone Hikaru all'ABCB),
+// le carte con la penitenza sotto i ciliegi (cap. 56) e la scommessa sul bacio
+// (cap. 50), che sono di Komatsu. Qui l'organizzatore e' lui.
 [
  'ckey' => 'asso',
  'titolo' => 'L\'asso di cuori',
@@ -282,6 +285,7 @@ return [
      . 'Komatsu ha già capito che Hatta bara.',
  'luogo' => 'parco',
  'condizione' => 'sempre',
+ 'esclusi' => 'komatsu,hatta',
  'min_cast' => 3, 'max_cast' => 6, 'finestra' => 1500,
  'scene' => $scene(
    [
@@ -297,7 +301,7 @@ return [
          ['compostezza' => 1], ['malinteso_cast' => 4, 'compostezza' => -1], ['testa' => 2, 'candore' => -2]),
       $o('telecinesi', 'Girare la carta giusta col pensiero', 'nessuna', 0,
          'Un soffio di vento, dicono tutti, e la carta si gira proprio quando serviva. Hai il re.',
-         '', [], [], ['dai_suki' => 1], 'telecinesi'),
+         '', ['compostezza' => 1], [], ['dai_suki' => 1], 'telecinesi'),
     ],
    ],
    [
@@ -313,7 +317,7 @@ return [
          'Contratti, e la penitenza raddoppia.',
          ['affetto_cast' => 3], ['compostezza' => -2], ['dai_suki' => 3]),
       $o('fuga', 'Prendere la rincorsa e scappare', 'sport', 40,
-         'Sei già oltre la fontanella quando Komatsu capisce. Nessuno ti inseguirà: fa troppo caldo.',
+         'Sei già oltre la fontanella quando Komatsu capisce. Nessuno ti inseguirà: non ne vale la pena.',
          'Ti prendono alla fontanella. La penitenza adesso è doppia, e la fanno decidere a Hatta.',
          ['affetto_cast' => -1], ['compostezza' => -2, 'malinteso_cast' => 3], ['sport' => 3]),
     ],
@@ -359,7 +363,7 @@ return [
     'opzioni' => [
       $o('verita', 'Dire alla destinataria com\'è andata', 'cuore', 40,
          'Glielo dici, tutto, anche la parte in cui non fai una bella figura. Ti ringrazia, e va a cercare chi l\'ha scritta.',
-         'Glielo dici, ma capisce che la lettera era tua. Arrossisce, e scappa.',
+         'Glielo dici, ma si convince che la lettera sia tua. Arrossisce, e scappa.',
          ['malinteso_cast' => -8, 'affetto_cast' => 3], ['malinteso_cast' => 12], ['cuore' => 3]),
       $o('proteggi', 'Coprire chi l\'ha scritta', 'dai_suki', 45,
          'Racconti una storia in cui la lettera è finita lì per errore, e nessuno ci fa più caso. Chi l\'ha scritta ti guarda grato.',
@@ -383,9 +387,9 @@ return [
  'occhiello' => 'La vigilia, sui gradini',
  'premessa' => 'È la vigilia di Natale. O meglio: è di nuovo la vigilia di Natale. Qualcuno di voi '
      . 'ha la sensazione precisa di aver già visto quella coppia passare, di aver già sentito quel '
-     . 'campanello di bicicletta, di aver già detto questa frase. In cima ai gradini nevica appena.',
+     . 'campanello di bicicletta, di aver già detto questa frase. In cima ai gradini fa un freddo pulito.',
  'luogo' => 'gradini',
- 'condizione' => 'evento:natale',
+ 'condizione' => 'giorno:12-24',
  'min_cast' => 2, 'max_cast' => 4, 'finestra' => 1800,
  'scene' => $scene(
    [
@@ -395,7 +399,7 @@ return [
       $o('accorgiti', 'Rendersi conto che il giorno si sta ripetendo', 'testa', 45,
          'Lo capisci, e lo capisci prima di tutti. Hai un vantaggio che nessuno ha mai avuto: sai come va a finire.',
          'Ti viene un dubbio, ma lo scacci. Sarà la stanchezza.',
-         ['compostezza' => -1], [], ['testa' => 3]),
+         ['compostezza' => 1, 'affetto_cast' => 2], [], ['testa' => 3]),
       $o('rifai', 'Dire stavolta la cosa che la prima volta non hai detto', 'cuore', 50,
          'La dici. Questa volta la dici, e la faccia di chi ascolta non è quella della prima volta.',
          'Ci riprovi e non ti esce, esattamente come la prima volta. Forse il giorno si ripete apposta.',
@@ -420,7 +424,7 @@ return [
          ['pf' => -1], ['pf' => -2, 'compostezza' => -1], ['sport' => 2, 'dai_suki' => 1]),
       $o('aspetta', 'Aspettare mezzanotte tenendosi per mano', 'nessuna', 0,
          'Restate lì. Quando suona, vi accorgete che è il 25, e che non vi siete lasciati la mano.',
-         '', ['affetto_cast' => 5], [], ['cuore' => 2]),
+         '', ['affetto_cast' => 3], [], ['cuore' => 2]),
     ],
    ],
  ),
@@ -439,6 +443,7 @@ return [
      . 'ha mai sentito parlare di Hikaru Hiyama.',
  'luogo' => 'gradini',
  'condizione' => 'raro',
+ 'esclusi' => 'hikaru,yusaku',
  'min_cast' => 2, 'max_cast' => 4, 'finestra' => 1800,
  'scene' => $scene(
    [
@@ -465,7 +470,7 @@ return [
         . 'successe.',
     'opzioni' => [
       $o('torna', 'Risalire i gradini nella nebbia', 'nessuna', 0,
-         'Sali, e in cima qualcuno ti chiama «darling» con una voce che conosci. Non sei mai stat{o} così content{o} di sentirla.',
+         'Sali, e in cima qualcuno grida «darling!» con una voce che conosci. Non lo dice a te, ma non sei mai stat{o} così content{o} di sentirla.',
          '', ['affetto_cast' => 4], [], ['cuore' => 2]),
       $o('resta', 'Restare ancora un po\'', 'cuore', 50,
          'Resti un\'ora, e la passi con chi è rimasto con te. Poi torni, e ve lo porterete dietro in due.',
@@ -488,7 +493,7 @@ return [
      . 'intenzione di dirlo.',
  'luogo' => 'spiaggia',
  'condizione' => 'evento:mare',
- 'min_cast' => 2, 'max_cast' => 6, 'finestra' => 1800,
+ 'min_cast' => 1, 'max_cast' => 6, 'finestra' => 1800,
  'scene' => $scene(
    [
     'testo' => 'Si parte. Chi è già in acqua chiama gli altri. Il mare è più freddo di come sembrava '
@@ -500,7 +505,7 @@ return [
          ['affetto_cast' => 2], ['compostezza' => -2, 'affetto_cast' => 2], ['nuoto' => 3]),
       $o('riva', 'Restare a riva con chi non va', 'nessuna', 0,
          'Resti sotto l\'ombrellone con chi non nuota. Si chiacchiera di tutto, e il tempo passa meglio che sull\'isola.',
-         '', ['affetto_cast' => 3], [], ['cuore' => 1, 'nuoto' => -2]),
+         '', ['affetto_cast' => 1], [], ['cuore' => 1, 'nuoto' => -2]),
       $o('salva', 'Andare a riprendere chi è in difficoltà', 'nuoto', 50,
          'Lo raggiungi, lo tieni a galla, lo riporti indietro. Sulla sabbia nessuno dei due dice niente per un bel pezzo.',
          'Lo raggiungi, ma siete in difficoltà in due. Vi tira fuori il bagnino, e tutta la spiaggia guarda.',
@@ -538,10 +543,10 @@ return [
      . 'che nessuno capisce.',
  'luogo' => 'montagna',
  'condizione' => 'inverno',
- 'min_cast' => 2, 'max_cast' => 4, 'finestra' => 1800,
+ 'min_cast' => 1, 'max_cast' => 4, 'finestra' => 1800,
  'scene' => $scene(
    [
-    'testo' => 'Fuori, solo bianco. Dentro, il respiro di quattro persone che appanna i vetri. '
+    'testo' => 'Fuori, solo bianco. Dentro, il respiro di chi è dentro che appanna i vetri. '
         . 'Qualcuno ha paura dell\'altezza, e lo nasconde malissimo.',
     'opzioni' => [
       $o('calma', 'Tenere tutti calmi', 'testa', 40,
@@ -564,10 +569,10 @@ return [
     'opzioni' => [
       $o('aspetta', 'Aspettare i soccorsi stretti insieme', 'nessuna', 0,
          'Aspettate stretti, e quando la funivia riparte vi sembra un peccato.',
-         '', ['affetto_cast' => 5, 'pf' => -1], [], ['cuore' => 2]),
+         '', ['affetto_cast' => 3, 'pf' => -1], [], ['cuore' => 2]),
       $o('teletrasporto', 'Portare tutti giù, al rifugio', 'nessuna', 0,
          'Chiudi gli occhi, e un attimo dopo siete nel rifugio, vicino alla stufa, con la neve ancora sulle spalle. Nessuno sa spiegare come. Quasi nessuno.',
-         '', ['calore' => 3, 'affetto_cast' => 3], [], ['cuore' => 1], 'teletrasporto'),
+         '', ['calore' => 3, 'affetto_cast' => 3], [], ['cuore' => 1], 'teletrasporto') + ['solo_primario' => true],
       $o('canta', 'Cantare a squarciagola per non pensarci', 'musica', 40,
          'Canti, e alla seconda strofa cantano tutti. Il tempo passa in un attimo.',
          'Canti stonatissimo. Qualcuno ride, qualcuno si tappa le orecchie, e la funivia ancora non riparte.',
@@ -640,7 +645,7 @@ return [
      . 'carta colorata per scrivere un desiderio. Si scrive, si appende, e si fa finta di non '
      . 'leggere quelli degli altri.',
  'luogo' => 'commerciale',
- 'condizione' => 'evento:tanabata',
+ 'condizione' => 'evento:tanabata+sera',
  'min_cast' => 2, 'max_cast' => 6, 'finestra' => 1800,
  'scene' => $scene(
    [
@@ -674,7 +679,7 @@ return [
          ['compostezza' => 1], ['malinteso_cast' => 6, 'compostezza' => -1], ['sport' => 3]),
       $o('passeggia', 'Non leggere niente e passeggiare con qualcuno', 'nessuna', 0,
          'Camminate fino in fondo alla via senza guardare i bambù. Il desiderio di qualcuno, forse, si è appena avverato.',
-         '', ['affetto_cast' => 5], [], ['cuore' => 2]),
+         '', ['affetto_cast' => 3], [], ['cuore' => 2]),
     ],
    ],
  ),
@@ -682,8 +687,8 @@ return [
 
 // ─────────────────────────────────────────────────────────────────────────
 // La festa delle bambole a casa Hiyama (cap. 49): il sake dolce, e i poteri
-// dei Kasuga che con l'alcol partono da soli — Kurumi scambia i poteri di
-// tutti con un colpo al collo.
+// dei Kasuga che vanno storti — Kurumi, con un colpo al collo, fa partire a
+// Kyosuke i poteri sbagliati.
 [
  'ckey' => 'bambole',
  'titolo' => 'Il sake dolce',
@@ -707,7 +712,7 @@ return [
          'Rifiuti, ma la madre di Hikaru non accetta un no. Il bicchiere è pieno di nuovo.',
          [], ['brillo' => 120], ['testa' => 3]),
       $o('servi', 'Fare il giro a riempire i bicchieri degli altri', 'dai_suki', 30,
-         'Servi tutti come un vero padrone di casa. Ti adorano, e a te non resta il tempo di bere.',
+         'Servi tutti come se fossi di casa. Ti adorano, e a te non resta il tempo di bere.',
          'Servi tutti, e tutti ricambiano. Ne hai bevuti più degli altri.',
          ['affetto_cast' => 4], ['brillo' => 240], ['dai_suki' => 3]),
     ],
@@ -720,7 +725,7 @@ return [
          'Respiri, ti concentri, e tieni tutto a terra: cuscini, bicchieri, la tua bocca. Nessuno ha visto niente.',
          'Ti concentri, e un bicchiere si alza da solo davanti a tutti. Una risata isterica salva la situazione, più o meno.',
          ['compostezza' => -1], ['calore' => 3, 'compostezza' => -2], ['testa' => 3]),
-      $o('confessa', 'Dire a qualcuno una cosa che da sobrio non diresti', 'cuore', 35,
+      $o('confessa', 'Dire a qualcuno una cosa che a mente lucida non diresti', 'cuore', 35,
          'La dici. Domattina ne ricorderete metà a testa, e le due metà non combaceranno. Ma è stata detta.',
          'La dici alla persona sbagliata, convint{o} che sia quella giusta.',
          ['affetto_cast' => 6], ['malinteso_cast' => 12], ['cuore' => 3]),
@@ -744,6 +749,7 @@ return [
      . 'ragazzo serio. Adesso tocca a voi.',
  'luogo' => 'commerciale',
  'condizione' => 'evento:pesce_aprile',
+ 'esclusi' => 'komatsu',
  'min_cast' => 2, 'max_cast' => 6, 'finestra' => 1500,
  'scene' => $scene(
    [

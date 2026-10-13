@@ -128,7 +128,7 @@ leggere in due modi. Conversazioni che costano CUORE. Gelosia che nasce da infor
 *parziali*, mai da informazioni false.
 
 ### Pilastro 3 — Il quartiere come personaggio
-Sedici luoghi, ciascuno con orari, stagionalità, avventori abituali e memoria. Il quartiere
+Venticinque luoghi (sedici nella prima stesura), ciascuno con orari, stagionalità, avventori abituali e memoria. Il quartiere
 ricorda chi ci passa. Le voci si propagano di luogo in luogo e si deformano.
 
 ### Pilastro 4 — L'episodio
@@ -148,23 +148,24 @@ nell'album dei ricordi.
   Configurabile in `game_config` (`clock.compression`).
 - Conseguenza voluta: a ogni accesso trovi un'ora del giorno diversa. Nessuno è costretto a
   giocare la mattina per vedere la scuola.
-- **Fase episodio a 1:1**, con il resto del mondo che continua a 1:4 e il personaggio che
-  «recupera» alla chiusura — è esattamente il meccanismo dell'incontro tattico di Atlantik, già
-  collaudato.
+- ~~**Fase episodio a 1:1**~~ — prevista e **non fatta**. Gli episodi hanno invece una
+  finestra in tempo reale per ogni scena (F5), il mondo continua a 1:4 anche durante, e chi non
+  si fa vivo lo gioca l'agente autonomo: un tempo a parte per chi è in scena avrebbe spezzato
+  il quartiere in due orologi, e non è servito.
 - Il calendario è ciclico ma **completo**: passa per tutti i momenti che in KOR contano.
 
 | Periodo | Evento di ambientazione |
 |:---|:---|
-| Aprile | Inizio dell'anno, ciliegi, cerimonia d'ingresso, reclutamento dei club |
-| Maggio | Esami di metà periodo, gita scolastica |
-| Giugno | Stagione delle piogge, ombrelli condivisi |
-| Luglio-Agosto | Vacanze, mare, festival estivo con gli *yukata*, fuochi d'artificio, ritiri dei club, montagna |
-| Settembre | Rientro, festival culturale, festival sportivo |
-| Ottobre-Novembre | Foglie rosse, esami, il freddo che arriva |
-| Dicembre | Natale (l'episodio più importante della serie), neve, sci sulla Montagna d'Inverno |
+| Aprile | Inizio dell'anno, cerimonia d'ingresso, reclutamento dei club, *hanami* sotto i ciliegi |
+| Maggio | Golden Week, esami di metà trimestre |
+| Giugno | Stagione delle piogge, ombrelli condivisi, gita scolastica |
+| Luglio-Agosto | Tanabata, esami di luglio, vacanze, mare, festival estivo con gli *yukata* e i fuochi, Obon, ritiri dei club, montagna |
+| Settembre | Rientro, secondo trimestre |
+| Ottobre-Novembre | Festival sportivo, festival culturale, foglie rosse, il freddo che arriva |
+| Dicembre | Esami, Natale (l'episodio più importante della serie), neve, sci sulla Montagna d'Inverno, i centootto rintocchi |
 | Gennaio | Capodanno, primo sogno dell'anno, visita al tempio |
-| Febbraio | San Valentino (il *giri-choco* e l'*honmei-choco*), esami d'ammissione |
-| Marzo | *White Day*, diplomi, addii — poi il ciclo riparte |
+| Febbraio | Setsubun, San Valentino (il *giri-choco* e l'*honmei-choco*), esami d'ammissione |
+| Marzo | Festa delle bambole, *White Day*, diplomi, addii — poi il ciclo riparte, col pesce d'aprile |
 
 - **Meteo**: campo continuo deterministico, funzione di (seme, istante, posizione) — nessuna
   cella salvata a DB. È il modello già scritto per Atlantik, riusabile quasi tale e quale. Serve
@@ -174,7 +175,9 @@ nell'album dei ricordi.
 ### 4.2 La mappa
 
 Il quartiere è ispirato — come l'originale — a **Umegaoka, Gotokuji e Shimokitazawa**, nel
-municipio di Setagaya a Tokyo. Non è una riproduzione topografica: è una mappa di gioco a
+municipio di Setagaya a Tokyo. (Così si credeva alla prima stesura: la ricerca ha poi trovato
+il modello vero, **Takaoka**, la città di Matsumoto — vedi §12-bis. L'opera dice Tokyo, e il
+gioco ne tiene l'ora e il calendario.) Non è una riproduzione topografica: è una mappa di gioco a
 luoghi collegati, disegnata su Canvas nello stile delle tavole di Matsumoto.
 
 | Luogo | Ruolo di gioco |
@@ -524,6 +527,15 @@ Dopo F7 si aggiunge contenuto e comodità, non impalcatura. In ordine di arrivo:
   E nella sala del maestro, dieci fotografie libere della Takaoka vera (`assets/img/takaoka/`).
   Il 13 ottobre, la galleria di `/opera`: otto immagini dell'opera scelte dall'utente sul sito di
   CyberFred, con didascalia e fonte (`assets/img/opera/didascalie.php`); solo nel repo privato.
+- **Il controllo del 13 ottobre 2026, e il nuovo inizio** (migrazione `0022`). Un audit di
+  tutta la piattaforma: le gare fra richieste (punti potere pagati due volte, due mani sullo
+  stesso oggetto, il riposo che cancellava le spese, il doppio clic in un episodio), le colonne
+  senza segno che andavano sotto zero, il blocco che si poteva usare a mano, il pubblico
+  dominio che si raggiungeva in tre giorni, la neve che non cadeva mai, il tempio isolato di
+  notte (il sentiero verso l'area giochi), gli ospiti lasciati nelle case private, le storie
+  che chiamavano chi non c'entrava (`copioni.esclusi`), e una trentina di testi rimessi in
+  accordo col genere e col canone. Poi `mondo:ricomincia`: account e personaggi restano, tutto
+  quello che era successo si azzera, e il quartiere riparte dal 6 aprile 1987 per tutti.
 - **Le comunicazioni** (migrazione `0016`): filo diretto fra la gestione e un giocatore, nei
   due sensi, con avviso per posta che non ripete il messaggio. Non è finzione e non si
   traveste da tale — vedi la nota in testa a `src/Game/Comunicazioni.php`.

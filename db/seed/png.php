@@ -109,7 +109,7 @@ return [
         // compostezza che ne deriva è 3. È il motore della storia.
         $p('kyosuke', 'Kyosuke', 'Kasuga', 'm', 'superiori', 3, 11, 15, 1969, true,
            'gradini', 'casa_kasuga,gradini,liceo,abcb,parco,viale',
-           // Nuoto 1: non sa nuotare (capp. 66 e 115; al 143 sguazza ancora
+           // Nuoto 1: non sa nuotare (cap. 66; al 143 sguazza ancora
            // nella vasca dei bambini). Prima era 6.
            [6, 7, 7, 10], [4, 4, 3, 5, 1, 5, 4, 9], 9, 10,
            'Un ragazzo del terzo anno con l\'aria di chi sta per dire qualcosa e poi non la dice.',
@@ -119,13 +119,13 @@ return [
         // le attesta canto, chitarra e tastiere a livello professionale.
         // Candore 3, quindi compostezza 9: è la sola che non perde la faccia.
         $p('madoka', 'Madoka', 'Ayukawa', 'f', 'superiori', 3, 5, 25, 1969, false,
-           'abcb', 'casa_ayukawa,abcb,liceo,dischi,argine,gradini',
+           'abcb', 'casa_ayukawa,abcb,liceo,dischi,argine,gradini,moebius',
            [13, 12, 8, 9], [9, 9, 7, 10, 8, 10, 9, 3], 11, 0,
            'La ragazza che al bar sta dietro il bancone e non ti guarda finché non parli tu.',
            'Capelli lunghi castani, sguardo dritto, sigaretta che non accende più.'),
 
-        // Hikaru: tutta cuore e nessun filtro. Dai suki 13 è il valore più
-        // alto del quartiere: si attacca alle persone, ed è il suo modo di
+        // Hikaru: tutta cuore e nessun filtro. Dai suki 13, fra i valori più
+        // alti del quartiere: si attacca alle persone, ed è il suo modo di
         // stare al mondo, non un difetto.
         $p('hikaru', 'Hikaru', 'Hiyama', 'f', 'superiori', 1, 11, 15, 1971, false,
            'liceo', 'casa_hiyama,liceo,abcb,sala_giochi,parco,gradini',
@@ -166,7 +166,7 @@ return [
         // Lui e Akane non abitano dai Kasuga — la famiglia di Kyosuke è di
         // quattro persone (voce giapponese) — ma con i loro genitori, a pochi
         // minuti a piedi (FAQ 50): `casa_zii`.
-        $p('kazuya', 'Kazuya', 'Kasuga', 'm', 'elementari', 3, 4, 20, 1978, true,
+        $p('kazuya', 'Kazuya', 'Kasuga', 'm', 'elementari', 3, 1, 25, 1979, true,
            'parco', 'casa_zii,parco,luna_park,sala_giochi',
            [3, 9, 9, 7], [2, 6, 1, 4, 5, 3, 2, 8], 5, 11,
            'Un bambino che risponde a domande che non hai fatto ad alta voce.',
@@ -176,7 +176,7 @@ return [
         // un solo bersaglio per volta nel manga (CANONE). Ha l'età di Kyosuke
         // (cap. 57; FAQ 51, 1969): prima stava al secondo anno.
         $p('akane', 'Akane', 'Kasuga', 'f', 'superiori', 3, 8, 12, 1969, true,
-           'stazione', 'casa_zii,stazione,commerciale,abcb,liceo,dischi',
+           'stazione', 'casa_zii,stazione,commerciale,abcb,liceo,dischi,moebius,cinema',
            [9, 10, 12, 7], [7, 7, 6, 9, 6, 7, 6, 5], 9, 10,
            'Una del terzo anno che sembra sempre sul punto di ridere di te.',
            'Capelli corti, quasi sempre in pantaloni, andatura sicura, cambia espressione troppo in fretta.'),
@@ -195,14 +195,14 @@ return [
         // i megafoni del quartiere, e in F6 è un ruolo meccanico oltre che
         // narrativo: sono quelli che fanno correre le voci.
         $p('komatsu', 'Seiji', 'Komatsu', 'm', 'superiori', 3, 6, 19, 1969, false,
-           'liceo', 'commerciale,liceo,sala_giochi,abcb,dischi,parco,stazione',
-           // Nuoto 1: non sa nuotare nemmeno lui (cap. 31). Prima era 6.
+           'liceo', 'commerciale,liceo,sala_giochi,abcb,dischi,parco,stazione,cinema',
+           // Nuoto 1: non sa nuotare nemmeno lui (cap. 30). Prima era 6.
            [6, 6, 12, 6], [4, 6, 4, 4, 1, 5, 3, 8], 8, 0,
            'Uno del terzo anno che sa già tutto di tutti, e te lo racconta.',
            'Capelli ricci di natura, qualche brufolo, ride prima di finire la frase.'),
 
         $p('hatta', 'Kazuya', 'Hatta', 'm', 'superiori', 3, 2, 28, 1970, false,
-           'liceo', 'commerciale,liceo,sala_giochi,abcb,dischi',
+           'liceo', 'commerciale,liceo,sala_giochi,abcb,dischi,cinema',
            [6, 7, 11, 6], [5, 5, 4, 4, 5, 6, 3, 8], 8, 0,
            'Uno del terzo anno che sta sempre a un passo dietro Komatsu.',
            'Occhiali, paffuto, sempre mezzo passo dietro Komatsu.'),
@@ -219,10 +219,10 @@ return [
         // problema sia la concorrenza. Kakko altissimo, candore bassissimo:
         // sa benissimo quello che fa.
         $p('sayuri', 'Sayuri', 'Hirose', 'f', 'superiori', 2, 6, 3, 1970, false,
-           'commerciale', 'commerciale,liceo,abcb,dischi,stazione,sala_giochi',
+           'commerciale', 'commerciale,liceo,abcb,dischi,stazione,sala_giochi,cinema,moebius',
            [7, 12, 14, 6], [7, 6, 5, 10, 6, 6, 6, 2], 8, 0,
-           'Una del secondo anno che ti sorride come se vi conosceste da sempre. Non e\' vero.',
-           'Codini, curatissima, e ti guarda un mezzo secondo piu\' del necessario.'),
+           'Una del secondo anno che ti sorride come se vi conosceste da sempre. Non è vero.',
+           'Codini, curatissima, e ti guarda un mezzo secondo più del necessario.'),
 
         // Hiromi Sugi (capp. 83, 85): studentessa nuova, ex compagna di
         // classe di Kyosuke nella scuola di prima. Arriva con le fotografie
@@ -232,7 +232,7 @@ return [
         $p('hiromi', 'Hiromi', 'Sugi', 'f', 'superiori', 3, 1, 22, 1970, false,
            'liceo', 'liceo,commerciale,abcb,parco,gradini',
            [5, 13, 10, 8], [8, 5, 4, 6, 5, 5, 7, 6], 8, 0,
-           'Una del terzo anno appena trasferita, che pero\' si ricorda di te.',
+           'Una del terzo anno che ti conosce da prima, e si ricorda di com\'eri.',
            'Capelli corti, sveglia, e un album di fotografie che non doveva portare.'),
 
         // --- Il quartiere -----------------------------------------------------
@@ -271,13 +271,13 @@ return [
         // niente — o forse si'. Dove abitino non si sa: li mettiamo sopra un
         // negozio della via, come Yusaku, ed e' una scelta nostra.
         $p('umao', 'Umao', '', 'm', 'adulti', 0, 6, 14, 1966, false,
-           'parco', 'commerciale,parco,albero,argine,luna_park,giardini',
+           'parco', 'commerciale,parco,albero,argine,luna_park,giardini,cinema',
            [5, 6, 14, 13], [3, 5, 8, 4, 5, 5, 5, 2], 9, 0,
            'Un ragazzo che chiama la fidanzata «Ushiko!» come se recitasse a teatro.',
            'Pettinatura alla moda di qualche anno fa, e occhi solo per lei.'),
 
         $p('ushiko', 'Ushiko', '', 'f', 'adulti', 0, 9, 3, 1966, false,
-           'parco', 'commerciale,parco,albero,argine,luna_park,giardini',
+           'parco', 'commerciale,parco,albero,argine,luna_park,giardini,cinema',
            [4, 7, 14, 14], [3, 4, 5, 4, 5, 6, 6, 2], 8, 0,
            'Una ragazza che risponde «Umao!» con la stessa enfasi, e non si accorge di nessun altro.',
            'Vestito a fiori, e occhi solo per lui.'),

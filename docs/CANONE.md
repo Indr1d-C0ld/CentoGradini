@@ -318,6 +318,28 @@ statistica che in questa storia decide qualcosa.
 CUORE 3, 4 e 13. Chi ha il coraggio di parlare è quella che non può essere ricambiata. La
 storia dura diciotto volumi per questo, e adesso il sistema lo dice con i numeri.
 
+> **Nota del 13 ottobre 2026.** Questa tabella è la prima stesura, ed è rimasta qui com'era.
+> I numeri in uso sono in `db/seed/png.php`, ritarati con F2 sulla stessa scala delle schede
+> dei giocatori (che distribuiscono punti, e non arrivano a 13-15 su tutto):
+>
+> | Personaggio | RISSA | TESTA | DAI-SUKI | CUORE |
+> |:---|:---:|:---:|:---:|:---:|
+> | Kyosuke | 6 | 7 | 7 | 10 |
+> | Madoka | 13 | 12 | 8 | 9 |
+> | Hikaru | 5 | 7 | 13 | 12 |
+> | Manami | 5 | 11 | 10 | 9 |
+> | Kurumi | 7 | 7 | 11 | 8 |
+> | Yūsaku | 11 | 7 | 5 | 9 |
+> | Kazuya | 3 | 9 | 9 | 7 |
+> | Akane | 9 | 10 | 12 | 7 |
+> | Il Master | 10 | 12 | 6 | 11 |
+>
+> Il triangolo regge in parte: fra i tre Hikaru ha ancora il CUORE più alto e Madoka il più
+> basso. L'indecisione di Kyosuke, invece, non la porta più il CUORE ma il **candore**, che
+> nella scheda di oggi è un'abilità secondaria: il suo, 9, è il più alto del quartiere alla
+> pari con quello di Yūsaku, e la compostezza che ne deriva è 3 — arrossisce e perde la faccia
+> prima di quasi tutti.
+
 ---
 
 ## 7-bis. Quello che hanno detto i 156 riassunti
@@ -381,7 +403,9 @@ stesso posto, e il nostro modello a un edificio solo non tradisce niente.
 
 I **compleanni** di Manami, Kurumi, Akane e Kazuya: quarantamila parole e non compaiono mai.
 I nostri restano scelti per far tornare la coorte scolastica, e adesso sappiamo che non c'è un
-dato vero da mettere al loro posto.
+dato vero da mettere al loro posto. (Per le gemelle il mese c'è: gennaio 1972, stima della
+FAQ 1 — §7-quinquies; il giorno, il 20, resta nostro. Kazuya è nato il 25 gennaio 1979 perché
+abbia otto anni e faccia la terza elementare nell'aprile 1987: data nostra anche questa.)
 
 Dove **abitano Hikaru e Yusaku**: casa di Hikaru c'è eccome — ci si festeggia l'Hinamatsuri
 (cap. 49), il capodanno (cap. 92), ci si mangia la torta (cap. 78) — ma il quartiere non la
@@ -502,7 +526,9 @@ alla ferrovia, e alle sette di sera il sole le va a finire dentro.
 
 **E l'episodio 45 è diventato un copione.** Ai giardini pensili Madoka dice a Kyosuke che se
 ne va in America (è l'episodio TV 45, «Un mauvais coup», Réflexion 16 — non il capitolo 45 del
-manga, che è la funivia sulla neve: lo si era scritto sbagliato fino al 9 ottobre 2026); il copione `addio` è ambientato lì e non ha altra condizione che il luogo —
+manga, che è la notte in albergo: la funivia ferma sulla neve è il 46. Lo si era scritto
+sbagliato fino al 9 ottobre 2026, e il 9 ottobre lo si era corretto sbagliando il capitolo;
+rimesso a posto il 13); il copione `addio` è ambientato lì e non ha altra condizione che il luogo —
 perché ai giardini non ci si capita, ci si viene, e chi ci convoca qualcuno ha già deciso cosa
 dirgli. Il problema è dirlo.
 
@@ -526,11 +552,12 @@ numero.
    raccoglitore paziente ha finito il lavoro. Cosa ne è uscito: §7-bis. Resta da fare la
    parte difficile, cioè ricavarne peso, distanza e durata: i riassunti dicono *che* un
    potere è stato usato, non *quanto* pesava la cosa che si è mossa.
-3. **Quante volte i Kasuga hanno traslocato.** Il *perché* è chiuso (FAQ 26: quando i poteri
-   diventano di dominio pubblico); resta da trovare il numero esatto, che è il parametro che
-   tara la soglia.
-4. **Gli artefatti canonici**: l'orologio che ferma il tempo (cap. 109 «フシギな時計»), la
-   macchina fotografica dei pensieri, il pappagallo del nonno.
+3. ~~**Quante volte i Kasuga hanno traslocato.**~~ **Chiuso.** Il *perché* lo dice la FAQ 26
+   (quando i poteri diventano di dominio pubblico), il numero la FAQ 84 e la voce giapponese:
+   arrivano nel quartiere al **settimo** trasloco (§7-quinquies).
+4. **Gli artefatti canonici**: l'orologio che ferma il tempo (cap. 109 «フシギな時計») e il
+   pappagallo del nonno sono entrati nel gioco il 9 ottobre 2026 come oggetti unici; manca la
+   macchina fotografica dei pensieri.
 5. **L'isola della stirpe**, custodita dalla nonna: nel regolamento del 1990 comparivano «due
    isole solenni» vicino a un porto. Il canone ne conferma una, e le dà una funzione.
 6. **Le edizioni successive**: l'*aizōban* e il *bunkobon* in 10 volumi hanno testo aggiunto
@@ -580,7 +607,7 @@ messa a confronto con i semi. Quello che è stato corretto:
 | **Le gemelle** | compleanni diversi (8/9/1972, 3/7/1973), terza e seconda media | gemelle, gennaio 1972, primo anno delle superiori nella classe di Hikaru | voce giapponese («恭介、まどかとは2学年下でまなみとくるみの同級生»); FAQ 1 («xx Janvier 1972 (estimation)»), FAQ 16. Il giorno, il 20, è nostro |
 | **Akane** | secondo anno, nata nel 1970 | terzo anno, nata nel 1969: ha l'età di Kyosuke | cap. 57; FAQ 51 |
 | **Dove dormono Akane e Kazuya** | dai Kasuga | dai loro genitori, a pochi minuti a piedi: luogo nuovo `casa_zii` | voce giapponese (i Kasuga sono quattro); FAQ 50 (l'OAV). Il punto della carta è nostro |
-| **Nuoto di Kyosuke e Komatsu** | 6 | 1 | capp. 66, 115, 143 (Kyosuke); cap. 31 (Komatsu) |
+| **Nuoto di Kyosuke e Komatsu** | 6 | 1 | capp. 66, 115, 143 (Kyosuke); cap. 30 (Komatsu, che al laghetto non può tuffarsi per Hikaru) |
 | **Cucina di Kurumi** | 4 | 1 | voce giapponese: «家事炊事の腕前は壊滅的» |
 | **Aspetto** di Hikaru, Hatta, Komatsu, Hiromi, Sayuri, Master, Kazuya, Akane | — | come nella voce giapponese: il neo e i capelli castani di Hikaru, gli occhiali di Hatta, i ricci di Komatsu, i codini di Sayuri; il gatto non è di Kazuya (Jingoro è dei Kasuga, e solo nell'anime) | voce giapponese; FAQ 35 |
 | **Il copione `addio`** | «capitolo 45» | episodio TV 45 | Réflexion 16 |

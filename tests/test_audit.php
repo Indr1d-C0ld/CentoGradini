@@ -124,7 +124,9 @@ prova('passato il tempo, chi non ha coperto lascia l\'anomalia', function () {
     $prima = (int) Database::first('SELECT COUNT(*) n FROM anomalie WHERE osservatore_id = ?', [(int) $teste['id']])['n'];
     uguale(0, $prima, 'si parte senza anomalie');
 
-    uguale(1, Segreto::incidentiScaduti($epoca), 'l\'incidente vecchio deve chiudersi');
+    // Almeno uno: nel database di sviluppo possono esserci altri incidenti
+    // vecchi lasciati da altre prove. Conta che si chiuda questo.
+    vero(Segreto::incidentiScaduti($epoca) >= 1, 'l\'incidente vecchio deve chiudersi');
     uguale('sfuggito', (string) Database::first('SELECT stato FROM incidenti WHERE id = ?', [$inc])['stato']);
     uguale(1, (int) Database::first('SELECT COUNT(*) n FROM anomalie WHERE osservatore_id = ?', [(int) $teste['id']])['n'],
         'il testimone deve essersi tenuto l\'anomalia');

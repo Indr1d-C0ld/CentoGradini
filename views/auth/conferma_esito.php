@@ -5,7 +5,7 @@
   <div class="carta">
     <p>
       <?php if (is_array($utente) && isset($utente['username'])): ?>
-        Benvenuto, <strong><?= e((string) $utente['username']) ?></strong>.
+        Ti diamo il benvenuto, <strong><?= e((string) $utente['username']) ?></strong>.
       <?php endif; ?>
       L'iscrizione è attiva: adesso puoi entrare.
     </p>

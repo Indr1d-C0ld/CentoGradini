@@ -339,6 +339,28 @@ try {
                 (int) round($piovosi / $tot * 100), $nevosi));
             break;
 
+        case 'mondo:ricomincia':
+            // Il mondo da capo: si tengono account e personaggi, si azzera tutto
+            // quello che e' successo e il calendario torna al 6 aprile 1987.
+            // Irreversibile: va chiesto due volte.
+            if (!in_array('--conferma', $args, true)) {
+                errore('mondo:ricomincia azzera tutto quello che e\' successo nel quartiere. Se sei sicuro: mondo:ricomincia --conferma');
+            }
+            // Lo stesso lucchetto del battito: si aspetta che quello in corso
+            // finisca, e il prossimo non parte finche' non si e' finito. Un
+            // battito a meta' riscriverebbe voci e legami appena cancellati,
+            // con gli istanti del calendario vecchio.
+            $lucchetto = fopen($projectRoot . '/storage/tick.lock', 'c');
+            if ($lucchetto === false || !flock($lucchetto, LOCK_EX)) {
+                errore('non riesco a fermare il battito (storage/tick.lock)');
+            }
+            foreach (\App\Cli\Ricomincia::esegui() as $k => $n) {
+                riga(sprintf('  %-22s %6d', $k, $n));
+            }
+            flock($lucchetto, LOCK_UN);
+            riga('Il quartiere ricomincia: ' . \App\Sim\Orologio::esteso() . '.');
+            break;
+
         case 'mondo:luoghi':
             riga(col('chiave', 15) . col('nome', 27) . col('tipo', 10) . col('orario', 12) . 'uscite');
             foreach (Luoghi::tutti() as $k => $l) {
@@ -399,6 +421,7 @@ try {
             riga('    seed                           carica i dati di ambientazione da db/seed/');
             riga('    bilancio --conferma            rapporto di bilanciamento su schede, poteri, folla');
             riga('    status                         stato di configurazione, schema, utenti, battito, posta');
+            riga('    mondo:ricomincia --conferma    il mondo da capo: tiene account e personaggi, azzera il resto');
             riga('    ritratti:abitanti              quale fotografia porta ciascun abitante (per db/ritratti_abitanti.php)');
             riga('');
             riga('  Account');

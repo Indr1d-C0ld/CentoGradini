@@ -189,14 +189,16 @@ prova('di notte chiudono i negozi, non la via commerciale', function () use ($ts
 });
 
 prova('a ogni ora, quello che e\' aperto si raggiunge da qualunque posto', function () use ($ts) {
-    // Passando solo per luoghi aperti. L'unica eccezione e' voluta: di notte
-    // non ci sono treni, e mare e montagna restano fuori finche' la stazione
-    // non riapre.
+    // Passando solo per luoghi aperti, e mai attraverso una casa privata: la
+    // porta di casa Ayukawa non si apre a chi non e' di famiglia, e contarla
+    // come passaggio nascondeva il tempio isolato di notte. L'unica eccezione
+    // e' voluta: di notte non ci sono treni, e mare e montagna restano fuori
+    // finche' la stazione non riapre.
     $treno = ['spiaggia', 'montagna'];
-    foreach (['1987-05-14', '1987-08-10', '1987-12-27'] as $giorno) {
+    foreach (['1987-05-14', '1987-08-10', '1987-12-27', '1988-01-01'] as $giorno) {
         for ($h = 0; $h < 24; $h++) {
             $t  = $ts(sprintf('%s %02d:30:00', $giorno, $h));
-            $ok = static fn (string $k): bool => Luoghi::accessibile($k, $t)[0];
+            $ok = static fn (string $k): bool => Luoghi::accessibile($k, $t)[0] && !Luoghi::uno($k)['privato'];
             foreach (array_keys(Luoghi::tutti()) as $da) {
                 $visti = [$da => true];
                 $coda  = [$da];

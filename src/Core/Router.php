@@ -42,6 +42,11 @@ final class Router
     public function dispatch(Request $request): Response
     {
         $method = $request->method();
+        // HEAD e' un GET senza corpo (il server web lo toglie da se'): chi
+        // controlla /salute con HEAD riceveva 405.
+        if ($method === 'HEAD') {
+            $method = 'GET';
+        }
         $path   = $request->path();
 
         $pathMatched = false;

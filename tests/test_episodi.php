@@ -184,6 +184,9 @@ prova('ogni condizione usata dai copioni e\' una condizione che esiste', functio
 
     foreach (Database::all("SELECT ckey, condizione FROM copioni WHERE ckey NOT LIKE 'zz%'") as $c) {
         foreach (explode('+', (string) $c['condizione']) as $cond) {
+            if (preg_match('/^giorno:\d\d-\d\d$/', $cond) === 1) {
+                continue;
+            }
             foreach (['evento:', 'vigilia:'] as $pre) {
                 if (str_starts_with($cond, $pre)) {
                     vero($esiste(substr($cond, strlen($pre))),

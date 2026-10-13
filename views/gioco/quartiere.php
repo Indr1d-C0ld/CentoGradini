@@ -95,6 +95,9 @@ $luogo = $qui['luogo'];
     <strong><?= e(trim($chi['nome'] . ' ' . $chi['cognome'])) ?> ti ha pres<?= ($pg['sesso'] ?? 'm') === 'f' ? 'a' : 'o' ?> da parte.</strong>
     Sa dei tuoi poteri, e te l'ha detto in faccia. Puoi fidarti — e allora diventa qualcuno che ti
     copre — oppure guardarl<?= $chi['sesso'] === 'f' ? 'a' : 'o' ?> negli occhi e negare.
+    <?php if (!\App\Game\Segreto::presenteCon($pg, (int) $chi['id'])): ?>
+      <span class="tenue">Adesso non è qui: risponderai quando vi incontrate di nuovo.</span>
+    <?php else: ?>
     <div class="scelte-sospetto">
       <form method="post" action="<?= e(url('/confida')) ?>" data-conferma="Dirgli tutto è irreversibile. Sicuro?">
         <?= csrf_field() ?>
@@ -107,6 +110,7 @@ $luogo = $qui['luogo'];
         <button type="submit" class="secondario">Nega</button>
       </form>
     </div>
+    <?php endif; ?>
   </div>
 <?php endforeach; ?>
 
@@ -116,7 +120,7 @@ $luogo = $qui['luogo'];
     <div>
       <b>Sei per strada, verso <?= e($viaggio['nome']) ?>.</b>
       <?php if (($viaggio['chiuso'] ?? null) !== null): ?>
-        <span><?= e($viaggio['chiuso']) ?> ha chiuso, e ti hanno accompagnat<?= ($pg['sesso'] ?? 'm') === 'f' ? 'a' : 'o' ?> alla porta.</span>
+        <span><?= e($viaggio['chiuso']) ?></span>
       <?php endif; ?>
       <span data-conto>Arrivi fra <?= e(App\Game\Personaggio::quantoFa(0)) ?></span>
     </div>

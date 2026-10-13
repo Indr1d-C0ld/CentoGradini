@@ -519,6 +519,7 @@ prova('un biglietto si trova dove è stato lasciato, non altrove', function () {
     sgombra();
     $a = suPalco(attore('Scrive'));
     $b = suPalco(attore('Riceve'));
+    \App\Game\Legami::muovi((int) $b['id'], (int) $a['id'], 5, 0);   // un biglietto si lascia a chi si conosce
     vero(Bacheca::lascia($a, (int) $b['id'], 'Ci vediamo dopo.')['ok']);
 
     uguale(1, count(Bacheca::quiPer((int) $b['id'], PALCO)), 'qui c\'è');
@@ -529,6 +530,7 @@ prova('leggere un biglietto richiede di essere nel posto giusto', function () {
     sgombra();
     $a = suPalco(attore('Scrive2'));
     $b = suPalco(attore('Riceve2'));
+    \App\Game\Legami::muovi((int) $b['id'], (int) $a['id'], 5, 0);
     Bacheca::lascia($a, (int) $b['id'], 'Un messaggio.');
     $big = Bacheca::quiPer((int) $b['id'], PALCO)[0];
 
@@ -549,6 +551,7 @@ prova('i biglietti di un altro non si leggono', function () {
     $a = suPalco(attore('Scrive3'));
     $b = suPalco(attore('Riceve3'));
     $c = suPalco(attore('Ficcanaso'));
+    \App\Game\Legami::muovi((int) $b['id'], (int) $a['id'], 5, 0);
     Bacheca::lascia($a, (int) $b['id'], 'Roba privata.');
     $big = Bacheca::quiPer((int) $b['id'], PALCO)[0];
     vero(!Bacheca::leggi($c, (int) $big['id'])['ok'], 'non è per lui');

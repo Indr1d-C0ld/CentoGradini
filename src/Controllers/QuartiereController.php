@@ -270,7 +270,10 @@ final class QuartiereController
             'restano' => (int) ceil($restanoGioco / Orologio::compressione()),   // secondi reali
             // Il nome del locale da cui l'hanno accompagnato fuori, se e' andata cosi':
             // chi ritrova il proprio personaggio per strada deve sapere perche'.
-            'chiuso'  => ($da = \App\Game\Personaggio::accompagnatoDa($pg)) === null ? null : Luoghi::nome($da),
+            'chiuso'  => ($da = \App\Game\Personaggio::accompagnatoDa($pg)) === null ? null
+                : accorda((Luoghi::uno($da)['privato'] ?? false)
+                    ? 'Chi era di casa se n\'è andato, e sei uscit{o} anche tu.'
+                    : Luoghi::nome($da) . ' ha chiuso, e ti hanno accompagnat{o} alla porta.', $pg),
         ];
     }
 }

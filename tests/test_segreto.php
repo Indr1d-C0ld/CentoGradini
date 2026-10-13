@@ -58,6 +58,9 @@ function sgombra(): void
         'UPDATE personaggi SET luogo = ? WHERE luogo = ? AND cognome = ?',
         [LIMBO, PALCO, ucfirst(PREFISSO)]
     );
+    // Anche gli abitanti: all'albero ci passano Umao e Ushiko, e farebbero
+    // da testimoni a prove che vogliono il palco deserto.
+    Database::run('UPDATE personaggi SET luogo = ? WHERE luogo = ? AND png IS NOT NULL', [LIMBO, PALCO]);
 }
 
 function suPalco(array $pg): array
@@ -429,7 +432,7 @@ prova('a zero di compostezza non si inventa niente', function () {
     Database::run('UPDATE personaggi SET compostezza = 0 WHERE id = ?', [(int) $a['id']]);
     $c = Segreto::copri(ricarica($a), (int) $r['incidente'], 'scusa');
     vero(!$c['ok']);
-    vero(str_contains((string) $c['error'], 'scosso'), $c['error'] ?? '');
+    vero(str_contains((string) $c['error'], 'nervi'), $c['error'] ?? '');
 });
 
 prova('un incidente si copre una volta sola', function () {

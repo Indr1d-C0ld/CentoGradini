@@ -61,7 +61,7 @@ final class AuthController
         if (!$inviata['ok']) {
             // Non e' un fallimento: il messaggio e' in coda e riparte da solo.
             // Si avverte solo perche' non arrivera' nello stesso minuto.
-            Session::flash('warning', 'Iscrizione registrata. Il messaggio di conferma e\' in coda: '
+            Session::flash('warning', 'Iscrizione registrata. Il messaggio di conferma è in coda: '
                 . 'se non arriva entro qualche minuto, chiedine un altro dalla pagina di accesso.');
         }
         return redirect('/conferma-inviata');
@@ -113,7 +113,7 @@ final class AuthController
             }
         }
 
-        Session::flash('success', 'Se l\'iscrizione esiste ed e\' in attesa di conferma, il collegamento e\' stato inviato di nuovo.');
+        Session::flash('success', 'Se l\'iscrizione esiste ed è in attesa di conferma, il collegamento è stato inviato di nuovo.');
         return redirect('/accesso');
     }
 

@@ -19,6 +19,19 @@ $GLOBALS['__url_prefix']   = '';
 require $projectRoot . '/src/autoload.php';
 require $projectRoot . '/src/Support/helpers.php';
 
+// Su quale installazione stiamo per scrivere? Config::load sceglie il primo
+// file che trova, e quello di produzione vince sul config di progetto: senza
+// ORANGEROAD_CONFIG le prove creerebbero e cancellerebbero personaggi sul
+// mondo vero — e quella del «mondo da capo» lo azzererebbe. La prova
+// end-to-end aveva gia' questo controllo; le unitarie no, fino al 13/10/2026.
+\App\Core\Config::load($projectRoot);
+if (\App\Core\Config::get('app.env') === 'production' && getenv('PROVE_IN_PRODUZIONE') !== '1') {
+    fwrite(STDERR, "\n  Questa e' l'installazione di produzione (" . \App\Core\Config::sourceFile() . ").\n"
+        . "  Le prove scrivono sul database: in locale si lanciano con\n"
+        . "    ORANGEROAD_CONFIG=config/config.php php " . ($argv[0] ?? 'tests/...') . "\n\n");
+    exit(2);
+}
+
 $GLOBALS['__prove'] = ['ok' => 0, 'ko' => 0, 'errori' => []];
 
 function prova(string $nome, callable $f): void

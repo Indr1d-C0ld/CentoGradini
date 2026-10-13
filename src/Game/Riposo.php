@@ -68,26 +68,25 @@ final class Riposo
             return false;
         }
         $quanto = self::quanto($da, $adesso, self::haUsatoPoteri((int) $pg['id'], $adesso));
-        if ($quanto['notte']) {
-            $pp = (int) $pg['pp_max'];
-            $pf = (int) $pg['pf_max'];
-            $co = (int) $pg['compostezza_max'];
-        } else {
-            $pp = min((int) $pg['pp_max'], (int) $pg['pp'] + $quanto['pp']);
-            $pf = min((int) $pg['pf_max'], (int) $pg['pf'] + $quanto['pf']);
-            $co = min((int) $pg['compostezza_max'], (int) $pg['compostezza'] + $quanto['compostezza']);
-        }
-        // Mai verso il basso: il riposo non toglie. Se un valore è sopra il
-        // massimo per qualche ragione, lo si lascia dov'è.
-        $pp = max($pp, (int) $pg['pp']);
-        $pf = max($pf, (int) $pg['pf']);
-        $co = max($co, (int) $pg['compostezza']);
-
-        Database::run(
-            'UPDATE personaggi SET pp = ?, pf = ?, compostezza = ?, ristoro_gts = ? WHERE id = ?',
-            [$pp, $pf, $co, $adesso, (int) $pg['id']]
+        // Aggiornamenti RELATIVI, calcolati dal database nel momento in cui
+        // scrive: prima si scrivevano valori assoluti letti all'inizio del giro,
+        // e una spesa fatta nel frattempo da una richiesta web veniva
+        // cancellata (punti restituiti due volte). E solo se nessun altro ha
+        // gia' contato lo stesso tratto di tempo (ristoro_gts = quello letto):
+        // due battiti sovrapposti non regalano niente. Mai verso il basso: se
+        // un valore e' sopra il massimo, lo si lascia dov'e'.
+        $tutto = $quanto['notte'] ? 1000 : 0;
+        $n = Database::run(
+            'UPDATE personaggi SET
+                pp = GREATEST(pp, LEAST(pp_max, pp + ?)),
+                pf = GREATEST(pf, LEAST(pf_max, pf + ?)),
+                compostezza = GREATEST(compostezza, LEAST(compostezza_max, compostezza + ?)),
+                ristoro_gts = ?
+             WHERE id = ? AND ristoro_gts = ?',
+            [$tutto + $quanto['pp'], $tutto + $quanto['pf'], $tutto + $quanto['compostezza'],
+             $adesso, (int) $pg['id'], $da]
         );
-        return $pp !== (int) $pg['pp'] || $pf !== (int) $pg['pf'] || $co !== (int) $pg['compostezza'];
+        return $n->rowCount() === 1 && ($tutto > 0 || $quanto['pp'] + $quanto['pf'] + $quanto['compostezza'] > 0);
     }
 
     /**

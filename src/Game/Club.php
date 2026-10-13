@@ -112,7 +112,7 @@ final class Club
             'DELETE FROM club_membri WHERE ckey = ? AND personaggio_id = ?',
             [$ckey, (int) $pg['id']]
         )->rowCount();
-        return $n > 0 ? ['ok' => true] : ['ok' => false, 'error' => 'Non eri iscritto.'];
+        return $n > 0 ? ['ok' => true] : ['ok' => false, 'error' => 'Non risultavi fra gli iscritti.'];
     }
 
     // --- Dove si sta il pomeriggio ---------------------------------------------

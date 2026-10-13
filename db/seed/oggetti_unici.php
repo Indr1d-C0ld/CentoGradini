@@ -39,7 +39,7 @@ return [
             'okey' => 'orologio',
             'nome' => 'L\'orologio da taschino del nonno',
             'descrizione' => 'Argento annerito, il coperchio che si apre con uno scatto, e dentro '
-                . 'le lancette ferme su un\'ora qualunque. Se lo premi, il tempo si ferma per un '
+                . 'le lancette ferme su un\'ora qualunque. Se lo premi, il tempo si ferma per qualche '
                 . 'minuto per tutti tranne che per te: nessuno vede quello che fai. Poi va '
                 . 'ricaricato, e ci vogliono giorni. Il nonno l\'ha perso al tempio, e non se n\'è '
                 . 'ancora accorto.',
@@ -63,8 +63,9 @@ return [
         [
             'okey' => 'ciondolo',
             'nome' => 'Il ciondolo di Akemi',
-            'descrizione' => 'Un ciondolo semplice, d\'argento, che la madre di Kyosuke aveva '
-                . 'lasciato perché fosse dato a una persona sola: quella che si sceglie. Come il '
+            'descrizione' => 'Un ciondolo semplice, d\'argento: il regalo del padre di Kyosuke alla '
+                . 'madre, che il nonno conserva perché vada a una persona sola, quella che si '
+                . 'sceglie (capp. 150-151). Come il '
                 . 'cappello, non serve a niente; diversamente dal cappello, chi lo riceve sa '
                 . 'benissimo cosa vuol dire.',
             'detentore_id' => null,

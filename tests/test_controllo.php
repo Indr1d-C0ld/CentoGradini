@@ -531,16 +531,18 @@ prova('chi osserva trasforma ogni potere usato davanti a lui in una voce precisa
 prova('quando lo sanno in troppi, è di pubblico dominio: si trasloca (FAQ 26)', function () {
     $e = persona('Famoso', 'argine', 1);
     $sentito = [];
-    for ($i = 0; $i < 8; $i++) {
+    for ($i = 0; $i < 10; $i++) {
         $sentito[] = (int) persona('Folla' . $i, 'argine')['id'];
     }
-    Segreto::dominio((int) $e['id']);
     \App\Game\Voci::nasce('potere', (int) $e['id'], null, 'argine', $sentito, 'segreto');
-    uguale(8, Segreto::dominio((int) $e['id']));
+    uguale(10, Segreto::dominio((int) $e['id']));
     uguale('trasloco', Segreto::pericolo(di($e))['stato']);
+    // E chi torna dopo il trasloco non viene rispedito via dalle voci vecchie.
+    Database::run('UPDATE personaggi SET ultimo_trasloco_gts = ? WHERE id = ?', [Orologio::lineare() + 1, (int) $e['id']]);
+    uguale(0, Segreto::dominio((int) $e['id']), 'le voci di prima del trasloco non contano più');
 });
 
-prova('un segreto confidato a chi poi si guasta con te torna, moltiplicato', function () {
+prova('un segreto confidato a chi poi si guasta con te torna, e corre', function () {
     $e = persona('Fiducioso', 'argine', 1);
     $c = persona('Voltagabbana', 'argine');
     vero(Segreto::confida(di($e), (int) $c['id'])['ok']);
@@ -548,7 +550,9 @@ prova('un segreto confidato a chi poi si guasta con te torna, moltiplicato', fun
     Legami::muovi((int) $c['id'], (int) $e['id'], -40, 0);
     uguale('tradito', (string) Database::first('SELECT come FROM sanno WHERE esper_id = ? AND chi_sa_id = ?',
         [(int) $e['id'], (int) $c['id']])['come']);
-    uguale(2, Segreto::quantiSanno((int) $e['id']), 'conta doppio');
+    uguale(1, Segreto::quantiSanno((int) $e['id']), 'conta come chi ha capito da solo');
+    vero(Database::first("SELECT 1 x FROM voci WHERE soggetto_id = ? AND dettaglio = 'segreto'", [(int) $e['id']]) !== null,
+        'e lo racconta: il rischio si moltiplica nelle voci');
 });
 
 prova('Komatsu, quando capisce, lo racconta subito', function () {
@@ -872,6 +876,180 @@ prova('il primo sogno dell\'anno lo fanno tutti, poteri o no', function () use (
     $m = new ReflectionMethod(\App\Game\Poteri::class, 'primoSogno');
     vero($m->invoke(null, $ore('1988-01-02 07:00:00')) >= 0);
     uguale(0, $m->invoke(null, $ore('1988-01-05 07:00:00')), 'solo il 2 gennaio');
+});
+
+// =============================================================================
+titolo('L\'audit del 13 ottobre');
+
+prova('i punti potere non si spendono due volte: si pagano in un colpo solo', function () {
+    $e = persona('Svelto', 'argine', 1);
+    conPotere($e, 'telecinesi', 1);
+    $vecchia = di($e);                       // la riga letta a inizio richiesta
+    Database::run('UPDATE personaggi SET pp = 0 WHERE id = ?', [(int) $e['id']]);   // un'altra richiesta ha speso tutto
+    $r = Segreto::usa($vecchia, 'telecinesi');
+    vero(!$r['ok'], 'con la riga vecchia credeva di avere 20 punti');
+    uguale(0, (int) di($e)['pp']);
+});
+
+prova('compostezza a zero e una richiesta in ritardo: nessun errore, nessun numero negativo', function () {
+    $e = persona('Nervoso', 'argine', 1);
+    $t = persona('Vede2', 'argine');
+    Database::run('INSERT INTO incidenti (attore_id, pkey, luogo, gts, vistosita, folla, stato) VALUES (?, ?, ?, ?, 5, 0, ?)',
+        [(int) $e['id'], 'telecinesi', 'argine', Orologio::lineare(), 'aperto']);
+    $inc = (int) Database::lastInsertId();
+    Database::run('INSERT INTO incidente_testimoni (incidente_id, personaggio_id, notato) VALUES (?, ?, 1)', [$inc, (int) $t['id']]);
+    $vecchia = di($e);
+    Database::run('UPDATE personaggi SET compostezza = 0 WHERE id = ?', [(int) $e['id']]);
+    $r = Segreto::copri($vecchia, $inc, 'scusa');
+    vero($r['ok']);
+    uguale(0, (int) di($e)['compostezza']);
+});
+
+prova('il riposo aggiunge a quello che c\'è adesso, non a quello che c\'era', function () use ($ore) {
+    $pg = persona('Stanco2', 'parco', 1);
+    Database::run('UPDATE personaggi SET pp = 10, ristoro_gts = ? WHERE id = ?', [$ore('1987-05-14 10:00:00'), (int) $pg['id']]);
+    $vecchia = di($pg);
+    Database::run('UPDATE personaggi SET pp = 5 WHERE id = ?', [(int) $pg['id']]);   // speso nel frattempo
+    Riposo::ristora($vecchia, $ore('1987-05-14 12:00:00'));
+    uguale(7, (int) di($pg)['pp'], 'cinque rimasti e due ore di recupero');
+    vero(!Riposo::ristora($vecchia, $ore('1987-05-14 12:00:00')), 'e contato una volta sola');
+});
+
+prova('un oggetto non si passa a se stessi, e ripassarselo non regala affetto', function () {
+    $a = persona('Generoso2', 'argine');
+    $b = persona('Ricevente2', 'argine');
+    $prima = prendi('pappagallo', $a);
+    try {
+        vero(!Legami::passaOggetto(di($a), (int) $a['id'], 'pappagallo')['ok']);
+        vero(Legami::passaOggetto(di($a), (int) $b['id'], 'pappagallo')['ok']);
+        $dopoUno = Legami::fra((int) $b['id'], (int) $a['id'])['affetto'];
+        vero(Legami::passaOggetto(di($b), (int) $a['id'], 'pappagallo')['ok']);
+        vero(Legami::passaOggetto(di($a), (int) $b['id'], 'pappagallo')['ok']);
+        uguale($dopoUno, Legami::fra((int) $b['id'], (int) $a['id'])['affetto'], 'la seconda volta non dice niente');
+    } finally {
+        rimetti($prima);
+        Database::run("DELETE FROM oggetti_passaggi WHERE okey = 'pappagallo' AND (da_id IN (?, ?))", [(int) $a['id'], (int) $b['id']]);
+    }
+});
+
+prova('col tempo fermo non vede niente nemmeno chi osserva in silenzio', function () {
+    $e = persona('Fermo', 'argine', 1);
+    $c = persona('Paziente2', 'argine');
+    conPotere($e, 'telecinesi', 1);
+    scoperto($e, $c);
+    Segreto::scegli(di($c), (int) $e['id'], 'osserva');
+    \App\Game\Stati::metti((int) $e['id'], 'tempo_fermo', 8);
+    Segreto::usa(di($e), 'telecinesi');
+    uguale(0, (int) Database::first("SELECT COUNT(*) n FROM voci WHERE soggetto_id = ? AND tipo = 'potere'", [(int) $e['id']])['n']);
+});
+
+prova('da invisibili non si fanno gesti', function () {
+    $a = persona('Fantasma', 'argine');
+    $b = persona('Ignaro', 'argine');
+    \App\Game\Stati::metti((int) $a['id'], 'invisibile', 20);
+    $r = Legami::compi(di($a), (int) $b['id'], 'parlare');
+    vero(!$r['ok'] && str_contains((string) $r['error'], 'invisibile'));
+});
+
+prova('d\'inverno piove, e qualche volta nevica', function () {
+    $tz = new DateTimeZone('Asia/Tokyo');
+    $neve = 0;
+    $da = (new DateTimeImmutable('1988-01-01 00:00', $tz))->getTimestamp();
+    for ($t = $da; $t < $da + 60 * 86400; $t += 3600) {
+        $neve += \App\Sim\Meteo::a($t)['neve'] ? 1 : 0;
+    }
+    vero($neve > 0, 'due mesi d\'inverno senza un fiocco: il copione «neve» non si aprirebbe mai');
+});
+
+prova('chi se n\'è andato dalla scena non usa il potere altrove', function () {
+    $e = persona('Altrove', 'argine', 1);
+    conPotere($e, 'telecinesi', 1);
+    $scene = [['testo' => 'x', 'opzioni' => [
+        ['k' => 'p', 'testo' => 'p', 'prova' => 'nessuna', 'difficolta' => 0, 'ok' => 'fatto', 'ko' => '',
+         'effetti_ok' => [], 'effetti_ko' => [], 'peso' => ['cuore' => 1], 'potere' => 'telecinesi'],
+        ['k' => 'q', 'testo' => 'q', 'prova' => 'nessuna', 'difficolta' => 0, 'ok' => 'ok', 'ko' => '',
+         'effetti_ok' => [], 'effetti_ko' => [], 'peso' => ['cuore' => 1]],
+    ]]];
+    Database::run("INSERT INTO copioni (ckey, titolo, occhiello, premessa, luogo, condizione, min_cast, max_cast, finestra, scene, attivo)
+                   VALUES ('zzctl2', 'P', 'p', 'p', 'parco', 'sempre', 1, 4, 1800, ?, 0)
+                   ON DUPLICATE KEY UPDATE scene = VALUES(scene)", [json_encode($scene)]);
+    $gts = Orologio::lineare();
+    Database::run("INSERT INTO episodi (ckey, titolo, luogo, scena, stato, aperto_gts, scena_gts, scade_reale)
+                   VALUES ('zzctl2', 'P', 'parco', 0, 'aperto', ?, ?, ?)", [$gts, $gts, Orologio::adessoReale() + 600]);
+    $ep = (int) Database::lastInsertId();
+    Database::run('INSERT INTO episodio_cast (episodio_id, personaggio_id, entrato_gts) VALUES (?, ?, ?)', [$ep, (int) $e['id'], $gts]);
+    try {
+        \App\Game\Episodi::scegli(di($e), $ep, 'p');
+        uguale(0, (int) Database::first('SELECT COUNT(*) n FROM incidenti WHERE attore_id = ?', [(int) $e['id']])['n'],
+            'era all\'argine, la scena al parco');
+        $r = Database::first('SELECT racconto FROM episodio_scelte WHERE episodio_id = ?', [$ep]);
+        vero(str_contains((string) $r['racconto'], 'non parte'), (string) $r['racconto']);
+    } finally {
+        Database::run('DELETE FROM episodio_scelte WHERE episodio_id = ?', [$ep]);
+        Database::run('DELETE FROM episodio_cast WHERE episodio_id = ?', [$ep]);
+        Database::run('DELETE FROM ricordi WHERE episodio_id = ?', [$ep]);
+        Database::run('DELETE FROM episodi WHERE id = ?', [$ep]);
+        Database::run("DELETE FROM copioni WHERE ckey = 'zzctl2'");
+    }
+});
+
+prova('Hikaru che ha capito mentre l\'esper partiva lo affronterà appena lo trova', function () {
+    $hikaru = abitante('hikaru');
+    $e = persona('InPartenza', (string) $hikaru['luogo'], 1);
+    Database::run("UPDATE personaggi SET verso = 'parco', arrivo_gts = ? WHERE id = ?", [Orologio::lineare() + 600, (int) $e['id']]);
+    scoperto($e, $hikaru);
+    $m = new ReflectionMethod(Segreto::class, 'abitanteDecide');
+    try {
+        $m->invoke(null, $hikaru, (int) $e['id']);
+        uguale('affronta', (string) Database::first('SELECT atteggiamento FROM sanno WHERE esper_id = ? AND chi_sa_id = ?',
+            [(int) $e['id'], (int) $hikaru['id']])['atteggiamento']);
+    } finally {
+        Database::run('DELETE FROM sanno WHERE chi_sa_id = ?', [(int) $hikaru['id']]);
+    }
+});
+
+prova('in casa d\'altri non si resta da soli: uscito chi ti ha invitato, si esce', function () {
+    $madoka = abitante('madoka');
+    $prima  = (string) $madoka['luogo'];
+    $ospite = persona('Ospite', 'casa_ayukawa');
+    try {
+        Database::run('UPDATE personaggi SET luogo = ?, verso = NULL WHERE id = ?', ['casa_ayukawa', (int) $madoka['id']]);
+        Legami::muovi((int) $madoka['id'], (int) $ospite['id'], 40, 0);
+        uguale(0, Personaggio::accompagnaFuori(null, (int) $ospite['id']), 'finché c\'è lei, si resta');
+        Database::run('UPDATE personaggi SET luogo = ? WHERE id = ?', ['abcb', (int) $madoka['id']]);
+        uguale(1, Personaggio::accompagnaFuori(null, (int) $ospite['id']), 'uscita lei, si esce');
+    } finally {
+        Database::run('UPDATE personaggi SET luogo = ? WHERE id = ?', [$prima, (int) $madoka['id']]);
+    }
+});
+
+prova('chi il testo nomina non finisce nel cast: il Master non è un cliente del suo bar', function () {
+    $cast = new ReflectionMethod(\App\Game\Episodi::class, 'castDisponibile');
+    $master = abitante('master');
+    $ids = array_column($cast->invoke(null, (string) $master['luogo'], 10, Orologio::lineare(), 'bancone', 'master'), 'png');
+    vero(!in_array('master', $ids, true));
+});
+
+prova('il terzo Natale si apre la vigilia, non il giorno dopo', function () use ($ore) {
+    $m = new ReflectionMethod(\App\Game\Episodi::class, 'condizioneSoddisfatta');
+    vero($m->invoke(null, 'giorno:12-24', $ore('1987-12-24 20:00:00')));
+    vero(!$m->invoke(null, 'giorno:12-24', $ore('1987-12-25 20:00:00')));
+});
+
+prova('San Valentino a scuola si fa il sabato, perché il 14 febbraio 1988 è domenica', function () use ($ore) {
+    $m = new ReflectionMethod(\App\Game\Episodi::class, 'condizioneSoddisfatta');
+    uguale('Sun', (new DateTimeImmutable('1988-02-14'))->format('D'));
+    vero($m->invoke(null, 'vigilia:san_valentino+scuola', $ore('1988-02-13 10:00:00')));
+});
+
+prova('un biglietto si lascia solo a chi si è incontrato', function () {
+    $a = persona('Scrivente', 'argine');
+    $b = persona('Sconosciuto', 'parco');
+    $r = \App\Game\Bacheca::lascia(di($a), (int) $b['id'], 'Ciao!');
+    vero(!$r['ok'] && str_contains((string) $r['error'], 'conoscete'));
+    Legami::muovi((int) $a['id'], (int) $b['id'], 5, 0);
+    vero(\App\Game\Bacheca::lascia(di($a), (int) $b['id'], 'Ciao!')['ok']);
+    Database::run('DELETE FROM biglietti WHERE da_id = ?', [(int) $a['id']]);
 });
 
 pulisci();

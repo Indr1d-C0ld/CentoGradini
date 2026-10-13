@@ -83,7 +83,7 @@ $g('difendere', 'Difendere davanti agli altri', 11, 1, null, true,
   'Mettersi in mezzo quando qualcuno parla male di quella persona, e farlo davanti a tutti. '
   . 'La domanda che resta agli altri non è se avevi ragione: è perché ci tenevi tanto.',
   '%A ha difeso %B davanti a tutti.',
-  '%A si è scaldato parecchio per %B. Troppo, per uno che non c\'entra niente.', 80),
+  '%A ha preso le parti di %B con troppo calore, per chi non c\'entra niente.', 80),
 
 $g('bottone', 'Chiedere il secondo bottone', 18, 3, 'diploma', true,
   'Il secondo bottone della divisa è quello sopra il cuore, e il giorno del diploma si dà '

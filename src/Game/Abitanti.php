@@ -260,7 +260,13 @@ final class Abitanti
         [$p, $aff] = $chi;
 
         if ($aff <= -15) {
-            return [(int) $p['id'], 'evitare'];
+            // Evitare qualcuno una volta alla settimana basta: ripeterlo ogni due
+            // ore faceva scendere l'affetto all'infinito, e trascinava un
+            // confidente verso la soglia del tradimento senza che il giocatore
+            // facesse niente.
+            $gia = Database::first("SELECT 1 x FROM gesti_fatti WHERE gkey = 'evitare' AND attore_id = ? AND verso_id = ? AND gts > ? LIMIT 1",
+                [(int) $png['id'], (int) $p['id'], $gts - 7 * 86400]);
+            return $gia === null ? [(int) $p['id'], 'evitare'] : null;
         }
         $possibili = [];
         foreach (Legami::disponibili($png, $gts) as $g) {

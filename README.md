@@ -114,14 +114,16 @@ Oltre a chi ha capito conta **quanti ne parlano**: quando abbastanza persone
 hanno sentito una voce chiara sui tuoi poteri, il segreto è di pubblico dominio,
 e la FAQ 26 dice che è allora che i Kasuga traslocano. E confidarsi non è più
 gratis: se chi conosce il tuo segreto per confidenza si guasta con te, «il
-rischio torna, moltiplicato» — conta doppio, e la prima cosa che fa è dirlo in giro.
+rischio torna, moltiplicato» — non perché conti doppio, ma perché la prima cosa
+che fa è dirlo in giro.
 
 **Le forze tornano.** Punti potere, punti ferita e compostezza risalgono di un
 punto ogni tanto durante il giorno, e tutti con una notte di sonno, come nel
 regolamento del 1990. E ci sono gli stati che durano un po': il **raffreddore**,
 che ci si prende arrivando all'aperto sotto la pioggia senza che nessuno abbia
 diviso l'ombrello con te — e un esper malato non comanda i poteri, ne parte un
-altro —, le **bende** dopo una brutta giornata, l'invisibilità. Si vedono addosso
+altro —, le **bende** dopo una brutta giornata, l'invisibilità, e l'essere un
+po' **brilli** dopo il sake dolce della festa delle bambole. Si vedono addosso
 a chi li ha, nell'elenco di chi c'è.
 
 **E dall'altra parte?** Chi non ha poteri non gioca una versione ridotta: gioca
@@ -282,7 +284,7 @@ database.
 Il calendario è vero — l'anno scolastico giapponese 1987-88, dal 6 aprile al 5
 aprile — ma **non finisce mai**: arrivato in fondo ricomincia. Feste nazionali,
 tre trimestri, il sabato a scuola, il compleanno dell'Imperatore il 29 aprile,
-ventisei giornate che valgono un episodio.
+ventotto giornate che valgono un episodio.
 
 Il tempo di gioco scorre a **1:4**: un'ora reale è quattro ore nel quartiere, un
 giorno reale è quattro giorni. Chi gioca mezz'ora la sera vede passare mezza
@@ -300,7 +302,7 @@ stesso cielo. Il clima viene dalla data avvolta (giugno è sempre stagione delle
 piogge) ma il rumore dall'istante lineare — *il calendario si ripete, il meteo
 no*.
 
-Lo stesso vale per i **quattordici eventi stagionali**: i ciliegi, la Golden
+Lo stesso vale per i **ventuno eventi stagionali**: i ciliegi, la Golden
 Week, il festival d'estate al tempio, il festival culturale, il capodanno, San
 Valentino. Non inventano meccaniche — alzano la gente in giro e accelerano le
 voci, e tutto il resto segue da solo.
@@ -314,9 +316,10 @@ compleanno. Le classi giocabili sono la terza media e le tre superiori.
 
 ### Il quartiere è un posto vero
 
-La ricerca ha portato a una scoperta che ha cambiato l'ambientazione: il
-quartiere di *Kimagure Orange Road* **non è Tokyo**. È **Takaoka**, la città in
-cui Izumi Matsumoto è cresciuto. La scalinata è quella del parco Takaoka Kojō,
+La ricerca ha portato a una scoperta che ha cambiato l'ambientazione: l'opera
+dice Tokyo, e il gioco tiene l'ora e il calendario di Tokyo, ma il quartiere di
+*Kimagure Orange Road* è disegnato su **Takaoka**, la città di provincia in cui
+Izumi Matsumoto è cresciuto. La scalinata è quella del parco Takaoka Kojō,
 l'ABCB è un locale che si chiamava ABAB, la stazione è Etchū-Nakagawa. Chi gioca
 cammina nell'infanzia dell'autore.
 
@@ -330,7 +333,7 @@ progetto esiste.
 
 | | |
 |---:|:---|
-| **25** | luoghi, con **90** collegamenti, orari, stagionalità e vedute |
+| **25** | luoghi, con **92** collegamenti, orari, stagionalità e vedute |
 | **16** | abitanti canonici che girano per il quartiere da soli, e fanno gesti |
 | **17** | poteri esper, con vistosità e Controllo |
 | **24** | tratti di personalità, riscritti nel Giappone del 1987 |
@@ -340,9 +343,9 @@ progetto esiste.
 | **26** | copioni di episodi, sedici presi dall'opera |
 | **4** | oggetti unici, uno per server |
 | **71** | manopole di configurazione, tutte lette da qualcuno |
-| **21** | migrazioni |
+| **22** | migrazioni |
 | **86** | rotte |
-| **522** | verifiche su 17 file di prova (16 unitari + 1 end-to-end) |
+| **538** | verifiche su 18 file di prova (17 unitari + 1 end-to-end) |
 
 ### Le schermate
 
@@ -484,6 +487,14 @@ profondità, l'uso da telefono, la fotografia del personaggio e le
 comunicazioni. Dopo F7 si aggiunge dove serve, ma il motore del mondo — tempo,
 meteo, Segreto, legami, episodi, voci — è quello e non cambia.
 
+**Ottobre 2026: la revisione d'autunno, e si ricomincia.** Un controllo globale
+del mondo ha aggiunto profondità senza cambiare il motore — i poteri che servono
+davvero (teletrasporto, telepatia, ipnosi), le tre scelte di chi ha capito, gli
+abitanti che parlano e ragionano, sedici storie nuove dall'opera — e un audit di
+tutta la piattaforma ha chiuso le gare fra richieste, i vicoli ciechi della mappa
+e una trentina di incoerenze di testo e di canone. Con la revisione il quartiere
+è ripartito dal 6 aprile 1987 per tutti, con i personaggi di prima e nient'altro.
+
 La rilettura dell'opera è completa: tutti e 156 i riassunti dei capitoli raccolti
 e spogliati, e le domande aperte quasi tutte chiuse — comprese quelle a cui la
 risposta è «il canone non lo dice», che valgono quanto le altre.
@@ -542,7 +553,16 @@ php bin/console.php mondo:ora  # che ora, che giorno e che tempo fa adesso
 php bin/console.php mondo:anno # una passata sull'anno simulato, per guardarlo
 php bin/console.php mondo:luoghi
 php bin/console.php bilancio --conferma   # rapporto di bilanciamento
+php bin/console.php mondo:ricomincia --conferma   # tutti da capo: vedi sotto
 ```
+
+**`mondo:ricomincia`** è il «si riparte tutti insieme» di una revisione grande.
+Tiene account e personaggi — nome, scheda, tratti, poteri, fotografia — e azzera
+tutto quello che è successo: legami, voci, ricordi, episodi, anomalie, chi sa
+cosa, incidenti, tracce, club, bacheca, biglietti. Il calendario riparte dal 6
+aprile 1987 alle sette, i personaggi si ritrovano in cima ai gradini riposati e
+con il Controllo dei poteri da rifare, gli oggetti unici tornano a casa loro e
+gli abitanti ritrovano i legami del canone. Non si annulla: prima un `mysqldump`.
 
 Il **bilancio** risponde alle domande che una prova non sa porre. Una prova
 dice «la vistosità morde»; questo dice *quanto*: genera centinaia di schede
@@ -567,6 +587,11 @@ non glielo si chiede esplicitamente. Per provare in locale:
 ```bash
 ORANGEROAD_CONFIG=config/config.php bash tests/tutte.sh
 ```
+
+Le prove unitarie lavorano sul database vero dell'installazione che caricano, e
+una (`test_ricomincia.php`) lo azzera per mestiere: per questo anche loro **si
+rifiutano** di partire se la configurazione caricata dice `env = production`,
+a meno di `PROVE_IN_PRODUZIONE=1`.
 
 Per verificare il deploy vero (crea e cancella un utente di prova, e controlla
 anche che le cartelle dei sorgenti non siano servite):
@@ -856,6 +881,48 @@ Annotate qui perché non si ripetano.
    ripiego era — appunto — i gradini. Se n'è accorta la prova dell'orologio, la
    cui casa è il tempio. Quando il risultato giusto coincide con il ripiego, la
    prova va fatta su un caso in cui non coincidono.
+
+32. **Leggere e poi scrivere non è una transazione.** Il pagamento dei punti
+   potere leggeva il saldo, controllava e scriveva il nuovo valore: due clic
+   insieme passavano entrambi il controllo e un potere si usava due volte con i
+   punti di uno. Lo stesso per gli oggetti unici (due mani sullo stesso
+   cappello) e per il riposo, che scriveva valori assoluti letti all'inizio del
+   battito e cancellava le spese fatte nel frattempo. La cura è sempre la
+   stessa: un `UPDATE` condizionato (`WHERE pp >= ?`, `WHERE detentore_id = ?`)
+   o relativo (`pp = pp + ?`), e il numero di righe toccate dice chi ha vinto.
+
+33. **Una colonna `UNSIGNED` non va mai sotto zero, e MariaDB non arrotonda: si
+   arrabbia.** `compostezza - 3` su una compostezza di 2 era un errore 500, non
+   uno zero. Si scrive `GREATEST(compostezza, 3) - 3`.
+
+34. **Un passaggio deve essere percorribile da tutti, non solo aperto.** La prova
+   della via commerciale (n. 28) contava come passaggio anche casa Ayukawa, che
+   è privata e non si apre a chi non è di famiglia. Così nascondeva il tempio:
+   di notte aperto, ma raggiungibile solo dal liceo e dal luna park, chiusi, e da
+   quella casa. Il Capodanno al tempio non lo poteva festeggiare nessuno. Adesso
+   c'è il sentiero verso l'area giochi, e la prova le case private le salta.
+
+35. **Una soglia tarata su una stagione va guardata nelle altre.** La pioggia
+   d'inverno partiva sopra una soglia di 0.86 sul rumore, che con il clima di
+   gennaio non si raggiungeva quasi mai: la neve, che ha bisogno della pioggia e
+   del freddo insieme, non cadeva in tutto l'inverno, e il gesto «sotto la neve»
+   non si poteva fare. Si è visto solo simulando un anno intero.
+
+36. **Una simulazione lunga trova quello che le prove non cercano.** Le prove
+   creano personaggi apposta e li mettono dove serve; il quartiere vero no. Una
+   settimana di gioco simulata con quattro giocatori che si muovono a caso,
+   fanno gesti, usano poteri e scelgono negli episodi ha trovato il tempio
+   isolato e ha confermato il resto: nessuna eccezione e nessun battito guasto
+   in 336 battiti.
+
+37. **Una prova che si può lanciare in produzione non deve toccare niente di vero.**
+   La prova end-to-end caricava un ritratto finto sul Master e poi lo toglieva: in
+   locale innocuo, in produzione ha cancellato il ritratto vero, rimesso a posto dal
+   backup. E la pulizia cancellava le tracce che contenevano «Prova» — maiuscole
+   comprese, e quindi anche quelle della prova di coraggio. Adesso il ritratto si
+   prova su un abitante che non ce l'ha, le tracce si cercano per il nome del
+   personaggio di prova, e in produzione la prova non lancia un battito accanto a
+   quello del cron.
 
 ## Licenza e diritti
 

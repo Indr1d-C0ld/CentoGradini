@@ -76,13 +76,13 @@ final class Calendario
     // devono coincidere con quelle: il 9 ottobre 2026 non coincidevano in cinque
     // casi, e la testata di ogni pagina annunciava il festival d'estate per l'1
     // agosto mentre le meccaniche lo facevano il 25 luglio. Le tiene allineate
-    // una prova (tests/test_audit.php). Sportivo e culturale cadono sulle due
+    // una prova (tests/test_controllo.php). Sportivo e culturale cadono sulle due
     // feste nazionali, il 10 ottobre e il 3 novembre.
     /** @var array<string,array{titolo:string,nota:string}> */
     private const EVENTI = [
         '04-06' => ['titolo' => 'Cerimonia d\'ingresso',      'nota' => 'Comincia l\'anno. Facce nuove, divise nuove, nessuno sa ancora niente di nessuno.'],
         '04-10' => ['titolo' => 'Reclutamento dei club',      'nota' => 'Volantini, insistenze, promesse. Oggi si decide con chi si passeranno i pomeriggi.'],
-        '04-13' => ['titolo' => 'Hanami',                      'nota' => 'Teli sotto i ciliegi del parco, e petali dappertutto.'],
+        '04-12' => ['titolo' => 'Hanami',                      'nota' => 'Teli sotto i ciliegi del parco, e petali dappertutto.'],
         '05-18' => ['titolo' => 'Esami di metà trimestre',     'nota' => 'Tre giorni in cui nessuno ha voglia di parlare d\'altro.'],
         '06-15' => ['titolo' => 'Gita scolastica',             'nota' => 'Il pullman, le coppie sui sedili in fondo, il maestro che conta le teste.'],
         '07-07' => ['titolo' => 'Tanabata',                     'nota' => 'Desideri scritti su strisce di carta appese al bambù. Qualcuno legge quello degli altri.'],

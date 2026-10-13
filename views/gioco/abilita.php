@@ -61,7 +61,7 @@ use App\Sim\Scuola;
 
 <?php if ($tratti !== []): ?>
 <div class="carta">
-  <p class="occhiello">Come sei fatto</p>
+  <p class="occhiello">Come sei</p>
   <?php foreach ($tratti as $t): ?>
     <div class="tratto">
       <h3><?= e($t['nome']) ?></h3>

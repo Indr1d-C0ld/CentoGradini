@@ -151,6 +151,12 @@ final class Bacheca
         if ($dest === null || (string) $dest['stato'] !== 'attivo') {
             return ['ok' => false, 'error' => 'Quella persona non c\'è più.'];
         }
+        // Un biglietto si lascia a qualcuno che si e' incontrato: e' la stessa
+        // regola dei profili. Prima bastava un numero, e si potevano mandare
+        // biglietti anonimi a chiunque provando gli id uno dopo l'altro.
+        if (!Legami::conosce($id, $aId)) {
+            return ['ok' => false, 'error' => 'Non vi conoscete: a chi non hai mai incontrato non sapresti cosa scrivere.'];
+        }
 
         $max = GameConfig::int('biglietti.max_al_giorno', 8);
         $da24 = (int) (Database::first(

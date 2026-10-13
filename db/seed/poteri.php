@@ -149,7 +149,7 @@ $p('ipnosi', 'Ipnosi', '催眠術', null, 3, 68, 74, 6,
 
 $p('autoipnosi', 'Autoipnosi', 'ヒュプノシス', null, 2, 75, 79, 3,
   'Fissarti allo specchio e ripetere una parola finché non diventi quella cosa: più forte, '
-  . 'più sicuro, meno imbranato. Funziona. È il problema.',
+  . 'più sicur{o}, meno imbranat{o}. Funziona. È il problema.',
   'Si disfa allo specchio, con uno schiaffo, o con un secchio d\'acqua. Finché dura sei '
   . 'un\'altra persona, e non sempre una migliore: con questo potere si diventa stronzi in '
   . 'fretta.'),
@@ -185,11 +185,11 @@ $p('voce', 'Manipolazione della voce', '声色', null, 2, 93, 96, 4,
 // renderebbe una carta fortunata invece che un tratto di quel personaggio.
 $p('blocco', 'Bloccare i poteri', '超能力封じ', null, 4, 0, 0, 0,
   'Spegnere il potere di un altro esper mentre lo sta usando. Non lo si toglie e non lo si '
-  . 'ruba: semplicemente, per un momento, quella persona non riesce piu\' a farlo. Chi lo '
-  . 'subisce se ne accorge benissimo, e capisce anche chi e\' stato.',
-  'Funziona solo su chi e\' presente, e solo mentre sta usando un potere. Non si puo\' tenere '
-  . 'acceso: e\' un interruttore, non una parete. Nel canone lo sa fare Kazuya, che e\' il piu\' '
-  . 'forte della famiglia pur essendo il piu\' piccolo.'),
+  . 'ruba: semplicemente, per un momento, quella persona non riesce più a farlo. Chi lo '
+  . 'subisce se ne accorge benissimo, e capisce anche chi è stato.',
+  'Funziona solo su chi è presente, e solo mentre sta usando un potere. Non si accende a mano: '
+  . 'scatta da solo, è un interruttore e non una parete. Nel canone lo sa fare Kazuya, che è il '
+  . 'più forte della famiglia pur essendo il più piccolo.'),
 
     ],
 ];

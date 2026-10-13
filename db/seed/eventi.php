@@ -44,7 +44,7 @@ return [
            . 'i grandi che li guardano dalle finestre. Tutti i nomi che sentirai per un anno li '
            . 'senti oggi per la prima volta.'),
 
-        $e('ciliegi', 'I ciliegi in fiore', 4, 12, 6, 'parco', 80, 65, 20,
+        $e('ciliegi', 'I ciliegi in fiore', 4, 12, 4, 'parco', 80, 65, 20,
            'Una settimana e poi cadono. Si stende un telo sotto gli alberi, si mangia per terra e '
            . 'si resta fino a buio: è l\'unico momento dell\'anno in cui stare seduti in un parco '
            . 'a non fare niente è una cosa che si fa apposta.'),

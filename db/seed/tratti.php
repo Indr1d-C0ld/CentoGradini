@@ -48,7 +48,7 @@ return [
 
 $t('combinaguai', 1, 7, 'Combinaguai', 'MF', [],
   'Sei quell{o} che ci prova sempre e la prende sempre. Sai a memoria chi esce con chi in '
-  . 'tutta la scuola, hai una teoria su ogni ragazza e nessuna funziona. Nei guai ci finisci '
+  . 'tutta la scuola, hai una teoria su ogni cotta della scuola e nessuna funziona. Nei guai ci finisci '
   . 'per curiosità, non per cattiveria, e ne esci con un bernoccolo e nessuna lezione imparata. '
   . 'Gli altri ti vogliono bene esattamente per questo.',
   'Farti prendere sul serio da qualcuno, almeno una volta.'),
@@ -83,11 +83,11 @@ $t('club', 26, 29, 'Anima del club', 'MF', ['sport' => 2],
   . 'chiunque. Solo che ogni tanto passi davanti al bar e vedi gli altri seduti dentro.',
   'Decidere se il club è quello che vuoi o solo quello a cui ti sei abituat{o}.'),
 
-$t('negozio', 30, 34, 'Figlio del negozio', 'MF', ['cucina' => 2],
+$t('negozio', 30, 34, 'Bottega di famiglia', 'MF', ['cucina' => 2],
   'La tua famiglia ha una bottega sulla strada commerciale, e dopo la scuola c\'è il turno. '
   . 'Conosci tutti per nome, sai chi paga a fine mese e chi litiga con chi, e la gente ti '
   . 'racconta cose che non racconterebbe a un compagno di classe. Il grembiule però ti fa '
-  . 'sembrare sempre un po\' più vecchio di quello che sei.',
+  . 'sembrare sempre un po\' più vecchi{o} di quello che sei.',
   'Farti guardare una volta senza il grembiule addosso.'),
 
 $t('mirror', 35, 38, 'Occhiali a specchio', 'MF', ['dai_suki' => 2, 'kakko' => 1],
@@ -98,7 +98,7 @@ $t('mirror', 35, 38, 'Occhiali a specchio', 'MF', ['dai_suki' => 2, 'kakko' => 1
   'Toglierteli davanti a una persona sola.'),
 
 $t('stazza', 39, 41, 'Stazza', 'MF', ['pf' => 2, 'dai_suki' => -1, 'rissa' => 1],
-  'Più alto e più largo di tutti gli altri, da quando avevi dodici anni. Ti mettono sempre in '
+  'Più alt{o} e più larg{o} di tutti gli altri, da quando avevi dodici anni. Ti mettono sempre in '
   . 'fondo nelle foto di classe e ti chiedono sempre di spostare i banchi. Nessuno ti attacca '
   . 'briga, il che è comodo e anche un po\' triste.',
   'Che qualcuno ti chieda qualcosa che non richieda forza.'),
@@ -121,7 +121,7 @@ $t('passato_oscuro', 51, 54, 'Passato oscuro', 'MF', [],
   . 'racconti. Finché resta là dietro va tutto bene.',
   'Che non venga fuori. Oppure: raccontarlo tu, prima che lo faccia qualcun altro.'),
 
-$t('gemello', 55, 59, 'Gemello', 'MF', [],
+$t('gemello', 55, 59, 'Gemelli', 'MF', [],
   'Avete la stessa faccia e caratteri opposti, come Manami e Kurumi. Vi confondono da sempre '
   . 'e nessuno dei due lo sopporta più. Il vantaggio è che potete scambiarvi di posto; lo '
   . 'svantaggio è che quando uno combina qualcosa, la colpa arriva a metà.',
@@ -146,13 +146,13 @@ $t('burikko', 67, 69, 'Burikko', 'F', ['dai_suki' => 1, 'kakko' => -1],
   . 'sei davvero.',
   'Farti piacere da qualcuno mentre sei quell\'altra.'),
 
-$t('secchione', 70, 73, 'Secchione', 'MF', ['testa' => 2, 'dai_suki' => -1, 'inglese' => 2],
+$t('secchione', 70, 73, 'Testa sui libri', 'MF', ['testa' => 2, 'dai_suki' => -1, 'inglese' => 2],
   'Corso serale, libri di preparazione, tabella di marcia appesa sopra la scrivania. Il jūken '
   . 'è fra un anno o due e in casa tua non si parla d\'altro. Gli altri ti chiedono i compiti e '
   . 'tu glieli dai, perché è l\'unico momento in cui ti cercano.',
   'Passare un pomeriggio senza pensare all\'esame, e che sia con qualcuno.'),
 
-$t('solo_in_casa', 74, 76, 'Solo in casa', 'MF', ['cucina' => 2, 'cuore' => -1],
+$t('solo_in_casa', 74, 76, 'Casa vuota', 'MF', ['cucina' => 2, 'cuore' => -1],
   'I tuoi sono all\'estero, o lavorano lontano, o semplicemente non ci sono. Hai le chiavi, '
   . 'l\'orario che vuoi e una casa in cui di sera è accesa una finestra sola. Tutti pensano '
   . 'che sia una fortuna. È anche una fortuna.',
