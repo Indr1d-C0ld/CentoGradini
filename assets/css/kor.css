@@ -1058,3 +1058,9 @@ label.in_linea { display: inline-flex; align-items: center; gap: .4rem; }
 
 /* --- Un potere che chiede dove, o su chi --------------------------------- */
 .scelta-potere { display: block; margin-top: .35rem; width: 100%; min-width: 7rem; max-width: 16rem; font-size: .9rem; }
+
+/* --- La Takaoka vera, nella sala del maestro ------------------------------ */
+.galleria-takaoka { grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr)); }
+.galleria-takaoka img { aspect-ratio: 4 / 3; object-fit: cover; }
+.galleria-takaoka figcaption { line-height: 1.45; }
+.galleria-takaoka .credito { display: block; margin-top: .25rem; font-size: .76rem; opacity: .85; }

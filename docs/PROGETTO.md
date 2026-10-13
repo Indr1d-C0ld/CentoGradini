@@ -516,6 +516,12 @@ Dopo F7 si aggiunge contenuto e comodità, non impalcatura. In ordine di arrivo:
   tradire, gli stati del 1990 (`Stati`: raffreddore, bende), i sogni premonitori all'alba, e
   gli abitanti che fanno gesti, capiscono da soli e scelgono cosa farne. Tre abitanti nuovi:
   Takashi, Umao e Ushiko.
+- **Le storie** (9 ottobre 2026, migrazione `0021`): sedici copioni presi dall'opera, con i
+  capitoli da cui vengono (`db/seed/copioni_storie.php`); le opzioni che usano un potere dentro
+  una scena; le condizioni composte e la vigilia di un evento; sette eventi nuovi (Tanabata,
+  Obon, la festa delle bambole, il pesce d'aprile, tre sessioni d'esame); la Moebius e il cinema;
+  il gesto «prendersi cura»; l'orologio, il pappagallo e il ciondolo; il primo sogno dell'anno.
+  E nella sala del maestro, dieci fotografie libere della Takaoka vera (`assets/img/takaoka/`).
 - **Le comunicazioni** (migrazione `0016`): filo diretto fra la gestione e un giocatore, nei
   due sensi, con avviso per posta che non ripete il messaggio. Non è finzione e non si
   traveste da tale — vedi la nota in testa a `src/Game/Comunicazioni.php`.

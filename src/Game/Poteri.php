@@ -221,7 +221,7 @@ final class Poteri
         if ($ora < $alba || $ora >= $alba + 3) {
             return 0;
         }
-        $n = 0;
+        $n = self::primoSogno($gts);
         foreach (Database::all(
             "SELECT p.* FROM personaggi p JOIN personaggio_poteri pp ON pp.personaggio_id = p.id AND pp.pkey = 'sogni'
              WHERE p.png IS NULL AND p.user_id IS NOT NULL AND p.stato = 'attivo'"
@@ -251,6 +251,49 @@ final class Poteri
                 'INSERT INTO ricordi (personaggio_id, user_id, episodio_id, titolo, testo, gts, luogo)
                  VALUES (?, ?, NULL, ?, ?, ?, ?)',
                 [(int) $pg['id'], (int) $pg['user_id'], 'Un sogno', self::sogno($pg, $gts, $rng), $gts, (string) $pg['luogo']]
+            );
+            $n++;
+        }
+        return $n;
+    }
+
+    /**
+     * Il primo sogno dell'anno, 初夢 (cap. 92; TV39-40): la notte fra l'1 e il 2
+     * gennaio lo fanno tutti, poteri o no, e porta fortuna se ci sono il monte
+     * Fuji, un falco o una melanzana — in quest'ordine. Finisce nei ricordi.
+     */
+    private static function primoSogno(int $gts): int
+    {
+        if (\App\Sim\Calendario::stato($gts)['md'] !== '01-02') {
+            return 0;
+        }
+        $titolo = 'Il primo sogno dell\'anno';
+        $n = 0;
+        foreach (Database::all(
+            "SELECT * FROM personaggi WHERE png IS NULL AND user_id IS NOT NULL AND stato = 'attivo'"
+        ) as $pg) {
+            if (Database::first('SELECT 1 x FROM ricordi WHERE personaggio_id = ? AND titolo = ? AND gts > ?',
+                    [(int) $pg['id'], $titolo, $gts - 2 * 86400]) !== null) {
+                continue;
+            }
+            $rng = Rng::for(GameConfig::int('world.seed', 19870406), 'hatsuyume', (int) $pg['id'], intdiv($gts, 86400));
+            $testo = (string) $rng->pick([
+                'Sogni il monte Fuji, bianco, contro un cielo pulitissimo. Ti svegli e per un momento ti '
+                    . 'sembra che l\'anno non possa andare male. È il primo dei tre sogni fortunati.',
+                'Sogni un falco che gira in tondo sopra i gradini, sempre più in alto. Il secondo dei tre '
+                    . 'sogni fortunati: dicono che porti lontano.',
+                'Sogni una melanzana. Una melanzana e basta, enorme, lucida. Ti svegli ridendo: è il terzo '
+                    . 'dei sogni fortunati, e il più ridicolo.',
+                'Sogni la scuola, solo che i corridoi non finiscono mai e tutti hanno la faccia di qualcun '
+                    . 'altro. Nessun Fuji, nessun falco, nessuna melanzana: un sogno qualunque, per un anno '
+                    . 'che si vedrà.',
+                'Sogni di essere in ritardo per qualcosa di importantissimo e di non ricordare cosa. Ti '
+                    . 'svegli col cuore in gola. Il primo sogno dell\'anno non era dei migliori.',
+            ]);
+            Database::run(
+                'INSERT INTO ricordi (personaggio_id, user_id, episodio_id, titolo, testo, gts, luogo)
+                 VALUES (?, ?, NULL, ?, ?, ?, ?)',
+                [(int) $pg['id'], (int) $pg['user_id'], $titolo, $testo, $gts, (string) $pg['luogo']]
             );
             $n++;
         }

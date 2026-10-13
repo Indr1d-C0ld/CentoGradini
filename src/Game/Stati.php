@@ -33,9 +33,11 @@ final class Stati
 {
     /** Come si vede addosso a qualcuno, per chi lo incrocia. */
     public const COME_SI_VEDE = [
+        'bende'       => 'è pien{o} di cerotti',
+        'brillo'      => 'è un po\' brill{o}',
         'raffreddore' => 'ha il raffreddore',
-        'bende'       => 'è pieno di cerotti',
         'invisibile'  => '',   // appunto
+        'tempo_fermo' => '',   // nessuno lo vede, per definizione
     ];
 
     public static function metti(int $pgId, string $stato, int $minuti, ?int $gts = null): void
@@ -75,7 +77,7 @@ final class Stati
         foreach (self::di((int) $pg['id'], $gts) as $s) {
             $p = self::COME_SI_VEDE[$s] ?? '';
             if ($p !== '') {
-                $parole[] = $s === 'bende' && (string) ($pg['sesso'] ?? 'm') === 'f' ? 'è piena di cerotti' : $p;
+                $parole[] = accorda($p, $pg);
             }
         }
         return implode(', ', $parole);
@@ -84,7 +86,9 @@ final class Stati
     /** I poteri non rispondono come dovrebbero: raffreddore, febbre. */
     public static function poteriSballati(int $pgId, ?int $gts = null): bool
     {
-        return self::ha($pgId, 'raffreddore', $gts);
+        // Malati o brilli: «quando un esper si ubriaca succedono cose strane.
+        // I poteri partono da soli in momenti casuali» (regolamento del 1990).
+        return self::ha($pgId, 'raffreddore', $gts) || self::ha($pgId, 'brillo', $gts);
     }
 
     /**

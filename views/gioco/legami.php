@@ -3,7 +3,7 @@
  * @var array<string,mixed> $pg
  * @var array<string,mixed> $mondo
  * @var list<array<string,mixed>> $legami
- * @var array<string,mixed>|null $oggetto
+ * @var list<array<string,mixed>> $oggetti
  */
 use App\Sim\Scuola;
 ?>
@@ -17,12 +17,12 @@ use App\Sim\Scuola;
   è una dimenticanza: in questa storia nessuno lo sa mai.
 </p>
 
-<?php if ($oggetto !== null): ?>
+<?php foreach ($oggetti as $oggetto): ?>
 <div class="evento-oggi">
   <b>Hai <?= e(mb_strtolower($oggetto['nome'])) ?>.</b>
   <span>Puoi darlo a qualcuno che sia dove sei tu. Una volta dato, è dato.</span>
 </div>
-<?php endif; ?>
+<?php endforeach; ?>
 
 <?php if ($legami === []): ?>
   <div class="carta">

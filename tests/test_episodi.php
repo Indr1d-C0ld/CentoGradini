@@ -118,7 +118,8 @@ prova('ogni copione seminato ha la forma che il motore si aspetta', function () 
 
     $abilita = ['nessuna', 'rissa', 'testa', 'dai_suki', 'cuore',
                 'inglese', 'sport', 'guida', 'kakko', 'nuoto', 'musica', 'cucina', 'candore'];
-    $effetti = ['affetto_cast', 'malinteso_cast', 'compostezza', 'pf', 'pp', 'calore'];
+    $effetti = ['affetto_cast', 'malinteso_cast', 'compostezza', 'pf', 'pp', 'calore', 'brillo', 'raffreddore'];
+    $poteri  = array_column(Database::all('SELECT pkey FROM poteri'), 'pkey');
 
     foreach ($copioni as $c) {
         $scene = json_decode((string) $c['scene'], true);
@@ -140,6 +141,13 @@ prova('ogni copione seminato ha la forma che il motore si aspetta', function () 
                 }
                 vero(in_array((string) $o['prova'], $abilita, true),
                     "{$dove} opzione «{$k}»: prova «{$o['prova']}» non esiste");
+                // Un'opzione che usa un potere: il potere deve esistere, e non
+                // si tira su un'abilita' — il rischio e' quello del Segreto.
+                if (isset($o['potere'])) {
+                    vero(in_array((string) $o['potere'], $poteri, true),
+                        "{$dove} opzione «{$k}»: il potere «{$o['potere']}» non esiste");
+                    uguale('nessuna', (string) $o['prova'], "{$dove} opzione «{$k}»: un potere non si tira");
+                }
                 // Se c'e' una prova vera, ci deve essere anche il testo di
                 // quando va male: se no il fallimento non racconta niente.
                 if ((string) $o['prova'] !== 'nessuna') {
@@ -167,17 +175,24 @@ prova('ogni condizione usata dai copioni e\' una condizione che esiste', functio
     $m = new ReflectionMethod(Episodi::class, 'condizioneSoddisfatta');
     $m->setAccessible(true);
     $note = ['sempre', 'autunno', 'estate', 'inverno', 'primavera', 'pioggia', 'rovescio',
-             'neve', 'scuola', 'vacanza', 'sospetto', 'pettegolezzo', 'festa'];
+             'neve', 'scuola', 'vacanza', 'sospetto', 'pettegolezzo', 'festa', 'sera', 'notte', 'raro'];
     $eventi = array_column(Database::all('SELECT ekey FROM eventi'), 'ekey');
+    // «evento:x» e «vigilia:x» valgono anche come prefisso: «esami» copre
+    // esami_maggio, esami_luglio, esami_dicembre.
+    $esiste = static fn (string $e): bool => array_filter($eventi,
+        static fn (string $k): bool => $k === $e || str_starts_with($k, $e . '_') || str_starts_with($k, $e)) !== [];
 
     foreach (Database::all("SELECT ckey, condizione FROM copioni WHERE ckey NOT LIKE 'zz%'") as $c) {
-        $cond = (string) $c['condizione'];
-        if (str_starts_with($cond, 'evento:')) {
-            vero(in_array(substr($cond, 7), $eventi, true),
-                "«{$c['ckey']}»: l'evento «" . substr($cond, 7) . "» non esiste nel calendario");
-            continue;
+        foreach (explode('+', (string) $c['condizione']) as $cond) {
+            foreach (['evento:', 'vigilia:'] as $pre) {
+                if (str_starts_with($cond, $pre)) {
+                    vero($esiste(substr($cond, strlen($pre))),
+                        "«{$c['ckey']}»: l'evento «" . substr($cond, strlen($pre)) . "» non esiste nel calendario");
+                    continue 2;
+                }
+            }
+            vero(in_array($cond, $note, true), "«{$c['ckey']}»: condizione «{$cond}» sconosciuta");
         }
-        vero(in_array($cond, $note, true), "«{$c['ckey']}»: condizione «{$cond}» sconosciuta");
     }
 });
 

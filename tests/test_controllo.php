@@ -289,6 +289,9 @@ prova('la testata e le meccaniche hanno lo stesso calendario', function () {
         'culturale' => 'Festival culturale', 'natale' => 'Vigilia di Natale',
         'capodanno' => 'Capodanno', 'san_valentino' => 'San Valentino',
         'white_day' => 'White Day', 'diploma' => 'Cerimonia di diploma',
+        'tanabata' => 'Tanabata', 'obon' => 'Obon', 'hinamatsuri' => 'Festa delle bambole',
+        'pesce_aprile' => 'Pesce d\'aprile', 'esami_maggio' => 'Esami di metà trimestre',
+        'esami_luglio' => 'Esami di luglio', 'esami_dicembre' => 'Esami di fine trimestre',
     ];
     $date = [];
     foreach ($testata as $md => $ev) {
@@ -659,6 +662,216 @@ prova('il bentō lo si cucina: chi non sa cucinare lo brucia, e rende meno', fun
     } finally {
         Orologio::fingiAdesso(null);
     }
+});
+
+// =============================================================================
+titolo('Le storie dell\'opera');
+
+prova('i copioni dell\'opera ci sono, e ognuno può aprirsi in qualche momento', function () {
+    $n = (int) Database::first('SELECT COUNT(*) n FROM copioni')['n'];
+    vero($n >= 26, "copioni: {$n}");
+    $nuovi = ['doppio', 'bancone', 'vigilia', 'coraggio', 'asso', 'lettera', 'terzo_natale', 'senza_di_te',
+              'isola', 'funivia', 'nonni', 'tanabata', 'bambole', 'pesce_aprile', 'lenti', 'due_biglietti'];
+    $presenti = array_column(Database::all('SELECT ckey FROM copioni'), 'ckey');
+    uguale([], array_values(array_diff($nuovi, $presenti)));
+});
+
+prova('le condizioni composte: tutte insieme, o niente', function () use ($ore) {
+    $m = new ReflectionMethod(\App\Game\Episodi::class, 'condizioneSoddisfatta');
+    $notteEstate = $ore('1987-08-03 23:30:00');
+    $giornoEstate = $ore('1987-08-03 14:00:00');
+    vero($m->invoke(null, 'estate+notte', $notteEstate));
+    vero(!$m->invoke(null, 'estate+notte', $giornoEstate), 'di giorno no');
+    vero(!$m->invoke(null, 'inverno+notte', $notteEstate), 'd\'estate no');
+});
+
+prova('la vigilia di un esame è il giorno prima, non il giorno stesso', function () use ($ore) {
+    $m = new ReflectionMethod(\App\Game\Episodi::class, 'condizioneSoddisfatta');
+    vero($m->invoke(null, 'vigilia:esami', $ore('1987-05-17 21:00:00')), 'il 17 maggio è la vigilia');
+    vero(!$m->invoke(null, 'vigilia:esami', $ore('1987-05-18 21:00:00')), 'il 18 è l\'esame');
+    vero(!$m->invoke(null, 'vigilia:esami', $ore('1987-05-10 21:00:00')), 'il 10 non c\'entra');
+    vero($m->invoke(null, 'evento:esami', $ore('1987-05-19 10:00:00')), '«esami» copre gli esami di maggio');
+});
+
+prova('il pesce d\'aprile cade nell\'ultima settimana del ciclo, e si accende', function () use ($ore) {
+    $m = new ReflectionMethod(\App\Game\Episodi::class, 'condizioneSoddisfatta');
+    vero($m->invoke(null, 'evento:pesce_aprile', $ore('1988-04-01 12:00:00')), 'il primo aprile 1988');
+    vero(!$m->invoke(null, 'evento:pesce_aprile', $ore('1988-04-03 12:00:00')), 'il 3 no');
+    vero($m->invoke(null, 'evento:tanabata', $ore('1987-07-07 19:00:00')), 'e Tanabata il 7 luglio');
+});
+
+prova('una giornata rara è rara: circa una su dieci, e dura tutto il giorno', function () use ($ore) {
+    $m = new ReflectionMethod(\App\Game\Episodi::class, 'condizioneSoddisfatta');
+    $rari = 0;
+    for ($g = 0; $g < 200; $g++) {
+        $mattina = $ore('1987-06-01 09:00:00') + $g * 86400;
+        $sera    = $mattina + 10 * 3600;
+        $r = $m->invoke(null, 'raro', $mattina);
+        uguale($r, $m->invoke(null, 'raro', $sera), 'deve valere per tutta la giornata');
+        $rari += $r ? 1 : 0;
+    }
+    vero($rari >= 8 && $rari <= 35, "rari {$rari} su 200");
+});
+
+prova('un\'opzione che usa un potere la vede solo chi ce l\'ha, e chi non c\'è non la sceglie', function () {
+    $opz = [['k' => 'a', 'testo' => 'a', 'prova' => 'nessuna', 'peso' => ['cuore' => 1]],
+            ['k' => 'b', 'testo' => 'b', 'prova' => 'nessuna', 'peso' => ['cuore' => 9], 'potere' => 'telecinesi']];
+    $senza = persona('Normale', 'argine');
+    $con   = persona('Telecineta', 'argine', 1);
+    conPotere($con, 'telecinesi', 1);
+    uguale(['a'], array_column(\App\Game\Episodi::opzioniPer(di($senza), $opz), 'k'));
+    uguale(['a', 'b'], array_column(\App\Game\Episodi::opzioniPer(di($con), $opz), 'k'));
+    // Anche se il peso lo spingerebbe lì, l'agente autonomo non usa poteri.
+    Database::run('UPDATE personaggi SET cuore = 15 WHERE id = ?', [(int) $con['id']]);
+    uguale('a', \App\Game\Episodi::agenteAutonomo(di($con), $opz));
+});
+
+prova('scegliere il potere in una scena lo usa davvero, con i suoi rischi', function () {
+    $e = persona('Tentato', 'argine', 1);
+    $t = persona('Vede', 'argine');
+    Database::run('UPDATE personaggi SET testa = 15 WHERE id = ?', [(int) $t['id']]);
+    conPotere($e, 'telecinesi', 1);
+    $scene = [['testo' => 'Una scena.', 'opzioni' => [
+        ['k' => 'normale', 'testo' => 'x', 'prova' => 'nessuna', 'difficolta' => 0, 'ok' => 'ok', 'ko' => '',
+         'effetti_ok' => [], 'effetti_ko' => [], 'peso' => ['cuore' => 1]],
+        ['k' => 'potere', 'testo' => 'y', 'prova' => 'nessuna', 'difficolta' => 0, 'ok' => 'fatto', 'ko' => 'niente',
+         'effetti_ok' => [], 'effetti_ko' => [], 'peso' => ['cuore' => 1], 'potere' => 'telecinesi'],
+    ]]];
+    Database::run("INSERT INTO copioni (ckey, titolo, occhiello, premessa, luogo, condizione, min_cast, max_cast, finestra, scene, attivo)
+                   VALUES ('zzctl', 'Prova', 'prova', 'prova', 'argine', 'sempre', 2, 4, 1800, ?, 0)
+                   ON DUPLICATE KEY UPDATE scene = VALUES(scene)", [json_encode($scene, JSON_UNESCAPED_UNICODE)]);
+    $gts = Orologio::lineare();
+    Database::run("INSERT INTO episodi (ckey, titolo, luogo, scena, stato, aperto_gts, scena_gts, scade_reale)
+                   VALUES ('zzctl', 'Prova', 'argine', 0, 'aperto', ?, ?, ?)", [$gts, $gts, Orologio::adessoReale() + 600]);
+    $ep = (int) Database::lastInsertId();
+    foreach ([$e, $t] as $p) {
+        Database::run('INSERT INTO episodio_cast (episodio_id, personaggio_id, entrato_gts) VALUES (?, ?, ?)', [$ep, (int) $p['id'], $gts]);
+    }
+    try {
+        $prima = (int) di($e)['pp'];
+        vero(\App\Game\Episodi::scegli(di($e), $ep, 'potere')['ok']);
+        vero(!\App\Game\Episodi::scegli(di($t), $ep, 'potere')['ok'], 'chi non ha il potere non può sceglierlo');
+        \App\Game\Episodi::scegli(di($t), $ep, 'normale');
+        vero((int) di($e)['pp'] < $prima, 'il potere costa');
+        vero(Database::first("SELECT 1 x FROM incidenti WHERE attore_id = ? AND pkey = 'telecinesi'", [(int) $e['id']]) !== null,
+            'ed è un uso vero, con il suo incidente');
+    } finally {
+        Database::run('DELETE FROM episodio_scelte WHERE episodio_id = ?', [$ep]);
+        Database::run('DELETE FROM episodio_cast WHERE episodio_id = ?', [$ep]);
+        Database::run('DELETE FROM ricordi WHERE episodio_id = ?', [$ep]);
+        Database::run('DELETE FROM episodi WHERE id = ?', [$ep]);
+        Database::run("DELETE FROM copioni WHERE ckey = 'zzctl'");
+    }
+});
+
+prova('il sake dolce fa venire i poteri sballati', function () {
+    $e = persona('Brillo', 'argine', 1);
+    $m = new ReflectionMethod(\App\Game\Episodi::class, 'applicaEffetti');
+    $m->invoke(null, di($e), [di($e)], ['brillo' => 120], 'argine', Orologio::lineare());
+    vero(\App\Game\Stati::ha((int) $e['id'], 'brillo'));
+    vero(\App\Game\Stati::poteriSballati((int) $e['id']));
+    vero(str_contains(\App\Game\Stati::addosso(di($e)), 'brillo'));
+});
+
+// =============================================================================
+titolo('Luoghi, gesti e oggetti nuovi');
+
+prova('alla Moebius si entra solo in coppia', function () {
+    $pg = persona('Single', 'commerciale');
+    vero(Personaggio::porta(di($pg), 'moebius') !== null, 'da soli no');
+    $amico = persona('Cavaliere', 'commerciale');
+    Legami::muovi((int) $amico['id'], (int) $pg['id'], 40, 0);
+    uguale(null, Personaggio::porta(di($pg), 'moebius'), 'con qualcuno che ci tiene sì');
+});
+
+prova('a chi ha il raffreddore si porta da mangiare, e guarisce prima', function () {
+    $a = persona('Infermiere', 'argine');
+    $b = persona('Febbricitante2', 'argine');
+    $r = Legami::compi(di($a), (int) $b['id'], 'curare');
+    vero(!$r['ok'] && str_contains((string) $r['error'], 'benissimo'), 'a chi sta bene no');
+    \App\Game\Stati::metti((int) $b['id'], 'raffreddore', 600);
+    $r = Legami::compi(di($a), (int) $b['id'], 'curare');
+    vero($r['ok'], $r['error'] ?? '');
+    vero(!\App\Game\Stati::ha((int) $b['id'], 'raffreddore'), 'il raffreddore è passato');
+});
+
+function prendi(string $okey, array $pg): array
+{
+    $prima = Database::first('SELECT * FROM oggetti_unici WHERE okey = ?', [$okey]);
+    Database::run('UPDATE oggetti_unici SET detentore_id = ?, luogo = NULL, gts = ?, pronto_gts = NULL WHERE okey = ?',
+        [(int) $pg['id'], Orologio::lineare(), $okey]);
+    return $prima;
+}
+function rimetti(array $prima): void
+{
+    Database::run('UPDATE oggetti_unici SET detentore_id = ?, luogo = ?, gts = ?, pronto_gts = ? WHERE okey = ?',
+        [$prima['detentore_id'], $prima['luogo'], $prima['gts'], $prima['pronto_gts'], $prima['okey']]);
+}
+
+prova('l\'orologio del nonno ferma il tempo per un minuto, e poi va ricaricato', function () {
+    $e = persona('Orologiaio', 'argine', 1);
+    $t = persona('Distratto', 'argine');
+    Database::run('UPDATE personaggi SET testa = 15 WHERE id = ?', [(int) $t['id']]);
+    conPotere($e, 'teletrasporto', 1);
+    $prima = prendi('orologio', $e);
+    try {
+        vero(Legami::usaOggetto(di($e), 'orologio')['ok']);
+        $r = Segreto::usa(di($e), 'teletrasporto');
+        vero($r['ok'] && !$r['notato'], 'col tempo fermo nessuno vede niente');
+        vero(!Legami::usaOggetto(di($e), 'orologio')['ok'], 'subito dopo è scarico');
+    } finally {
+        rimetti($prima);
+    }
+});
+
+prova('col pappagallo accanto nessun gesto si fraintende', function () {
+    $a = persona('Pappagallaio', 'argine');
+    $b = persona('Accompagnato', 'argine');
+    $c = persona('Distrattissimo', 'argine');
+    Database::run('UPDATE personaggi SET testa = 1 WHERE id = ?', [(int) $c['id']]);
+    $prima = prendi('pappagallo', $a);
+    try {
+        $r = Legami::compi(di($a), (int) $b['id'], 'accompagnare');
+        vero($r['ok'], $r['error'] ?? '');
+        uguale(0, (int) $r['fraintesi'], 'il pappagallo ha gridato a tutti cosa voleva dire');
+    } finally {
+        rimetti($prima);
+    }
+});
+
+prova('l\'orologio si può dare a un parente, il ciondolo no', function () {
+    $ky = abitante('kyosuke');
+    $ku = abitante('kurumi');
+    $prima = [prendi('orologio', $ky), prendi('ciondolo', $ky)];
+    $luogo = (string) $ky['luogo'];
+    try {
+        Database::run('UPDATE personaggi SET luogo = ?, verso = NULL WHERE id = ?', [$luogo, (int) $ku['id']]);
+        vero(Legami::passaOggetto(abitante('kyosuke'), (int) $ku['id'], 'orologio')['ok']);
+        vero(!Legami::passaOggetto(abitante('kyosuke'), (int) $ku['id'], 'ciondolo')['ok']);
+    } finally {
+        rimetti($prima[0]);
+        rimetti($prima[1]);
+        Database::run('DELETE FROM oggetti_passaggi WHERE okey IN (?, ?) AND da_id = ?', ['orologio', 'ciondolo', (int) $ky['id']]);
+    }
+});
+
+prova('dato a un abitante, un oggetto torna a casa sua, non sempre ai gradini', function () {
+    $master = abitante('master');
+    $prima = prendi('orologio', $master);
+    try {
+        Database::run('UPDATE oggetti_unici SET gts = ? WHERE okey = ?', [Orologio::lineare() - 5 * 86400, 'orologio']);
+        Legami::ritrovaOggetti();
+        uguale('tempio', (string) Database::first('SELECT luogo FROM oggetti_unici WHERE okey = ?', ['orologio'])['luogo']);
+    } finally {
+        rimetti($prima);
+        Database::run("DELETE FROM tracce WHERE personaggio_id = ? AND tipo = 'oggetto'", [(int) $master['id']]);
+    }
+});
+
+prova('il primo sogno dell\'anno lo fanno tutti, poteri o no', function () use ($ore) {
+    $m = new ReflectionMethod(\App\Game\Poteri::class, 'primoSogno');
+    vero($m->invoke(null, $ore('1988-01-02 07:00:00')) >= 0);
+    uguale(0, $m->invoke(null, $ore('1988-01-05 07:00:00')), 'solo il 2 gennaio');
 });
 
 pulisci();

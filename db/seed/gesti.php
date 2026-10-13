@@ -92,6 +92,15 @@ $g('bottone', 'Chiedere il secondo bottone', 18, 3, 'diploma', true,
   '%B ha dato a %A il secondo bottone della divisa.',
   '%A ha avuto il bottone di %B. Lo hanno visto tutti.', 90),
 
+// Aggiunto dal controllo del 9 ottobre 2026: andare a trovare chi sta male,
+// e portargli qualcosa (capp. 38, 76, 89, 108; TV4). Si fa solo a chi ha il
+// raffreddore, e lo fa passare prima.
+$g('curare', 'Portare qualcosa a chi sta male', 9, 0, 'malato', true,
+  'Un brodo caldo, le fotocopie degli appunti, un\'ora seduti accanto a chi ha la febbre. È il '
+  . 'gesto più semplice di tutti, e quello che si ricorda più a lungo.',
+  '%A ha portato da mangiare a %B, che aveva la febbre.',
+  '%A passa i pomeriggi a casa di %B, a quanto si dice.', 95),
+
 $g('evitare', 'Evitare', -8, 0, null, true,
   'Cambiare strada, fare finta di non aver sentito, trovarsi sempre occupato. Non si litiga: '
   . 'ci si allontana, che fa più male e si nota di meno.',

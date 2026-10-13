@@ -86,6 +86,7 @@ final class Calendario
         '05-18' => ['titolo' => 'Esami di metà trimestre',     'nota' => 'Tre giorni in cui nessuno ha voglia di parlare d\'altro.'],
         '06-15' => ['titolo' => 'Gita scolastica',             'nota' => 'Il pullman, le coppie sui sedili in fondo, il maestro che conta le teste.'],
         '07-07' => ['titolo' => 'Tanabata',                     'nota' => 'Desideri scritti su strisce di carta appese al bambù. Qualcuno legge quello degli altri.'],
+        '07-13' => ['titolo' => 'Esami di luglio',              'nota' => 'Tre giorni chiusi in camera, o a fare finta.'],
         '07-20' => ['titolo' => 'Chiusura del primo trimestre','nota' => 'Pagelle. Poi due mesi di niente.'],
         '07-25' => ['titolo' => 'Festival d\'estate',           'nota' => 'Yukata, bancarelle, pesca dei pesciolini rossi e fuochi d\'artificio sul fiume.'],
         '08-13' => ['titolo' => 'Obon',                         'nota' => 'Si torna al paese dei nonni. Chi resta in città trova il quartiere mezzo vuoto.'],
@@ -106,6 +107,7 @@ final class Calendario
         '03-14' => ['titolo' => 'White Day',                     'nota' => 'Un mese dopo, tocca rispondere. Tacere è una risposta anche quello.'],
         '03-15' => ['titolo' => 'Cerimonia di diploma',          'nota' => 'Il secondo bottone della divisa si dà a chi si ama. Qualcuno lo chiede, qualcuno no.'],
         '03-24' => ['titolo' => 'Chiusura dell\'anno',           'nota' => 'Ultimo giorno. Fra due settimane si ricomincia, e sarà di nuovo aprile.'],
+        '04-01' => ['titolo' => 'Pesce d\'aprile',               'nota' => 'L\'unico giorno in cui le bugie sono permesse. Il giorno dopo nessuno si ricorda più quali erano.'],
     ];
 
     /**

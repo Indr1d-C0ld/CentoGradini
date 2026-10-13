@@ -83,7 +83,7 @@ final class LegamiController
             'pg'      => $pg,
             'mondo'   => Mondo::adesso(),
             'legami'  => Legami::miei((int) $pg['id']),
-            'oggetto' => Legami::oggettoDi((int) $pg['id']),
+            'oggetti' => Legami::oggettiDi((int) $pg['id']),
         ]));
     }
 
@@ -110,7 +110,7 @@ final class LegamiController
             'gesti'   => Legami::disponibili($pg),
             'mio'     => Legami::fra((int) $pg['id'], (int) $altro['id']),
             'loro'    => Legami::fra((int) $altro['id'], (int) $pg['id']),
-            'oggetto' => Legami::oggettoDi((int) $pg['id']),
+            'oggetti' => Legami::oggettiDi((int) $pg['id']),
         ]));
     }
 
@@ -191,6 +191,18 @@ final class LegamiController
             return redirect('/quartiere');
         }
         $res = Legami::raccogli($pg, $request->str('oggetto', 'cappello'));
+        Session::flash($res['ok'] ? 'success' : 'error', $res['racconto'] ?? $res['error'] ?? '');
+        return redirect('/quartiere');
+    }
+
+    /** Usare un oggetto che si ha in mano: l'orologio del nonno. */
+    public function usaOggetto(Request $request): Response
+    {
+        $pg = $this->mio();
+        if ($pg === null) {
+            return redirect('/quartiere');
+        }
+        $res = Legami::usaOggetto($pg, $request->str('oggetto'));
         Session::flash($res['ok'] ? 'success' : 'error', $res['racconto'] ?? $res['error'] ?? '');
         return redirect('/quartiere');
     }

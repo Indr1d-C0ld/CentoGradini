@@ -123,9 +123,18 @@ final class HomeController
         // Ordine stabile, qualunque cosa restituisca il filesystem.
         usort($ritratti, static fn (array $a, array $b): int => strcmp($a['file'], $b['file']));
 
+        // La Takaoka vera: fotografie libere da Commons, con i loro crediti.
+        // Si mostrano solo quelle il cui file c'e' davvero.
+        $crediti = (string) ($GLOBALS['__project_root'] ?? '') . '/assets/img/takaoka/crediti.php';
+        $takaoka = array_values(array_filter(
+            is_file($crediti) ? (array) require $crediti : [],
+            static fn (array $c): bool => is_file(dirname($crediti) . '/' . $c['file'])
+        ));
+
         return Response::html(view('santuario', [
             'title'    => 'Izumi Matsumoto',
             'ritratti' => $ritratti,
+            'takaoka'  => $takaoka,
         ]));
     }
 

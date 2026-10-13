@@ -161,12 +161,15 @@ prova('i prossimi eventi arrivano in ordine', function () use ($TZ) {
 });
 
 prova('gli eventi scavallano la fine del ciclo', function () use ($TZ) {
-    // A fine marzo l'evento successivo è la cerimonia d'ingresso, che sta
-    // dall'altra parte del giro.
+    // A fine marzo l'evento successivo è il pesce d'aprile, che nel ciclo cade
+    // nel 1988 (aggiunto il 9 ottobre 2026); dal 2 aprile in poi è la cerimonia
+    // d'ingresso, che sta dall'altra parte del giro.
     $x = (new DateTimeImmutable('1988-03-28 10:00:00', $TZ))->getTimestamp();
     $e = Calendario::prossimiEventi($x, 1);
     uguale(1, count($e));
-    uguale('Cerimonia d\'ingresso', $e[0]['titolo']);
+    uguale('Pesce d\'aprile', $e[0]['titolo']);
+    $y = (new DateTimeImmutable('1988-04-02 10:00:00', $TZ))->getTimestamp();
+    uguale('Cerimonia d\'ingresso', Calendario::prossimiEventi($y, 1)[0]['titolo']);
 });
 
 prova('tutte le date degli eventi sono giorni veri', function () {

@@ -27,6 +27,50 @@ return [
             'detentore_id' => null,
             'luogo' => 'gradini',
             'gts' => 0,
+            'dimora' => 'gradini',
+        ],
+
+        // --- Gli oggetti del nonno, e quello di Akemi (9 ottobre 2026) --------
+        // Il regolamento del 1990 li chiama «artefatti»: cose cariche di
+        // energia esper. Due sono del nonno (capp. 107, 109-110; TV41), uno
+        // della madre di Kyosuke (capp. 150-151). Nessuno migliora una
+        // statistica; tutti cambiano una scena.
+        [
+            'okey' => 'orologio',
+            'nome' => 'L\'orologio da taschino del nonno',
+            'descrizione' => 'Argento annerito, il coperchio che si apre con uno scatto, e dentro '
+                . 'le lancette ferme su un\'ora qualunque. Se lo premi, il tempo si ferma per un '
+                . 'minuto per tutti tranne che per te: nessuno vede quello che fai. Poi va '
+                . 'ricaricato, e ci vogliono giorni. Il nonno l\'ha perso al tempio, e non se n\'è '
+                . 'ancora accorto.',
+            'detentore_id' => null,
+            'luogo' => 'tempio',
+            'gts' => 0,
+            'dimora' => 'tempio',
+        ],
+        [
+            'okey' => 'pappagallo',
+            'nome' => 'Il pappagallo del nonno',
+            'descrizione' => 'Verde, con una gabbietta che si porta a mano, e il vizio di gridare ad '
+                . 'alta voce quello che pensa chi gli sta vicino. Con lui accanto non c\'è gesto che '
+                . 'si possa fraintendere: lo dice lui, a tutti, cosa volevi dire. Il nonno l\'ha '
+                . 'lasciato in custodia al parco, e il parco non lo voleva.',
+            'detentore_id' => null,
+            'luogo' => 'parco',
+            'gts' => 0,
+            'dimora' => 'parco',
+        ],
+        [
+            'okey' => 'ciondolo',
+            'nome' => 'Il ciondolo di Akemi',
+            'descrizione' => 'Un ciondolo semplice, d\'argento, che la madre di Kyosuke aveva '
+                . 'lasciato perché fosse dato a una persona sola: quella che si sceglie. Come il '
+                . 'cappello, non serve a niente; diversamente dal cappello, chi lo riceve sa '
+                . 'benissimo cosa vuol dire.',
+            'detentore_id' => null,
+            'luogo' => 'albero',
+            'gts' => 0,
+            'dimora' => 'albero',
         ],
     ],
 ];

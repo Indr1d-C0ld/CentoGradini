@@ -431,6 +431,12 @@ final class Personaggio
      */
     public static function porta(array $pg, string $lkey): ?string
     {
+        // Alla Moebius si entra solo in coppia (FAQ 25): serve qualcuno accanto
+        // a te, adesso, che ci tenga abbastanza da venire con te.
+        if ($lkey === 'moebius') {
+            return self::inCoppia($pg) ? null
+                : 'Alla Moebius si entra solo in coppia: serve qualcuno qui con te che voglia venirci.';
+        }
         $l = Luoghi::uno($lkey);
         if ($l === null || !$l['privato']) {
             return null;
@@ -452,6 +458,18 @@ final class Personaggio
             }
         }
         return 'È una casa privata: ci si entra se qualcuno di casa è dentro e ti fa entrare.';
+    }
+
+    /** C'e' qui qualcuno che ti accompagnerebbe? */
+    private static function inCoppia(array $pg): bool
+    {
+        $soglia = GameConfig::int('legami.soglia_coppia', 25);
+        return Database::first(
+            "SELECT 1 x FROM legami l JOIN personaggi p ON p.id = l.da_id
+             WHERE l.a_id = ? AND l.affetto >= ? AND p.luogo = ? AND p.verso IS NULL
+               AND p.stato = 'attivo' AND p.id <> ? LIMIT 1",
+            [(int) $pg['id'], $soglia, (string) $pg['luogo'], (int) $pg['id']]
+        ) !== null;
     }
 
     /**

@@ -70,8 +70,18 @@ $luogo = $qui['luogo'];
   </div>
 <?php endif; ?>
 
+<?php foreach (\App\Core\Database::all(
+    "SELECT id, luogo FROM incidenti WHERE attore_id = ? AND stato = 'aperto' ORDER BY id", [(int) $pg['id']]) as $inc): ?>
+  <div class="avviso errore">
+    <strong>Ti hanno visto, <?= e(\App\Sim\Luoghi::dove((string) $inc['luogo'])) ?>.</strong>
+    Qualcuno aspetta una spiegazione, e se non gliela dai si terrà quello che ha visto.
+    <a href="<?= e(url('/incidente/' . (int) $inc['id'])) ?>">Rispondi →</a>
+  </div>
+<?php endforeach; ?>
+
 <?php $sogno = \App\Core\Database::first(
-    "SELECT testo FROM ricordi WHERE personaggio_id = ? AND episodio_id IS NULL AND titolo = 'Un sogno' AND gts > ?
+    "SELECT testo FROM ricordi WHERE personaggio_id = ? AND episodio_id IS NULL
+       AND titolo IN ('Un sogno', 'Il primo sogno dell''anno') AND gts > ?
      ORDER BY gts DESC LIMIT 1", [(int) $pg['id'], \App\Sim\Orologio::lineare() - 12 * 3600]); ?>
 <?php if ($sogno !== null): ?>
   <div class="nota calda">
@@ -143,6 +153,23 @@ $luogo = $qui['luogo'];
   <p class="tenue">Qui <?= e($qui['folla_dice'] ?? '') ?>.</p>
   <p><a href="<?= e(url('/luogo/' . $luogo['lkey'])) ?>">Guarda meglio →</a></p>
 </div>
+
+<?php foreach (\App\Game\Legami::oggettiDi((int) $pg['id']) as $o): if ($o['okey'] !== 'orologio') { continue; } ?>
+  <div class="carta">
+    <p class="occhiello">In tasca</p>
+    <h2 style="margin-top:0"><?= e($o['nome']) ?></h2>
+    <?php if ($o['pronto_gts'] !== null && (int) $o['pronto_gts'] > \App\Sim\Orologio::lineare()): ?>
+      <p class="tenue">È scarico. Si ricarica da solo, ma ci vogliono giorni.</p>
+    <?php else: ?>
+      <p class="tenue">Un minuto in cui nessuno vede niente di quello che fai. Poi va ricaricato.</p>
+      <form method="post" action="<?= e(url('/oggetto/usa')) ?>">
+        <?= csrf_field() ?>
+        <input type="hidden" name="oggetto" value="orologio">
+        <button type="submit" class="secondario">Premi il pulsante</button>
+      </form>
+    <?php endif; ?>
+  </div>
+<?php endforeach; ?>
 
 <?php foreach (\App\Game\Legami::oggettiQui((string) $pg['luogo']) as $o): ?>
   <div class="carta">

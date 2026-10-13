@@ -66,6 +66,39 @@ return [
            . 'È la sera dell\'anno in cui il quartiere è tutto nello stesso posto — e quella in cui '
            . 'conviene meno di tutte fare qualcosa di strano davanti alla gente.'),
 
+        // --- Aggiunti dal controllo del 9 ottobre 2026 --------------------------
+        // Le feste che l'opera racconta e che il calendario degli eventi non
+        // aveva: Tanabata (TV14; FAQ 60), l'Obon dai nonni (capp. 71-73; TV34),
+        // la festa delle bambole a casa Hiyama (cap. 49), il pesce d'aprile di
+        // Komatsu (cap. 104), e gli esami (capp. 9, 38, 48, 68, 119, 127-129).
+        $e('tanabata', 'Tanabata', 7, 7, 1, 'commerciale', 70, 75, 55,
+           'Le strisce di carta colorata appese ai bambù lungo la via, con un desiderio scritto '
+           . 'sopra. Si legge quello degli altri facendo finta di niente, e si scopre sempre una '
+           . 'cosa che non si doveva sapere.'),
+
+        $e('esami_luglio', 'Esami di luglio', 7, 13, 3, 'liceo', 40, 55, 58,
+           'Tre giorni in cui il quartiere sembra più vuoto: sono tutti in camera a ripassare, o a '
+           . 'fare finta.'),
+
+        $e('obon', 'Obon', 8, 13, 3, 'stazione', 65, 60, 72,
+           'Si torna al paese dei nonni. La stazione è piena di valigie e di famiglie, e chi resta '
+           . 'in città trova il quartiere mezzo vuoto e le lanterne accese sulle soglie.'),
+
+        $e('esami_maggio', 'Esami di metà trimestre', 5, 18, 3, 'liceo', 40, 55, 45,
+           'I primi esami dell\'anno. Chi non ha studiato lo sa da una settimana, e lo sa anche chi '
+           . 'gli siede accanto.'),
+
+        $e('esami_dicembre', 'Esami di fine trimestre', 12, 14, 3, 'liceo', 40, 55, 92,
+           'Gli ultimi prima delle feste. Dopo, la vigilia: e c\'è chi studia pensando solo a quella.'),
+
+        $e('hinamatsuri', 'Festa delle bambole', 3, 3, 1, 'casa_hiyama', 60, 70, 115,
+           'Le bambole sui ripiani rossi a casa Hiyama, dove la porta è sempre aperta, e il sake '
+           . 'dolce che è dolce e basta — dicono. Kurumi lo sa che non è vero.'),
+
+        $e('pesce_aprile', 'Pesce d\'aprile', 4, 1, 1, 'commerciale', 50, 85, 125,
+           'L\'unico giorno dell\'anno in cui le bugie sono permesse. Il problema è che il giorno '
+           . 'dopo nessuno si ricorda più quali erano.'),
+
         $e('mare', 'Al mare', 8, 5, 14, 'spiaggia', 75, 70, 70,
            'Le vacanze vere. Chi può ci va, e chi ci va torna con qualcosa da raccontare che nel '
            . 'quartiere nessuno ha visto: sono le voci che reggono meglio, perché non c\'è modo di '

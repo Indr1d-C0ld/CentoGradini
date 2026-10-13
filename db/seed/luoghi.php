@@ -89,6 +89,34 @@ return [
         ],
 
         // --- Orange Road ------------------------------------------------------
+        // --- Aggiunti dal controllo del 9 ottobre 2026 -------------------------------
+        // La discoteca Moebius (capp. 4, 12, 34, 54, 155; FAQ 25): il posto di
+        // Madoka prima di Kyosuke, dove si entra solo in coppia e dove ci sono
+        // i lenti. Il quartiere non aveva un ritrovo per la sera. Il punto
+        // della carta e' nostro: nel manga sta in centro, qui verso la stazione.
+        [
+            'lkey' => 'moebius', 'dove' => 'alla Moebius', 'nome' => 'Moebius',
+            'sottotitolo' => 'La discoteca dove si entra solo in coppia',
+            'descrizione' => 'Una porta nera in fondo a una scala che scende, un buttafuori che '
+                . 'guarda chi hai accanto prima di guardare te, e dentro le luci che girano e la '
+                . 'musica che ti arriva nello stomaco prima che nelle orecchie. A una certa ora '
+                . 'mettono i lenti, e chi è venuto in coppia scopre se lo era davvero.',
+            'tipo' => 'ritrovo', 'x' => 196, 'y' => 214,
+            'apre' => 1140, 'chiude' => 60, 'ordine' => 55,
+        ],
+        // Il cinema (capp. 6, 55, 70, 115, 119, 128, 148): «due biglietti» e'
+        // uno dei motori di trama piu' ricorrenti dell'opera.
+        [
+            'lkey' => 'cinema', 'dove' => 'al cinema', 'nome' => 'Il cinema',
+            'sottotitolo' => 'Due sale, le poltrone rosse e un\'insegna a cui manca una lettera',
+            'descrizione' => 'Fa un film d\'azione americano e una storia d\'amore giapponese, e '
+                . 'quale dei due si va a vedere dice già tutto. Al buio, a dieci centimetri da '
+                . 'qualcuno, per due ore non si può parlare: è il posto più facile e più difficile '
+                . 'del quartiere per stare vicini.',
+            'tipo' => 'ritrovo', 'x' => 268, 'y' => 392,
+            'apre' => 600, 'chiude' => 1350, 'ordine' => 58,
+        ],
+
         [
             'lkey' => 'abcb', 'dove' => 'all\'ABCB', 'nome' => 'ABCB',
             'sottotitolo' => 'Il bar sulla strada arancione',

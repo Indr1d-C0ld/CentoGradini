@@ -350,7 +350,10 @@ prova('il cappello si raccoglie dove sta, e si dà a chi è presente', function 
     $r = Legami::raccogli($a, 'cappello');
     vero($r['ok'], $r['error'] ?? '');
     uguale((int) $a['id'], (int) Legami::oggettoDi((int) $a['id'])['detentore_id']);
-    uguale([], Legami::oggettiQui(PALCO), 'e non è più per terra');
+    // Solo il cappello: sotto l'albero dei ricordi, dal 9 ottobre 2026, sta
+    // anche il ciondolo di Akemi.
+    uguale([], array_values(array_filter(Legami::oggettiQui(PALCO),
+        static fn (array $o): bool => $o['okey'] === 'cappello')), 'e non è più per terra');
 
     $prima = Legami::fra((int) $b['id'], (int) $a['id'])['affetto'];
     $r = Legami::passaOggetto(ric($a), (int) $b['id'], 'cappello');

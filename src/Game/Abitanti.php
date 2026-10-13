@@ -171,7 +171,7 @@ final class Abitanti
      */
     private const GESTI_PER_AFFETTO = [
         ['parlare', -10], ['ascoltare', 10], ['ombrello', 25], ['accompagnare', 30],
-        ['invitare', 35], ['regalo', 40], ['difendere', 40], ['bento', 45],
+        ['invitare', 35], ['regalo', 40], ['difendere', 40], ['bento', 45], ['curare', 20],
     ];
 
     /**
@@ -284,10 +284,13 @@ final class Abitanti
             if ($aff < $minimo || !isset($possibili[$gkey])) {
                 continue;
             }
-            if ($soloGentili && !in_array($gkey, ['parlare', 'ascoltare', 'ombrello', 'difendere'], true)) {
+            if ($soloGentili && !in_array($gkey, ['parlare', 'ascoltare', 'ombrello', 'difendere', 'curare'], true)) {
                 continue;
             }
             if ($gkey === 'difendere' && !$qualcunoContro) {
+                continue;
+            }
+            if ($gkey === 'curare' && !Stati::ha((int) $p['id'], 'raffreddore', $gts)) {
                 continue;
             }
             $candidati[] = $gkey;

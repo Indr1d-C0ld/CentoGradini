@@ -175,6 +175,8 @@ final class Legami
             // data scritta qui: prima erano due date diverse (15 e 20 marzo).
             'diploma'  => [in_array('diploma', array_column(Eventi::inCorso((int) $cal['gts']), 'ekey'), true),
                            'Si fa il giorno del diploma, e basta.'],
+            // Chi sta male lo si sa solo guardando la persona: si controlla in compi().
+            'malato'   => [true, null],
             default    => [true, null],
         };
     }
@@ -219,6 +221,15 @@ final class Legami
             Calendario::stato($gts), Meteo::a($gts));
         if (!$ok) {
             return ['ok' => false, 'error' => $perche ?? 'Non adesso.'];
+        }
+        if ((string) ($g['richiede'] ?? '') === 'malato' && !Stati::ha($versoId, 'raffreddore', $gts)) {
+            return ['ok' => false, 'error' => sprintf('%s sta benissimo.', $altro['nome'])];
+        }
+        // Il pappagallo del nonno grida a tutti quello che pensa chi gli sta
+        // vicino: con lui accanto nessun gesto si puo' fraintendere.
+        $pappagallo = self::tiene((int) $pg['id'], 'pappagallo');
+        if ($pappagallo) {
+            $g['ambiguo'] = 0;
         }
         $costo = (int) $g['costo_cuore'];
         if ((int) $pg['compostezza'] < $costo) {
@@ -269,6 +280,15 @@ final class Legami
 
         Personaggio::traccia((string) $pg['luogo'], (int) $pg['id'], 'gesto',
             self::riempi((string) $g['lettura_vera'], $pg, $altro), $gts, 60);
+        if ($gkey === 'curare') {
+            // Chi viene curato guarisce prima: il raffreddore se ne va.
+            Database::run("DELETE FROM stati WHERE personaggio_id = ? AND stato = 'raffreddore'", [$versoId]);
+        }
+        if ($pappagallo) {
+            Personaggio::traccia((string) $pg['luogo'], (int) $pg['id'], 'pappagallo', sprintf(
+                'Il pappagallo di %s ha gridato a tutti cosa voleva dire, e nessuno ha potuto capire male.',
+                Personaggio::nomeCompleto($pg)), $gts, 50);
+        }
 
         // Il gesto diventa una voce, e i presenti la sanno di prima mano
         // (F6). Un gesto ambiguo la fa nascere come «insieme» invece che
@@ -555,6 +575,50 @@ final class Legami
 
     // --- Il cappello -----------------------------------------------------------------------
 
+    /** Gli oggetti che, dati a qualcuno, dicono una cosa che non si dice a voce. */
+    public const OGGETTI_DEL_CUORE = ['cappello', 'ciondolo'];
+
+    /** Questo personaggio tiene in mano quell'oggetto? */
+    public static function tiene(int $pgId, string $okey): bool
+    {
+        return Database::first('SELECT 1 x FROM oggetti_unici WHERE okey = ? AND detentore_id = ?', [$okey, $pgId]) !== null;
+    }
+
+    /** @return list<array<string,mixed>> gli oggetti che ha in mano */
+    public static function oggettiDi(int $pgId): array
+    {
+        return Database::all('SELECT * FROM oggetti_unici WHERE detentore_id = ? ORDER BY okey', [$pgId]);
+    }
+
+    /**
+     * Usare un oggetto. Per ora solo l'orologio del nonno ha qualcosa da fare:
+     * «fermava il tempo per un minuto per tutti tranne che per chi lo premeva»
+     * (regolamento del 1990, ARTEFATTI; cap. 109, TV41). Poi va ricaricato.
+     *
+     * @return array{ok:bool, error?:string, racconto?:string}
+     */
+    public static function usaOggetto(array $pg, string $okey): array
+    {
+        if ($okey !== 'orologio') {
+            return ['ok' => false, 'error' => 'Non c\'è niente da fare con quello, se non tenerlo.'];
+        }
+        $o = Database::first('SELECT * FROM oggetti_unici WHERE okey = ? AND detentore_id = ?', [$okey, (int) $pg['id']]);
+        if ($o === null) {
+            return ['ok' => false, 'error' => 'Non ce l\'hai tu.'];
+        }
+        $gts = Orologio::lineare();
+        if ($o['pronto_gts'] !== null && (int) $o['pronto_gts'] > $gts) {
+            return ['ok' => false, 'error' => 'Lo premi e non succede niente: va ancora ricaricato. Ci vogliono giorni.'];
+        }
+        Stati::metti((int) $pg['id'], 'tempo_fermo', 2, $gts);
+        Database::run('UPDATE oggetti_unici SET pronto_gts = ? WHERE okey = ?',
+            [$gts + max(1, GameConfig::int('oggetti.orologio_giorni', 3)) * 86400, $okey]);
+        return ['ok' => true, 'racconto' => 'Premi il pulsante e il mondo si ferma: la gente a metà di un '
+            . 'passo, un uccello appeso in aria, il rumore che sparisce. Hai un minuto in cui nessuno vede '
+            . 'niente di quello che fai. Usalo bene: poi l\'orologio va ricaricato.'];
+    }
+
+
     /**
      * @return array{ok:bool, error?:string, racconto?:string}
      */
@@ -575,8 +639,9 @@ final class Legami
             return ['ok' => false, 'error' => 'Quella persona non è qui.'];
         }
         // Il cappello dice una cosa che non si ha il coraggio di dire a voce:
-        // a un parente non la si dice.
-        if (($parentela = Parentele::come($pg, $altro)) !== null) {
+        // a un parente non la si dice. Il ciondolo pure. L'orologio e il
+        // pappagallo del nonno invece si danno a chi si vuole, parenti compresi.
+        if (in_array($okey, self::OGGETTI_DEL_CUORE, true) && ($parentela = Parentele::come($pg, $altro)) !== null) {
             return ['ok' => false, 'error' => sprintf('È tu%s %s: il cappello vuol dire un\'altra cosa.',
                 (string) $altro['sesso'] === 'f' ? 'a' : 'o', $parentela)];
         }
@@ -638,7 +703,7 @@ final class Legami
     {
         $gts ??= Orologio::lineare();
         $persi = Database::all(
-            "SELECT o.okey, o.detentore_id, p.luogo AS dove_era
+            "SELECT o.okey, o.detentore_id, o.dimora, p.luogo AS dove_era
              FROM oggetti_unici o
              LEFT JOIN personaggi p ON p.id = o.detentore_id
              WHERE (o.detentore_id IS NULL AND o.luogo IS NULL)
@@ -647,23 +712,28 @@ final class Legami
 
         // E un terzo, trovato dal controllo del 9 ottobre: dato a un abitante,
         // l'oggetto restava da lui per sempre — gli abitanti non lo passano a
-        // nessuno. Dopo qualche giorno lo riportano dove si trova di solito,
-        // sui gradini, e chi lo cerca sa dove andare a guardarlo.
+        // nessuno. Dopo qualche giorno lo riportano dove si trova di solito —
+        // la sua `dimora`: i gradini per il cappello, il tempio per l'orologio
+        // — e chi lo cerca sa dove andare a guardarlo. Si contano a parte: un
+        // oggetto riportato a casa e' gia' a posto, e mescolarlo ai persi lo
+        // faceva spostare una seconda volta.
+        $riportati = 0;
         $giorni = max(1, GameConfig::int('oggetti.png_giorni', 3));
         foreach (Database::all(
-            "SELECT o.okey, p.id, p.nome, p.cognome, p.sesso, p.luogo FROM oggetti_unici o
+            "SELECT o.okey, o.dimora, p.id, p.nome, p.cognome, p.sesso, p.luogo FROM oggetti_unici o
              JOIN personaggi p ON p.id = o.detentore_id
              WHERE p.png IS NOT NULL AND p.stato = 'attivo' AND o.gts <= ?",
             [$gts - $giorni * 86400]
         ) as $o) {
+            $casa = (string) ($o['dimora'] ?? '') !== '' ? (string) $o['dimora'] : 'gradini';
             Database::run(
                 'UPDATE oggetti_unici SET detentore_id = NULL, luogo = ?, gts = ? WHERE okey = ?',
-                ['gradini', $gts, (string) $o['okey']]
+                [$casa, $gts, (string) $o['okey']]
             );
-            Personaggio::traccia('gradini', (int) $o['id'], 'oggetto', accorda(sprintf(
-                '%s è salit{o} fin quassù e ha lasciato una cosa sul muretto, come si rimette a posto '
+            Personaggio::traccia($casa, (int) $o['id'], 'oggetto', accorda(sprintf(
+                '%s è passat{o} di qui e ha lasciato una cosa al suo posto, come si rimette a posto '
                 . 'una cosa che non è tua.', Personaggio::nomeCompleto($o)), $o), $gts, 70);
-            $persi[] = $o;
+            $riportati++;
         }
         foreach ($persi as $o) {
             $ultimo = Database::first(
@@ -671,7 +741,7 @@ final class Legami
                 [(string) $o['okey']]
             );
             $dove = (string) ($o['dove_era'] ?? '') !== '' ? (string) $o['dove_era']
-                : (string) ($ultimo['luogo'] ?? 'gradini');
+                : (string) ($ultimo['luogo'] ?? ((string) ($o['dimora'] ?? '') !== '' ? $o['dimora'] : 'gradini'));
             // Nessuna riga in oggetti_passaggi: quella tabella registra chi DA' a
             // chi, e qui non riceve nessuno (a_id non ammette NULL, e una prima
             // versione che ci provava faceva fallire il trasloco intero).
@@ -680,7 +750,7 @@ final class Legami
                 [$dove, $gts, (string) $o['okey']]
             );
         }
-        return count($persi);
+        return count($persi) + $riportati;
     }
 
     /** @return array<string,mixed>|null */

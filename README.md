@@ -171,12 +171,14 @@ l'opera non ha. Fonti in `docs/CANONE.md` §7-quater.
 
 ### 3. Il quartiere, e le voci
 
-Il quartiere è **ventitré luoghi** con orari, stagionalità e tempi di percorrenza
+Il quartiere è **venticinque luoghi** con orari, stagionalità e tempi di percorrenza
 veri, disegnati su una carta. Il liceo è chiuso in agosto, la spiaggia esiste
 solo d'estate, il luna park apre alle dieci, e la grande scalinata non la fa
 quasi nessuno — c'è una scaletta più comoda dietro la collina, ed è per questo
 che in cima si riesce sempre a stare da soli. Nelle **case private** si entra solo
-se qualcuno di casa è dentro e ti vuole abbastanza bene da farti entrare.
+se qualcuno di casa è dentro e ti vuole abbastanza bene da farti entrare; alla
+**Moebius**, la discoteca, solo in coppia. E c'è il **cinema**, dove si va in due
+e ci si ritrova in quattro.
 
 Gli orari sono dei **locali**, non delle strade: la sera la via commerciale abbassa
 le saracinesche ma ci si passa lo stesso, perché è la strada per la stazione. E
@@ -242,6 +244,29 @@ entro la finestra non blocca la storia: un **agente autonomo** sceglie per lui
 pesando le opzioni sulla sua scheda, così un timido resta timido anche quando a
 giocarlo è il motore.
 
+Gli episodi sono **ventisei copioni**, e sedici vengono dritti dall'opera, con il
+capitolo o la puntata da cui nascono: il **doppio appuntamento** in via commerciale,
+il **turno al bancone** dell'ABCB col professore che entra a prendere un caffè, la
+**sera prima dell'esame**, la **prova di coraggio** al tempio nelle notti d'estate,
+l'asso di cuori di Komatsu, la **lettera nella scarpiera sbagliata**, il **terzo
+Natale** sui gradini, il **mondo senza Hikaru** che arriva una giornata su dieci con
+la nebbia, l'isola davanti alla spiaggia, la funivia ferma a metà, il treno per il
+paese dei nonni, le strisce di carta di **Tanabata**, il **sake dolce** della festa
+delle bambole, il giorno delle bugie, i **lenti** alla Moebius e i due biglietti
+del cinema. Il calendario li accende: le feste e gli esami sono eventi, e una
+storia può chiedere la vigilia di un esame, o un'estate di notte.
+
+Dentro una scena, chi ha un potere può **usarlo**: è la soluzione più rapida, e la
+tentazione del manga. Passa per il Segreto, quindi chi è lì può vedere, e chi vede
+apre un incidente da coprire. Chi non c'è non usa poteri: il personaggio fa quello
+che avrebbe fatto, ma una cosa che può farlo traslocare la decide il giocatore.
+
+E ci sono quattro **oggetti unici**, uno per server: il cappello di paglia, il
+**ciondolo di Akemi** — da dare a una persona sola —, l'**orologio del nonno**, che
+ferma il tempo per un minuto e poi va ricaricato, e il suo **pappagallo**, che grida
+a tutti cosa vuoi dire e non lascia fraintendere niente. A chi ha la febbre si può
+portare da mangiare, e guarisce prima. Il primo sogno dell'anno lo fanno tutti.
+
 Quello che resta finisce nell'**album dei ricordi**, ognuno con la sua
 illustrazione generata dal luogo, dalla stagione, dall'ora e dal tempo che
 faceva. E si può **portare via**: il diario completo di un personaggio si
@@ -305,18 +330,19 @@ progetto esiste.
 
 | | |
 |---:|:---|
-| **23** | luoghi, con **82** collegamenti, orari, stagionalità e vedute |
+| **25** | luoghi, con **90** collegamenti, orari, stagionalità e vedute |
 | **16** | abitanti canonici che girano per il quartiere da soli, e fanno gesti |
 | **17** | poteri esper, con vistosità e Controllo |
 | **24** | tratti di personalità, riscritti nel Giappone del 1987 |
-| **10** | gesti fra personaggi, quasi tutti ambigui per costruzione |
+| **11** | gesti fra personaggi, quasi tutti ambigui per costruzione |
 | **10** | club scolastici |
-| **14** | eventi stagionali di server |
-| **10** | copioni di episodi |
-| **69** | manopole di configurazione, tutte lette da qualcuno |
-| **20** | migrazioni |
-| **85** | rotte |
-| **507** | verifiche su 17 file di prova (16 unitari + 1 end-to-end) |
+| **21** | eventi stagionali di server |
+| **26** | copioni di episodi, sedici presi dall'opera |
+| **4** | oggetti unici, uno per server |
+| **71** | manopole di configurazione, tutte lette da qualcuno |
+| **21** | migrazioni |
+| **86** | rotte |
+| **522** | verifiche su 17 file di prova (16 unitari + 1 end-to-end) |
 
 ### Le schermate
 
@@ -336,7 +362,7 @@ Il pannello, per chi amministra: `/admin` il cruscotto · `/admin/utenti` e
 `/admin/utente/{id}` gli account, i personaggi e la moderazione ·
 `/admin/mappa` la carta con le presenze · `/admin/statistiche` ·
 `/admin/comunicazioni` i fili con i giocatori · `/admin/fotografie` il muro delle
-facce · `/admin/abitanti` i sedici del canone e i loro ritratti · `/admin/accessi` le provenienze · `/admin/impostazioni` le sessantanove leve.
+facce · `/admin/abitanti` i sedici del canone e i loro ritratti · `/admin/accessi` le provenienze · `/admin/impostazioni` le settantuno leve.
 
 È anche una **PWA**: si installa, e il service worker tiene in tasca il guscio
 del sito. Non mette mai in cache le pagine di gioco — il quartiere cambia ogni
@@ -823,6 +849,14 @@ Annotate qui perché non si ripetano.
    torna falsa, e se non torna mai serve un limite a parte: qui, che la stessa
    storia non torni alla stessa persona prima di dieci giorni.
 
+31. **Una prova che si aspetta il valore di ripiego non prova niente.** Un abitante
+   che riceveva un oggetto lo riportava, dopo qualche giorno, «sui gradini»; la
+   prova controllava che il cappello finisse sui gradini, e passava. Ma l'oggetto
+   veniva poi spostato una seconda volta da un altro ramo del codice, il cui
+   ripiego era — appunto — i gradini. Se n'è accorta la prova dell'orologio, la
+   cui casa è il tempio. Quando il risultato giusto coincide con il ripiego, la
+   prova va fatta su un caso in cui non coincidono.
+
 ## Licenza e diritti
 
 Il codice di Cento Gradini è distribuito sotto **GNU General Public License v3.0
@@ -842,3 +876,9 @@ diritti.
 *Whimsical Orange Road: The Role-Playing Game* v3.0 (1990) è di «Totoro Hunter
 Leto II». Cento Gradini ne è una trasposizione riscritta da zero: né il
 regolamento originale né la nostra traduzione sono inclusi qui.
+
+Le **fotografie della Takaoka vera** nella sala dedicata a Matsumoto (`/santuario`)
+vengono da Wikimedia Commons, con licenza CC BY, CC BY-SA o di pubblico dominio:
+sono ridimensionate e convertite in WebP, e autore, licenza e fonte di ciascuna
+stanno sotto la foto e in `assets/img/takaoka/crediti.php`. Restano dei loro
+autori e si ridistribuiscono alle loro condizioni, non a quelle del codice.

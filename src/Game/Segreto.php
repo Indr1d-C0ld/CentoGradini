@@ -114,10 +114,16 @@ final class Segreto
 
         $vistosita = (int) $potere['vistosita'];
         $folla     = Folla::a($luogo, $gts);
+        // L'orologio del nonno: per un minuto il tempo e' fermo per tutti
+        // tranne che per chi l'ha premuto. Nessuno vede, nemmeno la folla.
+        $tempoFermo = Stati::ha((int) $pg['id'], 'tempo_fermo', $gts);
+        if ($tempoFermo) {
+            $folla = 0;
+        }
         // Chi è presente e NON sa già: chi sa non si stupisce più. E chi
         // viene ipnotizzato non vede niente: è proprio il punto.
         $cieco     = Poteri::nonVede($pkey, $scelta);
-        $presenti  = array_values(array_filter(self::testimoniPossibili($pg, $luogo),
+        $presenti  = $tempoFermo ? [] : array_values(array_filter(self::testimoniPossibili($pg, $luogo),
             static fn (array $t): bool => (int) $t['id'] !== $cieco));
         // Il calore del posto: dove girano storie la gente guarda (PROGETTO §7).
         // E chi è invisibile si fa notare un quinto.

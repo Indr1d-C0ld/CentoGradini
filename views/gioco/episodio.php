@@ -36,7 +36,7 @@ $scene = json_decode((string) $ep['scene'], true);
 <?php if ($mia === null): ?>
 <div class="carta">
   <p class="occhiello">Cosa fai</p>
-  <?php foreach ($scena['opzioni'] as $o): ?>
+  <?php foreach (\App\Game\Episodi::opzioniPer($pg, $scena['opzioni']) as $o): ?>
     <form method="post" action="<?= e(url('/episodio/scegli')) ?>" class="riga-scelta">
       <?= csrf_field() ?>
       <input type="hidden" name="episodio" value="<?= (int) $ep['id'] ?>">
@@ -44,7 +44,9 @@ $scene = json_decode((string) $ep['scene'], true);
       <div>
         <b><?= e($o['testo']) ?></b>
         <span class="tenue">
-          <?php if (($o['prova'] ?? 'nessuna') === 'nessuna'): ?>
+          <?php if (($o['potere'] ?? '') !== ''): ?>
+            usi un potere — chi è qui può vedere
+          <?php elseif (($o['prova'] ?? 'nessuna') === 'nessuna'): ?>
             riesce comunque
           <?php else: ?>
             si tira su <?= e(Scheda::NOMI[$o['prova']] ?? $o['prova']) ?>

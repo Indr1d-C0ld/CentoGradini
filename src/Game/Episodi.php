@@ -96,6 +96,16 @@ final class Episodi
 
     private static function condizioneSoddisfatta(string $cond, int $gts): bool
     {
+        // «estate+notte»: tutte insieme. Una storia che succede solo in
+        // un'estate di notte non si scrive con una condizione sola.
+        if (str_contains($cond, '+')) {
+            foreach (explode('+', $cond) as $parte) {
+                if (!self::condizioneSoddisfatta(trim($parte), $gts)) {
+                    return false;
+                }
+            }
+            return true;
+        }
         $cal = Calendario::stato($gts);
         $met = Meteo::a($gts);
         return match ($cond) {
@@ -118,6 +128,14 @@ final class Episodi
                 'SELECT 1 FROM voci_versioni WHERE passaggi >= 3 LIMIT 1') !== null,
             // Qualunque evento stagionale in corso.
             'festa'     => Eventi::inCorso($gts) !== [],
+            // L'ora: «sera» dal tramonto, «notte» quando e' buio davvero.
+            'sera'      => in_array($cal['fase'], ['sera', 'notte'], true),
+            'notte'     => Meteo::notte($gts),
+            // Una giornata su dieci, la stessa per tutto il quartiere: per le
+            // storie che non devono succedere spesso, come il mondo senza
+            // Hikaru. Si ancora al giorno, quindi dura tutto il giorno.
+            'raro'      => Rng::for(GameConfig::int('world.seed', 19870406), 'giorno-raro',
+                               intdiv($gts, 86400))->int(1, 10) === 1,
             default     => self::condizioneEvento($cond, $gts),
         };
     }
@@ -132,12 +150,25 @@ final class Episodi
      */
     private static function condizioneEvento(string $cond, int $gts): bool
     {
+        // «vigilia:esami»: l'evento comincia domani. La sera prima dell'esame
+        // e' una storia; l'esame no. Il nome vale come prefisso, cosi'
+        // «esami» copre gli esami di maggio, di luglio e di dicembre.
+        if (str_starts_with($cond, 'vigilia:')) {
+            $ekey = substr($cond, 8);
+            foreach (Eventi::inCorso($gts + 86400) as $e) {
+                if (str_starts_with((string) $e['ekey'], $ekey)
+                    && !in_array((string) $e['ekey'], array_column(Eventi::inCorso($gts), 'ekey'), true)) {
+                    return true;
+                }
+            }
+            return false;
+        }
         if (!str_starts_with($cond, 'evento:')) {
             return false;
         }
         $ekey = substr($cond, 7);
         foreach (Eventi::inCorso($gts) as $e) {
-            if ((string) $e['ekey'] === $ekey) {
+            if ((string) $e['ekey'] === $ekey || str_starts_with((string) $e['ekey'], $ekey . '_')) {
                 return true;
             }
         }
@@ -287,7 +318,7 @@ final class Episodi
         if ($scena === null) {
             return ['ok' => false, 'error' => 'Non c\'è nessuna scena da giocare.'];
         }
-        $valide = array_column($scena['opzioni'], 'k');
+        $valide = array_column(self::opzioniPer($pg, $scena['opzioni']), 'k');
         if (!in_array($opzione, $valide, true)) {
             return ['ok' => false, 'error' => 'Quella scelta non c\'è.'];
         }
@@ -307,6 +338,20 @@ final class Episodi
         // Se hanno scelto tutti, la scena si chiude senza aspettare il tempo.
         self::forseRisolvi($epId);
         return ['ok' => true];
+    }
+
+    /**
+     * Le opzioni che questo personaggio puo' scegliere: quelle che chiedono un
+     * potere solo a chi ce l'ha.
+     *
+     * @param list<array<string,mixed>> $opzioni
+     * @return list<array<string,mixed>>
+     */
+    public static function opzioniPer(array $pg, array $opzioni): array
+    {
+        $miei = array_column(Scheda::poteri((int) $pg['id']), 'pkey');
+        return array_values(array_filter($opzioni,
+            static fn (array $o): bool => ($o['potere'] ?? '') === '' || in_array($o['potere'], $miei, true)));
     }
 
     /** Risolve se tutti hanno scelto, oppure se la finestra è scaduta. */
@@ -372,8 +417,24 @@ final class Episodi
                 continue;
             }
 
-            $riuscita = self::tira($pg, $o, $epId, $scenaN);
+            // Un'opzione che chiede un potere lo usa davvero, con i suoi rischi:
+            // e' la tentazione del manga, la soluzione piu' rapida che crea un
+            // problema piu' grande. Passa per Segreto::usa(), quindi chi e' li'
+            // puo' vedere, e chi ha visto apre un incidente da coprire. Se il
+            // potere non parte (punti potere finiti, qualcuno lo spegne) la
+            // scelta va come se fosse andata male.
+            $potereUsato = null;
+            if (($o['potere'] ?? '') !== '') {
+                $uso = Segreto::usa($pg, (string) $o['potere']);
+                $riuscita = $uso['ok'] && !($uso['spento'] ?? false);
+                $potereUsato = $uso;
+            } else {
+                $riuscita = self::tira($pg, $o, $epId, $scenaN);
+            }
             $racconto = accorda($riuscita ? (string) $o['ok'] : (string) ($o['ko'] ?: $o['ok']), $pg);
+            if ($potereUsato !== null && ($potereUsato['notato'] ?? false)) {
+                $racconto .= ' Qualcuno ha visto.';
+            }
             Database::run(
                 'UPDATE episodio_scelte SET riuscita = ?, racconto = ?
                  WHERE episodio_id = ? AND scena = ? AND personaggio_id = ?',
@@ -443,6 +504,12 @@ final class Episodi
         $punteggioMigliore = -INF;
         $rng = Rng::for(GameConfig::int('world.seed', 19870406), 'agente', $epId, $scena, (int) $pg['id']);
 
+        // Chi non c'e' non usa poteri: il personaggio fa quello che avrebbe
+        // fatto, ma una cosa che puo' farlo traslocare la decide il giocatore.
+        $senzaPoteri = array_values(array_filter($opzioni, static fn (array $o): bool => ($o['potere'] ?? '') === ''));
+        if ($senzaPoteri !== []) {
+            $opzioni = $senzaPoteri;
+        }
         foreach ($opzioni as $o) {
             $p = 0.0;
             foreach ((array) ($o['peso'] ?? []) as $campo => $quanto) {
@@ -497,6 +564,10 @@ final class Episodi
                 'pp' => Database::run(
                     'UPDATE personaggi SET pp = GREATEST(0, LEAST(pp_max, pp + ?)) WHERE id = ?',
                     [$quanto, $id]),
+                // Gli stati del 1990: il sake dolce dell'Hinamatsuri (cap. 49),
+                // un bagno nel lago con i vestiti addosso. Il numero sono i minuti.
+                'brillo'      => Stati::metti($id, 'brillo', max(1, $quanto), $gts),
+                'raffreddore' => Stati::metti($id, 'raffreddore', max(1, $quanto), $gts),
                 // Il calore scende anche: «smentire», «dire la verità»,
                 // «renderla ridicola» sono le scelte che calmano un posto, e
                 // prima un valore negativo valeva zero — le otto opzioni fatte

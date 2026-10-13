@@ -6,7 +6,7 @@
  * @var list<array<string,mixed>> $gesti
  * @var array{affetto:int,fraintendimento:int} $mio
  * @var array{affetto:int,fraintendimento:int} $loro
- * @var array<string,mixed>|null $oggetto
+ * @var list<array<string,mixed>> $oggetti
  */
 use App\Game\Legami;
 use App\Game\Ritratto;
@@ -117,7 +117,7 @@ $soglia = GameConfig::int('legami.soglia_confessione', 45);
   </p>
 </div>
 
-<?php if ($oggetto !== null): ?>
+<?php foreach ($oggetti as $oggetto): ?>
 <div class="carta">
   <p class="occhiello">Hai una cosa in mano</p>
   <h3 style="margin-top:0"><?= e($oggetto['nome']) ?></h3>
@@ -130,7 +130,7 @@ $soglia = GameConfig::int('legami.soglia_confessione', 45);
     <button type="submit">Daglielo</button>
   </form>
 </div>
-<?php endif; ?>
+<?php endforeach; ?>
 
 <?php if ($mio['affetto'] >= $soglia): ?>
 <div class="carta confessione">

@@ -92,6 +92,7 @@ $router->post('/chiarisci', [LegamiController::class, 'chiarisci'], ['active', '
 $router->post('/confessa', [LegamiController::class, 'confessa'], ['active', 'quartiere', 'throttle']);
 $router->post('/oggetto/passa', [LegamiController::class, 'passaOggetto'], ['active', 'quartiere', 'throttle']);
 $router->post('/oggetto/raccogli', [LegamiController::class, 'raccogliOggetto'], ['active', 'quartiere', 'throttle']);
+$router->post('/oggetto/usa', [LegamiController::class, 'usaOggetto'], ['active', 'quartiere', 'throttle']);
 
 // --- Gli episodi ------------------------------------------------------------------
 $router->get('/episodio', [EpisodiController::class, 'corrente'], ['active', 'quartiere']);

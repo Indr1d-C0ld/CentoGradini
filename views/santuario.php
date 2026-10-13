@@ -3,6 +3,7 @@
  * Il santuario: la sala dedicata a Izumi Matsumoto.
  *
  * @var list<array{file:string,didascalia:string}> $ritratti
+ * @var list<array<string,string>> $takaoka
  */
 ?>
 <p class="occhiello">1958 — 2020</p>
@@ -37,14 +38,47 @@
   </p>
   <p>
     Questo dettaglio biografico è anche la cosa più sorprendente che abbiamo trovato mentre
-    costruivamo il quartiere di questo gioco. La scalinata dove Kyosuke incontra Madoka è la
-    gradinata di pietra del <strong>parco Takaoka Kojō</strong>. La scuola è la <strong>media
-    Kōryō</strong>. Il bar ABCB è un ristorante che si chiamava <strong>ABAB</strong>. La
-    stazione è <strong>Etchū-Nakagawa</strong>, sulla linea Himi. Matsumoto non ha inventato
-    una periferia di Tokyo: ha disegnato i posti in cui era cresciuto e li ha chiamati con un
-    altro nome. Chi gioca qui dentro cammina nella sua infanzia.
+    costruivamo il quartiere di questo gioco. La scalinata dove Kyosuke incontra Madoka è una
+    gradinata di pietra del <strong>parco Takaoka Kojō</strong>. Il bar ABCB è un ristorante che
+    si chiamava <strong>ABAB</strong>. E si dice — le fonti lo riportano così, senza
+    giurarci — che la scuola sia la <strong>media Kōryō</strong> e la stazione
+    <strong>Etchū-Nakagawa</strong>, sulla linea Himi. Matsumoto non ha inventato una periferia
+    di Tokyo: ha disegnato i posti in cui era cresciuto e li ha chiamati con un altro nome. Chi
+    gioca qui dentro cammina nella sua infanzia.
   </p>
 </div>
+
+<?php if ($takaoka !== []): ?>
+<div class="carta">
+  <h2>Il quartiere vero</h2>
+  <p>
+    Takaoka com'è, e com'era. Non c'è la scalinata dei cento gradini: le fonti dicono che è una
+    gradinata del parco Kojō, ma nessuna dice quale, e una fotografia presa a caso e spacciata
+    per quella sarebbe proprio l'errore che questa sala non vuole fare.
+  </p>
+  <div class="galleria galleria-takaoka">
+    <?php foreach ($takaoka as $fo): ?>
+      <figure>
+        <img src="<?= e(asset('img/takaoka/' . $fo['file'])) ?>" alt="<?= e($fo['didascalia']) ?>" loading="lazy">
+        <figcaption>
+          <?= e($fo['didascalia']) ?>
+          <span class="credito">
+            <?= e($fo['anno']) ?> · <?= e($fo['autore']) ?> ·
+            <?php if ($fo['licenza_url'] !== ''): ?>
+              <a href="<?= e($fo['licenza_url']) ?>" rel="license noopener" target="_blank"><?= e($fo['licenza']) ?></a>
+            <?php else: ?><?= e(mb_strtolower($fo['licenza'])) ?><?php endif; ?>
+            · <a href="<?= e($fo['origine']) ?>" rel="noopener" target="_blank">Wikimedia Commons</a>
+          </span>
+        </figcaption>
+      </figure>
+    <?php endforeach; ?>
+  </div>
+  <p class="aiuto">
+    Fotografie da Wikimedia Commons, con licenza libera o di pubblico dominio; ridimensionate e
+    convertite per il web. Autore e licenza sono sotto ciascuna.
+  </p>
+</div>
+<?php endif; ?>
 
 <div class="carta">
   <h2>La musica che non ha fatto</h2>
