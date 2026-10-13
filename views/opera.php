@@ -21,7 +21,12 @@ foreach ($immagini as $im) { $perGruppo[$im['gruppo']][] = $im; }
              alt="<?= e($im['didascalia'] !== '' ? $im['didascalia'] : 'Kimagure Orange Road') ?>"
              loading="lazy">
         <?php if ($im['didascalia'] !== ''): ?>
-          <figcaption><?= e($im['didascalia']) ?></figcaption>
+          <figcaption>
+            <?= e($im['didascalia']) ?>
+            <?php if (($im['fonte'] ?? '') !== ''): ?>
+              <a href="<?= e($im['fonte']) ?>" rel="noopener" target="_blank">fonte</a>
+            <?php endif; ?>
+          </figcaption>
         <?php endif; ?>
       </figure>
     <?php endforeach; ?>
@@ -33,7 +38,10 @@ foreach ($immagini as $im) { $perGruppo[$im['gruppo']][] = $im; }
     Le immagini sono tavole del manga e fotogrammi della serie animata: i diritti restano di
     <strong>Izumi Matsumoto</strong>, di Shūeisha e di Studio Pierrot. Sono qui in un omaggio
     senza scopo di lucro, a scopo di commento e riconoscimento dell'opera, e vengono rimosse
-    su richiesta di chi ne detiene i diritti.
+    su richiesta di chi ne detiene i diritti. Le abbiamo trovate su
+    <a href="http://madoka.ayukawa.free.fr/kor.htm" rel="noopener" target="_blank"><em>Kimagure Orange
+    Road Music Hall</em></a>, il sito di CyberFred, che da più di vent'anni raccoglie e studia l'opera
+    — ed è anche una delle fonti principali di questo gioco.
   </p>
 <?php else: ?>
   <div class="nota">

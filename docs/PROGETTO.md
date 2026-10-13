@@ -522,6 +522,8 @@ Dopo F7 si aggiunge contenuto e comodità, non impalcatura. In ordine di arrivo:
   Obon, la festa delle bambole, il pesce d'aprile, tre sessioni d'esame); la Moebius e il cinema;
   il gesto «prendersi cura»; l'orologio, il pappagallo e il ciondolo; il primo sogno dell'anno.
   E nella sala del maestro, dieci fotografie libere della Takaoka vera (`assets/img/takaoka/`).
+  Il 13 ottobre, la galleria di `/opera`: otto immagini dell'opera scelte dall'utente sul sito di
+  CyberFred, con didascalia e fonte (`assets/img/opera/didascalie.php`); solo nel repo privato.
 - **Le comunicazioni** (migrazione `0016`): filo diretto fra la gestione e un giocatore, nei
   due sensi, con avviso per posta che non ripete il messaggio. Non è finzione e non si
   traveste da tale — vedi la nota in testa a `src/Game/Comunicazioni.php`.

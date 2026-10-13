@@ -882,3 +882,11 @@ vengono da Wikimedia Commons, con licenza CC BY, CC BY-SA o di pubblico dominio:
 sono ridimensionate e convertite in WebP, e autore, licenza e fonte di ciascuna
 stanno sotto la foto e in `assets/img/takaoka/crediti.php`. Restano dei loro
 autori e si ridistribuiscono alle loro condizioni, non a quelle del codice.
+
+Nell'installazione in esercizio, la galleria di `/opera` mostra otto immagini
+dell'opera — la copertina del *Weekly Shōnen Jump* del debutto, le copertine dei
+diciotto volumi, due tavole dell'edizione giapponese e quattro fotogrammi della
+serie — trovate sul sito di CyberFred, *Kimagure Orange Road Music Hall*, con
+didascalia e fonte per ciascuna. Sono materiale protetto, in un omaggio senza
+scopo di lucro: per questo restano fuori dalla copia pubblica del repository, e
+chi installa il gioco ne trova le istruzioni in `assets/img/opera/`.

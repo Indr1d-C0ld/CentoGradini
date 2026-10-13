@@ -65,10 +65,13 @@ final class HomeController
      * Le immagini di una cartella, ordinate e con la didascalia dedotta dal
      * nome del file.
      *
-     * @return list<array{file:string, didascalia:string, gruppo:string}>
+     * @return list<array{file:string, didascalia:string, gruppo:string, fonte:string}>
      */
     private static function galleria(string $dir): array
     {
+        // Le didascalie scritte a mano, quando il nome del file non basta: un
+        // nome di file non porta accenti, apostrofi ne' la fonte.
+        $scritte = is_file($dir . '/didascalie.php') ? (array) require $dir . '/didascalie.php' : [];
         $out = [];
         foreach (glob($dir . '/*.{jpg,jpeg,png,webp,gif}', GLOB_BRACE) ?: [] as $f) {
             $nome   = basename($f);
@@ -90,7 +93,9 @@ final class HomeController
             $out[] = [
                 'file'       => $nome,
                 'gruppo'     => $gruppo,
-                'didascalia' => $did === '' ? '' : mb_strtoupper(mb_substr($did, 0, 1)) . mb_substr($did, 1),
+                'didascalia' => (string) ($scritte[$nome]['didascalia']
+                    ?? ($did === '' ? '' : mb_strtoupper(mb_substr($did, 0, 1)) . mb_substr($did, 1))),
+                'fonte'      => (string) ($scritte[$nome]['fonte'] ?? ''),
             ];
         }
         usort($out, static fn (array $a, array $b): int => strcmp($a['file'], $b['file']));
